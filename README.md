@@ -1,1 +1,2 @@
-Prometheus Exporter for vRealize Operations Manager
+# vrops-exporter
+Prometheus exporter to scrape metrics from vRealize Operations Manager
