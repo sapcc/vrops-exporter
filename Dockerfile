@@ -6,7 +6,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install --ignore-installed six
 RUN pip install --upgrade cffi
 
-ADD . vasa-exporter/
+ADD . vrops-exporter/
 RUN pip3 install --upgrade -r vrops-exporter/requirements.txt
 
 WORKDIR vrops-exporter/
