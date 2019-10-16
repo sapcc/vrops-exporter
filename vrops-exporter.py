@@ -14,8 +14,7 @@ if __name__ == '__main__':
     # Debug option
     os.environ['DEBUG'] = '0'
     if config['debug'] is True:
-        os.environ['DEBUG'] = '1'
-    print(os.environ['DEBUG'])
+        os.environ['DEBUG'] = '1'print(os.environ['DEBUG'])
 
     # Start the Prometheus http server.
     start_http_server(config['port'])

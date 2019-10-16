@@ -66,7 +66,7 @@ class VropsCollector:
         response = requests.get(url, auth=HTTPBasicAuth(self._user, self._password), verify=False, params=querystring,
                                 headers=headers)
 
-        if os.environ['DEBUG'] and os.environ['DEBUG'] == '1':
+        if os.environ['DEBUG'] == '1':
             print(response)
 
         json_response = response.json()
