@@ -1,12 +1,12 @@
-import requests
 import json
 import os
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from requests.auth import HTTPBasicAuth
-from prometheus_client.core import GaugeMetricFamily
+import importlib
+import sys
+sys.path.append('./module')
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
-from urllib.parse import urlparse, parse_qs, parse_qsl
+from urllib.parse import urlparse, parse_qs
+import tools.get_modules
 
 
 def do_GET(self):
@@ -51,37 +51,16 @@ class VropsCollector:
         self._target = target
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
+        modules = tools.get_modules.get_modules()
+        self._modules = modules[1]
+        self._modules_dict = dict()
+        for module in self._modules:
+            self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def collect(self):
-        if os.environ['DEBUG'] == '1':
-            print('started')
+        for target in self._modules_dict.keys():
+            mod = self._modules_dict[target]
+            func = getattr(mod, target)
+            res = func(self._target, self._user, self._password).collect()
+            yield res
 
-        url = "https://" + self._target + "/suite-api/api/resources"
-        querystring = {"resourceKind": "host"}
-        headers = {
-            'Content-Type': "application/json",
-            'Accept': "application/json"
-        }
-
-        response = requests.get(url, auth=HTTPBasicAuth(self._user, self._password), verify=False, params=querystring,
-                                headers=headers)
-
-        if os.environ['DEBUG'] == '1':
-            print(response)
-
-        json_response = response.json()
-        for resource in json_response["resourceList"]:
-            print(resource["identifier"], resource["resourceKey"]["name"])
-
-        if os.environ['DEBUG'] == '1':
-            print("Completed")
-
-        entityname = "vmentityname"
-
-        g = GaugeMetricFamily('vrops_ressource_gauge', 'Gauge Collector for vRops',
-                              labels=['target', 'entityname'])
-        g.add_metric(labels=[self._target, entityname], value=1)
-        yield g
-
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)

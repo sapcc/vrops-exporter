@@ -2,8 +2,8 @@ import sys
 import time
 import os
 from prometheus_client import start_http_server
-from module.YamlRead import YamlRead
-from module.VropsCollector import VropsCollector
+from tools.YamlRead import YamlRead
+import VropsCollector
 
 if __name__ == '__main__':
     # Read yaml file
