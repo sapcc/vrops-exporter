@@ -58,9 +58,9 @@ class VropsCollector:
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def collect(self):
-        for target in self._modules_dict.keys():
-            mod = self._modules_dict[target]
-            func = getattr(mod, target)
+        for module in self._modules_dict.keys():
+            imported_module = self._modules_dict[module]
+            func = getattr(imported_module, module)
             res = func(self._target, self._user, self._password).collect()
-            yield res
-
+            for i in res:
+                yield i

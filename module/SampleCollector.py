@@ -13,6 +13,7 @@ class SampleCollector(BaseCollector):
         self._password = password
 
     def collect(self):
+        metric_list = list()
         if os.environ['DEBUG'] == '1':
             print('started')
 
@@ -41,4 +42,6 @@ class SampleCollector(BaseCollector):
         g = GaugeMetricFamily('vrops_ressource_gauge', 'Gauge Collector for vRops',
                               labels=['target', 'entityname'])
         g.add_metric(labels=[self._target, entityname], value=1)
-        return g
+
+        metric_list.append(g)
+        return metric_list
