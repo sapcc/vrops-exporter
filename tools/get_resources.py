@@ -5,10 +5,9 @@ from requests.auth import HTTPBasicAuth
 
 def get_resources(self, resourcetype, resourcekind=None, parentid=None):
 
-    url = "https://" + _target + "/suite-api/api/" + resourcetype
+    url = "https://" + self._target + "/suite-api/api/" + resourcetype
 
     querystring = {
-        'adapterInstanceId': identifier,
         'parentId': parentid,
         'adapterKind': 'VMware',
         'resourceKind': resourcekind,
@@ -26,7 +25,7 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
 
     if resourcekind:
         response = requests.get(url,
-                                auth=HTTPBasicAuth(_user, _password),
+                                auth=HTTPBasicAuth(self._user, self._password),
                                 params=querystring,
                                 verify=False,
                                 headers=headers)
@@ -39,7 +38,7 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
 
     else:
         response = requests.get(url,
-                                auth=HTTPBasicAuth(user, password),
+                                auth=HTTPBasicAuth(self._user, self._password),
                                 verify=False,
                                 headers=headers)
 
