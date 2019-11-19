@@ -1,0 +1,4306 @@
+{
+  "methods" : [ {
+    "name" : "get_all_actions",
+    "url" : "/api/actiondefinitions",
+    "http_method" : "GET",
+    "doc" : "Look up all Action Definitions in the system.<br>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "perform_action",
+    "url" : "/api/actions/{id}",
+    "http_method" : "POST",
+    "doc" : "Perform an Action on one or more resources<br>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The id for the action to be executed"
+    } ]
+  }, {
+    "name" : "populate_action",
+    "url" : "/api/actions/{id}/query",
+    "http_method" : "POST",
+    "doc" : "Populate the information needed to run an action<br>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The id for the action to be executed"
+    } ]
+  }, {
+    "name" : "get_adapter_types",
+    "url" : "/api/adapterkinds",
+    "http_method" : "GET",
+    "doc" : "Gets Adapter Types identified by the specified identifiers or all if 'null' is specified<br/>",
+    "query_params" : [ {
+      "name" : "adapterKindKey",
+      "doc" : "Optional list of identifiers to filter by.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "retrieveResourceKindInfos",
+      "doc" : "Optional param that specifies whether need to report resource-kind-keys.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_resource_type_for_adapter_type",
+    "url" : "/api/adapterkinds/{adapterKindKey}/resourcekinds/{resourceKindKey}",
+    "http_method" : "GET",
+    "doc" : "Get a specific Resource Kind supported by a specific Adapter Kind.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "resourceKindKey",
+      "type" : null,
+      "doc" : "Resource Kind Identifier"
+    }, {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_resource_type_properties_for_adapter_type",
+    "url" : "/api/adapterkinds/{adapterKindKey}/resourcekinds/{resourceKindKey}/properties",
+    "http_method" : "GET",
+    "doc" : "Get the meta-data for properties for a specific Resource Kind supported by a specific Adapter Kind.",
+    "query_params" : [ {
+      "name" : "properties",
+      "doc" : "Optional list of property names to filter by.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "retrieveAllLocalizations",
+      "doc" : "Optional param that specifies whether need to report names in all localizations.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "resourceKindKey",
+      "type" : null,
+      "doc" : "Resource Kind Identifier"
+    }, {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_resources_with_adapter_and_resource_kind",
+    "url" : "/api/adapterkinds/{adapterKindKey}/resourcekinds/{resourceKindKey}/resources",
+    "http_method" : "GET",
+    "doc" : "Query for Resources within a particular Adapter Kind and Resource Kind.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "identifiers",
+      "doc" : "Resource Identifiers where the Key represents\n the Resource Identifier Key and the Value represents\n the Resource Identifier value",
+      "type" : "map",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "name",
+      "doc" : "Resource Name (partial match)",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "resourceKindKey",
+      "type" : null,
+      "doc" : "Resource Kind Identifier"
+    }, {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_resource_type_attributes_for_adapter_type",
+    "url" : "/api/adapterkinds/{adapterKindKey}/resourcekinds/{resourceKindKey}/statkeys",
+    "http_method" : "GET",
+    "doc" : "Get the meta-data for attributes (excluding properties) for a specific Resource Kind supported by a specific Adapter Kind.",
+    "query_params" : [ {
+      "name" : "attributeKeys",
+      "doc" : "Optional list of attribute-keys to filter by.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "statOnly",
+      "doc" : "Optional param that indicate whether need to return only stats or stats and properties together.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "retrieveAllLocalizations",
+      "doc" : "Optional param that specifies whether need to report names in all localizations.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "resourceKindKey",
+      "type" : null,
+      "doc" : "Resource Kind Identifier"
+    }, {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_resources_with_adapter_kind",
+    "url" : "/api/adapterkinds/{adapterKindKey}/resources",
+    "http_method" : "GET",
+    "doc" : "Query for Resources of a particular Adapter Kind.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_adapter_type",
+    "url" : "/api/adapterkinds/{id}",
+    "http_method" : "GET",
+    "doc" : "Get an Adapter Kind using the specified identifier.<br/>",
+    "query_params" : [ {
+      "name" : "retrieveResourceKindInfos",
+      "doc" : "Optional param that specifies whether need to report resource-kind-keys.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "Adapter Kind Identifier"
+    } ]
+  }, {
+    "name" : "get_resource_types_for_adapter_type",
+    "url" : "/api/adapterkinds/{key}/resourcekinds",
+    "http_method" : "GET",
+    "doc" : "Get all the Resource Kinds supported by a specific Adapter Kind.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "retrieveAllLocalizations",
+      "doc" : "Optional param that specifies whether need to report names in all localizations.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "key",
+      "type" : null,
+      "doc" : "identifier of the adapter kind of type 'string'"
+    } ]
+  }, {
+    "name" : "create_adapter_instance",
+    "url" : "/api/adapters",
+    "http_method" : "POST",
+    "doc" : "Creates an Adapter Instance.<br/>",
+    "query_params" : [ {
+      "name" : "extractIdentifierDefaults",
+      "doc" : "Indicates whether need to return default value or null in a result for\n                                  identifiers that have no/null value in request body",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_adapter_instance",
+    "url" : "/api/adapters",
+    "http_method" : "PUT",
+    "doc" : "Updates an Adapter Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "patch_adapter_instance",
+    "url" : "/api/adapters",
+    "http_method" : "PATCH",
+    "doc" : "Patches an Adapter Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "enumerate_adapter_instances",
+    "url" : "/api/adapters",
+    "http_method" : "GET",
+    "doc" : "Returns all the adapter instance resources in the system.<br/>",
+    "query_params" : [ {
+      "name" : "adapterKindKey",
+      "doc" : "Adapter Kind key, if specified the API returns only instances of this Adapter Kind",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_adapter_instance",
+    "url" : "/api/adapters/{adapterId}",
+    "http_method" : "GET",
+    "doc" : "Look up a single adapter instance using an identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "mark_adapter_instance_as_being_maintained",
+    "url" : "/api/adapters/{adapterId}/maintained",
+    "http_method" : "PUT",
+    "doc" : "Marks the adapter instance as being 'maintained' for the given duration.<br/>",
+    "query_params" : [ {
+      "name" : "duration",
+      "doc" : "duration in minutes for which this resource will not be monitored",
+      "type" : "int",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "unmark_adapter_instance_as_being_maintained",
+    "url" : "/api/adapters/{adapterId}/maintained",
+    "http_method" : "DELETE",
+    "doc" : "Marks the adapter instance as being 'started'. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "start_monitoring_resources_of_adapter_instance",
+    "url" : "/api/adapters/{adapterId}/monitoringstate/start",
+    "http_method" : "PUT",
+    "doc" : "Starts the adapter instance from monitoring its resources.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "stop_monitoring_resources_of_adapter_instance",
+    "url" : "/api/adapters/{adapterId}/monitoringstate/stop",
+    "http_method" : "PUT",
+    "doc" : "Stops the adapter instance from monitoring its resources.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "get_resources_of_adapter_instance",
+    "url" : "/api/adapters/{adapterId}/resources",
+    "http_method" : "GET",
+    "doc" : "Enumerates all resources managed by an adapter instance.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "adapterId",
+      "type" : null,
+      "doc" : "identifier of the adapter in UUID format."
+    } ]
+  }, {
+    "name" : "delete_adapter_instance",
+    "url" : "/api/adapters/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes an Adapter instance given an identifier.<br/>",
+    "query_params" : [ {
+      "name" : "deleteResources",
+      "doc" : "If set to true, resources discovered by this\n                          adapter instance would be deleted as well.",
+      "type" : "boolean",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "identifier of the adapter instance"
+    } ]
+  }, {
+    "name" : "create_alert_definition",
+    "url" : "/api/alertdefinitions",
+    "http_method" : "POST",
+    "doc" : "Creates an Alert Definition.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_alert_definition",
+    "url" : "/api/alertdefinitions",
+    "http_method" : "PUT",
+    "doc" : "Updates an existing Alert Definition.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert_definitions",
+    "url" : "/api/alertdefinitions",
+    "http_method" : "GET",
+    "doc" : "Returns a collection of Alert Definitions matching the search criteria specified.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "adapterKind",
+      "doc" : "Adapter Kind key of the Alert Definitions to search for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "id",
+      "doc" : "The identifier(s) of the Alert Definitions to search for.<br/>\n Do not specify <i>adapterKind</i> or <i>resourceKind</i> if searching by the identifier",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceKind",
+      "doc" : "Resource Kind key of the Alert Definitions to search for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_alert_definition",
+    "url" : "/api/alertdefinitions/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes an Alert Definition.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The id of the Alert Definition to delete"
+    } ]
+  }, {
+    "name" : "get_alert_definition_by_id",
+    "url" : "/api/alertdefinitions/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets Alert Definition using the identifier specified.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The id of the Alert Definition to delete"
+    } ]
+  }, {
+    "name" : "get_alert_plugins_of_type",
+    "url" : "/api/alertplugins",
+    "http_method" : "GET",
+    "doc" : "Get Notification Plugins, optionally filtered for a specific type",
+    "query_params" : [ {
+      "name" : "pluginTypeId",
+      "doc" : "the type",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "patch_alert_plugin",
+    "url" : "/api/alertplugins",
+    "http_method" : "PATCH",
+    "doc" : "Patch a new Notification Plugin Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_alert_plugin",
+    "url" : "/api/alertplugins",
+    "http_method" : "POST",
+    "doc" : "Create a new Notification Plugin Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_alert_plugin",
+    "url" : "/api/alertplugins",
+    "http_method" : "PUT",
+    "doc" : "Update an existing Notification Plugin Instance",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert_plugin_types",
+    "url" : "/api/alertplugins/types",
+    "http_method" : "GET",
+    "doc" : "Get the Notification Plugin Types available",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert_plugin_type_with_id",
+    "url" : "/api/alertplugins/types/{pluginTypeId}",
+    "http_method" : "GET",
+    "doc" : "Get the Notification Plugin Type Metadata",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "pluginTypeId",
+      "type" : null,
+      "doc" : "the notification type"
+    } ]
+  }, {
+    "name" : "delete_alert_plugin",
+    "url" : "/api/alertplugins/{pluginId}",
+    "http_method" : "DELETE",
+    "doc" : "Delete an existing Notification Plugin Instance. <br/> Response Status is HttpStatus No Content",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "pluginId",
+      "type" : null,
+      "doc" : "identifier of the plugin instance."
+    } ]
+  }, {
+    "name" : "get_alert_plugin_instance",
+    "url" : "/api/alertplugins/{pluginId}",
+    "http_method" : "GET",
+    "doc" : "Get Notification Plugin specified by plugin id",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "pluginId",
+      "type" : null,
+      "doc" : "identifier of the plugin instance."
+    } ]
+  }, {
+    "name" : "modify_alert_plugin_state",
+    "url" : "/api/alertplugins/{pluginId}/enable/{enabled}",
+    "http_method" : "PUT",
+    "doc" : "Start an existing Notification Plugin Instance. <br/> Response Status is HttpStatus No Content",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "enabled",
+      "type" : null,
+      "doc" : ""
+    }, {
+      "name" : "pluginId",
+      "type" : null,
+      "doc" : "identifier of the plugin instance."
+    } ]
+  }, {
+    "name" : "get_rules_of_plugin",
+    "url" : "/api/alertplugins/{pluginId}/rules",
+    "http_method" : "GET",
+    "doc" : "Retrieve all the notification rule of the plugin instance.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "pluginId",
+      "type" : null,
+      "doc" : "identifier of the plugin instance."
+    } ]
+  }, {
+    "name" : "get_alerts",
+    "url" : "/api/alerts",
+    "http_method" : "GET",
+    "doc" : "Look up Alerts by their identifiers or using the identifiers",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "id",
+      "doc" : "",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceId",
+      "doc" : "",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "modify_alerts",
+    "url" : "/api/alerts",
+    "http_method" : "POST",
+    "doc" : "Modify multiple Alerts by looking them up using their identifiers",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "action",
+      "doc" : "The action to take",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "minutes",
+      "doc" : "The number of minutes to suspend an alert. Required\n                  when action is <b><i>suspend</i></b>, otherwise ignored.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_canceled_alerts",
+    "url" : "/api/alerts/bulk",
+    "http_method" : "DELETE",
+    "doc" : "Deletes canceled alerts using one or more criteria specified in the Query Spec.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert_contributing_symptoms",
+    "url" : "/api/alerts/contributingsymptoms",
+    "http_method" : "GET",
+    "doc" : "Gets the list of triggered symptoms for the requested alerts.",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "Identifiers of the Alerts",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_alert_groups",
+    "url" : "/api/alerts/group/{groupingCondition}/query",
+    "http_method" : "POST",
+    "doc" : "Query for Alert groups using one or more criteria specified in the Query Spec.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "groupingCondition",
+      "type" : null,
+      "doc" : "the condition to be used for grouping"
+    } ]
+  }, {
+    "name" : "query_alert_notes",
+    "url" : "/api/alerts/notes/query",
+    "http_method" : "POST",
+    "doc" : "Query for Alert Notes based on specified criteria.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_alert",
+    "url" : "/api/alerts/query",
+    "http_method" : "POST",
+    "doc" : "Query for Alerts using one or more criteria specified in the Query Spec.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert_types",
+    "url" : "/api/alerts/types",
+    "http_method" : "GET",
+    "doc" : "Gets the Alert Types and Subtypes defined in the system.<br/>",
+    "query_params" : [ {
+      "name" : "ignoreLegacy",
+      "doc" : "If set to true will filter out the legacy Alert Types & Subtypes\n                     Defaults to true.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_alert",
+    "url" : "/api/alerts/{id}",
+    "http_method" : "GET",
+    "doc" : "Look up an Alert by its identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "UUID of the alert."
+    } ]
+  }, {
+    "name" : "get_alert_notes",
+    "url" : "/api/alerts/{id}/notes",
+    "http_method" : "GET",
+    "doc" : "Returns all the Alert Notes associated with an Alert.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "UUID of the alert."
+    } ]
+  }, {
+    "name" : "add_alert_note",
+    "url" : "/api/alerts/{id}/notes",
+    "http_method" : "POST",
+    "doc" : "Adds a Note to an Alert.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "UUID of the alert."
+    } ]
+  }, {
+    "name" : "delete_alert_note",
+    "url" : "/api/alerts/{id}/notes/{noteId}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a specific Alert Note for a specific Alert.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "noteId",
+      "type" : null,
+      "doc" : "Alert Note identifier"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : "UUID of the alert."
+    } ]
+  }, {
+    "name" : "get_alert_note",
+    "url" : "/api/alerts/{id}/notes/{noteId}",
+    "http_method" : "GET",
+    "doc" : "Returns requested Alert Note associated with an Alert.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "noteId",
+      "type" : null,
+      "doc" : "Alert Note identifier"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : "UUID of the alert."
+    } ]
+  }, {
+    "name" : "get_available_privilege_groups",
+    "url" : "/api/auth/privilegegroups",
+    "http_method" : "GET",
+    "doc" : "Get the available privilege groups. ",
+    "query_params" : [ {
+      "name" : "key",
+      "doc" : "the key of the privilege group to get, null or empty to return all",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_available_privileges",
+    "url" : "/api/auth/privileges",
+    "http_method" : "GET",
+    "doc" : "Get the available privileges.. ",
+    "query_params" : [ {
+      "name" : "key",
+      "doc" : "the key of the privilege to get, null or empty to return all",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_roles",
+    "url" : "/api/auth/roles",
+    "http_method" : "GET",
+    "doc" : "Query for a list of application roles using the role names.. ",
+    "query_params" : [ {
+      "name" : "roleName",
+      "doc" : "list of valid role names",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_user_role",
+    "url" : "/api/auth/roles",
+    "http_method" : "POST",
+    "doc" : "Create a user role.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_user_role",
+    "url" : "/api/auth/roles",
+    "http_method" : "PUT",
+    "doc" : "Update a user role.. Name of the role cannot be changed.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_user_role",
+    "url" : "/api/auth/roles/{roleName}",
+    "http_method" : "DELETE",
+    "doc" : "Delete a role with the given roleName.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "get_role_by_name",
+    "url" : "/api/auth/roles/{roleName}",
+    "http_method" : "GET",
+    "doc" : "Look up a role with the given roleName.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "get_role_privileges",
+    "url" : "/api/auth/roles/{roleName}/privileges",
+    "http_method" : "GET",
+    "doc" : "Get the privileges for a user role.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "add_role_privileges",
+    "url" : "/api/auth/roles/{roleName}/privileges",
+    "http_method" : "POST",
+    "doc" : "Add the privileges to a user role.. New privileges union with any previous privileges.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "set_role_privileges",
+    "url" : "/api/auth/roles/{roleName}/privileges",
+    "http_method" : "PUT",
+    "doc" : "Set the privileges for a user role.. Replaces any previous privileges.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "remove_role_privileges",
+    "url" : "/api/auth/roles/{roleName}/privileges",
+    "http_method" : "DELETE",
+    "doc" : "Remove specified privileges from a user role.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "name of the role"
+    } ]
+  }, {
+    "name" : "add_auth_source",
+    "url" : "/api/auth/sources",
+    "http_method" : "POST",
+    "doc" : "Add a new authentication source in the system.. If the authentication source is of type LDAP or AD and if ssl is enabled, the response object will contain a list of certificates found matching with the provided host.if the authentication source is not of type LDAP or AD (or) if ssl is not enabled, then the authentication source is available for use as soon as the api call is successful.It is the duty of the caller to call the PATCH (/sources) api with the certificate details. Once the PATCH api call is successful, the authentication source is available for use.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_auth_source",
+    "url" : "/api/auth/sources",
+    "http_method" : "PUT",
+    "doc" : "updates an authentication source in the system. if the host is an ldap host and if host/port is changed, then the response will contain a list of certificates found matching with the host. It is the duty of the caller to call the PATCH (/sources) api with the certificate details. Once the PATCH api call is successful, the authentication source is available for use.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_auth_sources",
+    "url" : "/api/auth/sources",
+    "http_method" : "GET",
+    "doc" : "Lists all the available auth sources in the system. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "patch_auth_source_with_certificate_details",
+    "url" : "/api/auth/sources",
+    "http_method" : "PATCH",
+    "doc" : "Patch an already added authentication source with the certificate data. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "search_user_groups_for_auth_source",
+    "url" : "/api/auth/sources/{id}/usergroups/search",
+    "http_method" : "POST",
+    "doc" : "search user-groups for an auth source.  auth source can be SSO/LDAP/AD.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "import_users",
+    "url" : "/api/auth/sources/{id}/users",
+    "http_method" : "POST",
+    "doc" : "import users from auth source. Auth source can be SSO/LDAP/AD.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "search_users_for_auth_source",
+    "url" : "/api/auth/sources/{id}/users/search",
+    "http_method" : "POST",
+    "doc" : "search users for an auth source. auth source can be SSO/LDAP/AD.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_auth_source",
+    "url" : "/api/auth/sources/{sourceId}",
+    "http_method" : "GET",
+    "doc" : "Retrieve information about a particular authentication source. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "sourceId",
+      "type" : null,
+      "doc" : "identifier of the source."
+    } ]
+  }, {
+    "name" : "delete_auth_source",
+    "url" : "/api/auth/sources/{sourceId}",
+    "http_method" : "DELETE",
+    "doc" : "delete an authentication source. when deleting an SSO auth source, the 'user-name' and 'password' used during creation of the sso auth source should be sent in the payload object.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "sourceId",
+      "type" : null,
+      "doc" : "identifier of the source."
+    } ]
+  }, {
+    "name" : "get_auth_source_types",
+    "url" : "/api/auth/sourcetypes",
+    "http_method" : "GET",
+    "doc" : "Lists all the available authentication source types.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_auth_source_type",
+    "url" : "/api/auth/sourcetypes/{sourceId}",
+    "http_method" : "GET",
+    "doc" : "Retrieve information about a particular authentication source type.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "sourceId",
+      "type" : null,
+      "doc" : "identifier of the source type."
+    } ]
+  }, {
+    "name" : "acquire_token",
+    "url" : "/api/auth/token/acquire",
+    "http_method" : "POST",
+    "doc" : "Acquire a token to perform REST API calls.. Performing a <b><i>POST /api/auth/token/acquire</i></b> would yield a response object that includes token and its validity.<br>HTTP Status 401 will be sent back if the authentication operation has failed.<br><b>NOTE:</b> The validity of the acquired token is extended after each call and is set to 6 hours from the last call.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "release_token",
+    "url" : "/api/auth/token/release",
+    "http_method" : "POST",
+    "doc" : "Call this URL to terminate the current sessionId. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_traversal_specs",
+    "url" : "/api/auth/traversalspecs",
+    "http_method" : "GET",
+    "doc" : "Get/Query the list of all traversal specification templates in the system.. ",
+    "query_params" : [ {
+      "name" : "adapterKind",
+      "doc" : "type of adapter",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceKind",
+      "doc" : "type of resource",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "name",
+      "doc" : "name of the traversal spec.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_user_groups",
+    "url" : "/api/auth/usergroups",
+    "http_method" : "GET",
+    "doc" : "Retrieve a list of local user groups using identifiers or names or all.. If none of the parameters are specified, all the user groups in the system are returned.",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "identifiers of the local user groups.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "name",
+      "doc" : "the names of the local user groups",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_user_groups",
+    "url" : "/api/auth/usergroups",
+    "http_method" : "DELETE",
+    "doc" : "Delete a list of user groups using their identifiers.. ",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "identifiers of the local user group objects.",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_user_group",
+    "url" : "/api/auth/usergroups",
+    "http_method" : "POST",
+    "doc" : "Create a new local user group. The id of the user group has to be null",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "modify_user_group",
+    "url" : "/api/auth/usergroups",
+    "http_method" : "PUT",
+    "doc" : "Modify a local user group.. You can add or remove users from the group. Name and id of the group cannot be changed.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "assign_role_permission_to_user_group",
+    "url" : "/api/auth/usergroups/{groupId}/permissions",
+    "http_method" : "PUT",
+    "doc" : "Assign a role permission to a particular user group.  Replaces existing role permission in its entirety if it exists already for the named role.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "Identifier of the user group to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "get_assigned_role_permissions_for_user_group",
+    "url" : "/api/auth/usergroups/{groupId}/permissions",
+    "http_method" : "GET",
+    "doc" : "Get assigned role permissions for a user group. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "Identifier of the user group to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "unassigned_role_permission_from_user_group",
+    "url" : "/api/auth/usergroups/{groupId}/permissions/{roleName}",
+    "http_method" : "DELETE",
+    "doc" : "Unassign role permission from a user group. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : ""
+    }, {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "Identifier of the user group to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "assign_traversal_spec_to_user_group",
+    "url" : "/api/auth/usergroups/{groupId}/traversalspecs",
+    "http_method" : "PUT",
+    "doc" : "(Deprecated) Assign a traversal specification to a particular user.. Traversal specifications assigned through this API will add the specified traversal specification to a role permission for the ReadOnly role. It will also update the user's existing role permissions with this traversal specification.<br><br>This API is replaced by the <code>assignRolePermissionToUser</code> and <code>unassignRolePermissionFromUser</code> APIs which are PUT and DELETE operations respectively at the <code>/auth/usergroups/{groupId}/permissions</code> endpoint.<br><strong>Note:</strong> mixing current and deprecated APIs is not recommended and may result in undefined behavior.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "Identifier of the user group to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "get_user_group",
+    "url" : "/api/auth/usergroups/{id}",
+    "http_method" : "GET",
+    "doc" : "Look up a local user group using its identifier.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "identifier of the user group"
+    } ]
+  }, {
+    "name" : "delete_user_group",
+    "url" : "/api/auth/usergroups/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Delete a local user group. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "identifier of the user group"
+    } ]
+  }, {
+    "name" : "get_users",
+    "url" : "/api/auth/users",
+    "http_method" : "GET",
+    "doc" : "Look up a list of users using the user identifiers or their role names.. If both ids and roleNames are not specified, information about all the <i>local users</i> are returned.",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "list of identifiers in UUID format",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "roleName",
+      "doc" : "list of valid role names.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "username",
+      "doc" : "list of usernames that is used for partial and complete matching.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_users",
+    "url" : "/api/auth/users",
+    "http_method" : "DELETE",
+    "doc" : "Delete a collection of users with the given identifiers.. ",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "identifiers of all users that need to be deleted from the system.",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "modify_user",
+    "url" : "/api/auth/users",
+    "http_method" : "PUT",
+    "doc" : "Modify the details of a particular user.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_user",
+    "url" : "/api/auth/users",
+    "http_method" : "POST",
+    "doc" : "Create a new user.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "change_password",
+    "url" : "/api/auth/users/passwordchange",
+    "http_method" : "PUT",
+    "doc" : "Changes the password of the logged in user.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_user",
+    "url" : "/api/auth/users/{id}",
+    "http_method" : "GET",
+    "doc" : "Look up a particular user using her identifier. Using this method, you can look up details about a particular <i>local user</i>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "identifier of the user."
+    } ]
+  }, {
+    "name" : "delete_user",
+    "url" : "/api/auth/users/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Create a new user.. An admin operation, using this a particular <i>local user</i> can be deleted from the system.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "identifier of the user."
+    } ]
+  }, {
+    "name" : "assign_role_permission_to_user",
+    "url" : "/api/auth/users/{userId}/permissions",
+    "http_method" : "PUT",
+    "doc" : "Assign a role permission to a particular user.  Replaces existing role permission in its entirety if it exists already for the named role.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "userId",
+      "type" : null,
+      "doc" : "Identifier of the user to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "get_assigned_role_permissions_for_user",
+    "url" : "/api/auth/users/{userId}/permissions",
+    "http_method" : "GET",
+    "doc" : "Get assigned role permissions for a user.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "userId",
+      "type" : null,
+      "doc" : "Identifier of the user to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "unassigned_role_permission_from_user",
+    "url" : "/api/auth/users/{userId}/permissions/{roleName}",
+    "http_method" : "DELETE",
+    "doc" : "Unassign role permission from a user.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "roleName",
+      "type" : null,
+      "doc" : "The name of the role of the role permission to unassign"
+    }, {
+      "name" : "userId",
+      "type" : null,
+      "doc" : "Identifier of the user to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "assign_traversal_spec_to_user",
+    "url" : "/api/auth/users/{userId}/traversalspecs",
+    "http_method" : "PUT",
+    "doc" : "(Deprecated) Assign a traversal specification to a particular user.. Traversal specifications assigned through this API will add the specified traversal specification to a role permission for the ReadOnly role. It will also update the user's existing role permissions with this traversal specification.<br><br>This API is replaced by the <code>assignRolePermissionToUser</code> and <code>unassignRolePermissionFromUser</code> APIs which are PUT and DELETE operations respectively at the <code>/auth/usergroups/{groupId}/permissions</code> endpoint.<br><strong>Note:</strong> mixing current and deprecated APIs is not recommended and may result in undefined behavior.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "userId",
+      "type" : null,
+      "doc" : "Identifier of the user to which the role permission needs to be assigned"
+    } ]
+  }, {
+    "name" : "create_collector_group",
+    "url" : "/api/collectorgroups",
+    "http_method" : "POST",
+    "doc" : "Creates a Collector Group in the System.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_collector_group",
+    "url" : "/api/collectorgroups",
+    "http_method" : "PUT",
+    "doc" : "Updates a Collector Group in the system. This Replaces all existing configuration of a Collector Group with the data specified as part of the Request.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_collector_groups",
+    "url" : "/api/collectorgroups",
+    "http_method" : "GET",
+    "doc" : "Enumerates all the Collector Groups defined in the system.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_collector_group",
+    "url" : "/api/collectorgroups/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets details of a particular Collector Group in the system.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_collector_group",
+    "url" : "/api/collectorgroups/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a Collector Group from the system using its identifier.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_collector_to_collector_group",
+    "url" : "/api/collectorgroups/{id}/collector/{collectorId}",
+    "http_method" : "PUT",
+    "doc" : "Adds a Collector to Collector Group.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "collectorId",
+      "type" : null,
+      "doc" : "Identifier of the Collector to add"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "remove_collector_from_collector_group",
+    "url" : "/api/collectorgroups/{id}/collector/{collectorId}",
+    "http_method" : "DELETE",
+    "doc" : "Removes a Collector from a Collector Group.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "collectorId",
+      "type" : null,
+      "doc" : "Identifier of the Collector to add"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_collectors",
+    "url" : "/api/collectors",
+    "http_method" : "GET",
+    "doc" : "Gets all the Collectors registered with the vRealize Operations Manager system.<br/>",
+    "query_params" : [ {
+      "name" : "host",
+      "doc" : "Optional list of host names to filter by.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_adapters_on_collector",
+    "url" : "/api/collectors/{id}/adapters",
+    "http_method" : "GET",
+    "doc" : "Gets all the Adapters registered (bound) to a specific Collector.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_currency",
+    "url" : "/api/costconfig/currency",
+    "http_method" : "GET",
+    "doc" : "Retrieves details of currently selected currency such as display name, code, etc.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_credential_kinds",
+    "url" : "/api/credentialkinds",
+    "http_method" : "GET",
+    "doc" : "Get all Credential Kinds defined in the system. Gets all the Credential Kinds defined in the system.  Optionally filter by adapter kind keys.",
+    "query_params" : [ {
+      "name" : "adapterKind",
+      "doc" : "Filter by Adapter Kind Key",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_credentials",
+    "url" : "/api/credentials",
+    "http_method" : "GET",
+    "doc" : "Get all Credential Instances in the system. Gets all the Credential Instances in the system.  Optionally filter by adapter kind keys or credential instance identifiers.",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "Filter by CredentialInstance Id",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "adapterKind",
+      "doc" : "Filter by AdapterKind Id",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_credential",
+    "url" : "/api/credentials",
+    "http_method" : "POST",
+    "doc" : "Creates a new Credential Instance. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_credential",
+    "url" : "/api/credentials",
+    "http_method" : "PUT",
+    "doc" : "Update an existing Credential Instance. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_credential",
+    "url" : "/api/credentials/{id}",
+    "http_method" : "GET",
+    "doc" : "Get a Credential Instance. Get a Credential Instance using the identifier specified",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the specific Credential Instance"
+    } ]
+  }, {
+    "name" : "delete_credential",
+    "url" : "/api/credentials/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Delete a Credential Instance. Delete a Credential Instance using the identifier specified.  Requires the authenticated user to have correct privilege.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the specific Credential Instance"
+    } ]
+  }, {
+    "name" : "get_adapter_instances_using_credential",
+    "url" : "/api/credentials/{id}/adapters",
+    "http_method" : "GET",
+    "doc" : "Get the Adapter Instances using the Credential Instance. Gets the Adapter Instances using the Credential Instance specified by the identifier.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the specific Credential Instance"
+    } ]
+  }, {
+    "name" : "get_resources_using_credential",
+    "url" : "/api/credentials/{id}/resources",
+    "http_method" : "GET",
+    "doc" : "Get the Objects using the Credential Instance. Gets the Objects using the Credential Instance specified by the identifier.",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the specific Credential Instance"
+    } ]
+  }, {
+    "name" : "manage_dt",
+    "url" : "/api/deployment/cluster/dt",
+    "http_method" : "PUT",
+    "doc" : "Manages a specific run of Dynamic Threshold (DT) Computation in a vRealize Operations Manager Cluster.<br/>",
+    "query_params" : [ {
+      "name" : "action",
+      "doc" : "The type of action that one needs to perform - can be either \"start\" or \"stop\"",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_global_settings",
+    "url" : "/api/deployment/config/globalsettings",
+    "http_method" : "GET",
+    "doc" : "get all global setting values. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_global_setting_metadata",
+    "url" : "/api/deployment/config/globalsettings/metadata",
+    "http_method" : "GET",
+    "doc" : "Get global settings metadata. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_global_setting_value",
+    "url" : "/api/deployment/config/globalsettings/{key}",
+    "http_method" : "GET",
+    "doc" : "Get global setting value for the requested key. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "key",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "update_namespace_key_values",
+    "url" : "/api/deployment/config/globalsettings/{key}/{value}",
+    "http_method" : "PUT",
+    "doc" : "update global settings value for specified key. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "value",
+      "type" : null,
+      "doc" : ""
+    }, {
+      "name" : "key",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_namespace_values",
+    "url" : "/api/deployment/config/properties/{namespace}",
+    "http_method" : "GET",
+    "doc" : "get all key/values from the namespace. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "set_override_values",
+    "url" : "/api/deployment/config/properties/{namespace}",
+    "http_method" : "POST",
+    "doc" : "set values for the given namespace key. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_namespace_key",
+    "url" : "/api/deployment/config/properties/{namespace}/{key}",
+    "http_method" : "DELETE",
+    "doc" : "delete a key and its values. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "key",
+      "type" : null,
+      "doc" : "key to delete"
+    }, {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_namespace_values_0",
+    "url" : "/api/deployment/config/properties/{namespace}/{key}",
+    "http_method" : "GET",
+    "doc" : "get all values from the given key in the given namespace. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "key",
+      "type" : null,
+      "doc" : "key to delete"
+    }, {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "set_override_values_0",
+    "url" : "/api/deployment/config/properties/{namespace}/{key}/{value}",
+    "http_method" : "POST",
+    "doc" : "set values for the given namespace key. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "value",
+      "type" : null,
+      "doc" : "comma-separated string of values"
+    }, {
+      "name" : "key",
+      "type" : null,
+      "doc" : "key to delete"
+    }, {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_license_key_to_product",
+    "url" : "/api/deployment/licenses",
+    "http_method" : "POST",
+    "doc" : "Add one or more License keys to the vRealize Operations Manager instance.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_license_keys_for_product",
+    "url" : "/api/deployment/licenses",
+    "http_method" : "GET",
+    "doc" : "Gets all the License Details associated with a vRealize Operations Manager instance.. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_license_for_product",
+    "url" : "/api/deployment/licenses/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a speicific License associated with a vRealize Operations Manager instance.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_services_info",
+    "url" : "/api/deployment/node/services/info",
+    "http_method" : "GET",
+    "doc" : "Gets the health of all Services <br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_service_info",
+    "url" : "/api/deployment/node/services/{name}/info",
+    "http_method" : "GET",
+    "doc" : "Gets information about a specific Service that is part of the vRealize Operations Manager stack.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "name",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_node_status",
+    "url" : "/api/deployment/node/status",
+    "http_method" : "GET",
+    "doc" : "get the status of the node.. get the status of the node. status is ONLINE if all the services are running and responsive. else status is OFFLINE",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "push_event",
+    "url" : "/api/events",
+    "http_method" : "POST",
+    "doc" : "Push a single Event into the system.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "push_event_by_adapter_kind_key",
+    "url" : "/api/events/adapterkinds/{adapterKind}",
+    "http_method" : "POST",
+    "doc" : "Push a single Event into the system with associating an adapter kind as the event source.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterKind",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "push_events",
+    "url" : "/api/events/bulk",
+    "http_method" : "POST",
+    "doc" : "Push one or more Events into the system.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "push_events_by_adapter_kind_key",
+    "url" : "/api/events/bulk/adapterkinds/{adapterKind}",
+    "http_method" : "POST",
+    "doc" : "Push one or more Events into the system with associating an adapter kind as the event source.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterKind",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_maintenance_schedules",
+    "url" : "/api/maintenanceschedules",
+    "http_method" : "GET",
+    "doc" : "Query for all maintenance schedules based on schedule id, schedule name and resource id.. ",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "List of maintenance schedule identifiers.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "name",
+      "doc" : "List of maintenance schedule names.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceId",
+      "doc" : "List of resource identifiers.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_maintenance_schedules",
+    "url" : "/api/maintenanceschedules",
+    "http_method" : "DELETE",
+    "doc" : "Delete maintenance schedules with the given identifiers.. ",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "identifier of the schedule.",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_maintenance_schedules",
+    "url" : "/api/maintenanceschedules",
+    "http_method" : "POST",
+    "doc" : "Create a maintenance schedule. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_maintenance_schedules",
+    "url" : "/api/maintenanceschedules",
+    "http_method" : "PUT",
+    "doc" : "Update an existing maintenance schedule. ",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_email_template",
+    "url" : "/api/notifications/email/templates",
+    "http_method" : "POST",
+    "doc" : "Creates a new E-Mail template in the system.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_email_template",
+    "url" : "/api/notifications/email/templates",
+    "http_method" : "PUT",
+    "doc" : "Updates an E-Mail template in the system.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_email_templates",
+    "url" : "/api/notifications/email/templates",
+    "http_method" : "GET",
+    "doc" : "Query for Email templates based on names and identifiers.<br/>",
+    "query_params" : [ {
+      "name" : "name",
+      "doc" : "Name of the e-mail template (case insensitive),\n          wild cards are not supported. If not specified all e-mail templates\n          are included in the response.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "id",
+      "doc" : "List of identifiers. If only <i>id</i>s are specified,\n          e-mail templates with matching identifiers are returned.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_email_template",
+    "url" : "/api/notifications/email/templates/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes an E-Mail template from the system.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the e-mail template to be deleted"
+    } ]
+  }, {
+    "name" : "get_email_template",
+    "url" : "/api/notifications/email/templates/{id}",
+    "http_method" : "GET",
+    "doc" : "Look up an E-Mail template by its identifier.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the e-mail template to be deleted"
+    } ]
+  }, {
+    "name" : "set_email_condition",
+    "url" : "/api/notifications/email/templates/{id}/conditions",
+    "http_method" : "POST",
+    "doc" : "Sets the E-Mail template condition on an E-Mail template. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the e-mail template to be deleted"
+    } ]
+  }, {
+    "name" : "unset_email_condition",
+    "url" : "/api/notifications/email/templates/{id}/conditions",
+    "http_method" : "DELETE",
+    "doc" : "Clears all conditions associated with the E-Mail template with the given identifier.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the e-mail template to be deleted"
+    } ]
+  }, {
+    "name" : "get_email_conditions",
+    "url" : "/api/notifications/email/templates/{id}/conditions",
+    "http_method" : "GET",
+    "doc" : "Gets all Email Template Conditions for a particular Email Template.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the e-mail template to be deleted"
+    } ]
+  }, {
+    "name" : "get_all_notification_rules",
+    "url" : "/api/notifications/rules",
+    "http_method" : "GET",
+    "doc" : "Returns all the Notification Rules defined in the system.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_notification_plugin_rule",
+    "url" : "/api/notifications/rules",
+    "http_method" : "POST",
+    "doc" : "Creates a new Notification Rule for a Notification Plugin Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_notification_plugin_rule",
+    "url" : "/api/notifications/rules",
+    "http_method" : "PUT",
+    "doc" : "Updates a specific Notification Rule for a Notification Plugin Instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_notification_rule",
+    "url" : "/api/notifications/rules/{id}",
+    "http_method" : "GET",
+    "doc" : "Returns the Notification Rule for the specified identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "Identifier of the notification rule."
+    } ]
+  }, {
+    "name" : "delete_notification_plugin_rules",
+    "url" : "/api/notifications/rules/{ruleId}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a specific existing Notification Rule associated with a Notification Plugin Instance",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "ruleId",
+      "type" : null,
+      "doc" : "Notification Rule Identifier"
+    } ]
+  }, {
+    "name" : "create_recommendation",
+    "url" : "/api/recommendations",
+    "http_method" : "POST",
+    "doc" : "Create the recommendation.  The recommendation identifier  must be unique for the system.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_recommendations",
+    "url" : "/api/recommendations",
+    "http_method" : "GET",
+    "doc" : "Get recommendations",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "Get Recommendations with the matching id, both system defined and user\n defined",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "targetAdapterKind",
+      "doc" : "Get Recommendations that have an associated recommended action on and the action\n is applicable to the resource of the specified adapter kind.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "targetResourceKind",
+      "doc" : "Get Recommendations that have an associated recommended action on and the action\n is applicable to the resource of the specified resource kind.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_recommendation",
+    "url" : "/api/recommendations",
+    "http_method" : "PUT",
+    "doc" : "Update an existing recommendation",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_recommendation",
+    "url" : "/api/recommendations/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Delete a recommendation.  If a recommendation with the identifier does not exist no error is returned.",
+    "query_params" : [ {
+      "name" : "force",
+      "doc" : "if true, delete recommendation and if it is referenced in problem definition,\n                   update corresponding problem definition to remove the reference. If false,\n                   delete recommendation only if it is not referenced by any problem definition.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "the identifier of the recommendation to delete"
+    } ]
+  }, {
+    "name" : "get_recommendation_by_id",
+    "url" : "/api/recommendations/{id}",
+    "http_method" : "GET",
+    "doc" : "Get the recommendation specified by the given identifier",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "the identifier of the recommendation to delete"
+    } ]
+  }, {
+    "name" : "get_report_definitions",
+    "url" : "/api/reportdefinitions",
+    "http_method" : "GET",
+    "doc" : "Returns the Report Definitions based on the query specification specified.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "name",
+      "doc" : "Names of the Report Definitions",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "owner",
+      "doc" : "Owners of the Report Definitions",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "subject",
+      "doc" : "Subjects of the Report Definitions",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_report_definition",
+    "url" : "/api/reportdefinitions/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets a Report Definition for the specified identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_report_schedules",
+    "url" : "/api/reportdefinitions/{id}/schedules",
+    "http_method" : "GET",
+    "doc" : "Returns all the Report Schedules associated with a Report Definition.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "create_report_schedule",
+    "url" : "/api/reportdefinitions/{id}/schedules",
+    "http_method" : "POST",
+    "doc" : "Creates a Report Schedule to generate a Report for the specified Report Definition and Resource(s).<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "update_report_schedule",
+    "url" : "/api/reportdefinitions/{id}/schedules",
+    "http_method" : "PUT",
+    "doc" : "Updates Report Schedule associated with the specific Report Definition and",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_report_schedule",
+    "url" : "/api/reportdefinitions/{id}/schedules/{scheduleId}",
+    "http_method" : "GET",
+    "doc" : "Returns a specific Report Schedule for the specified Report Definition and Schedule identifier.</br>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "scheduleId",
+      "type" : null,
+      "doc" : "Report Schedule identifier"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_schedule",
+    "url" : "/api/reportdefinitions/{id}/schedules/{scheduleId}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes Report Schedule associated with the specific Report Definition and",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "scheduleId",
+      "type" : null,
+      "doc" : "Report Schedule identifier"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_reports",
+    "url" : "/api/reports",
+    "http_method" : "GET",
+    "doc" : "Gets the Reports based on the Report Query Spec provided. <br/>",
+    "query_params" : [ {
+      "name" : "name",
+      "doc" : "Reports name with which the filtering can be done.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceId",
+      "doc" : "Resources on which the reports are generated",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "status",
+      "doc" : "Status of the report",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "subject",
+      "doc" : "Subjects with which the filtering can be done.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_report",
+    "url" : "/api/reports",
+    "http_method" : "POST",
+    "doc" : "Generate (create) a Report using the specified Report Definition and for the specified Resource.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_report",
+    "url" : "/api/reports/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets the detail of a Report given its identifier. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_report",
+    "url" : "/api/reports/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes report by it's identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "download_report",
+    "url" : "/api/reports/{id}/download",
+    "http_method" : "GET",
+    "doc" : "Download the Report given its identifier.<br/>",
+    "query_params" : [ {
+      "name" : "format",
+      "doc" : "",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_resources",
+    "url" : "/api/resources",
+    "http_method" : "GET",
+    "doc" : "Gets a listing of resources based on the query spec specified.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "name",
+      "doc" : "Array of resource names to query for.\n <b>NOTE:</b> Currently, only single element supported",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "regex",
+      "doc" : "Array of resource names in java regex format.\n <b>NOTE:</b> <i>regex</i> and <i>name</i> are mutually exclusive. If both are specified, <i>name</i> is given preference.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "adapterKind",
+      "doc" : "Array of Adapter Kind keys",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceKind",
+      "doc" : "Array of Resource Kind keys",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "collectorName",
+      "doc" : "Array of Collector names",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "collectorId",
+      "doc" : "Array of Collector Identifiers",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "maintenanceScheduleId",
+      "doc" : "Array of  that identify Maintenance Schedules.<br/>\n Since vROps 6.1.0 release onwards, we don't support search\n and look up of Resources using Maintenance Schedules' identifiers.<br/>",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "adapterInstanceId",
+      "doc" : "Array of  that identify Adapter Instances",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "recentlyAdded",
+      "doc" : "Return resources created after the specified value.  Value is the number of seconds since Midnight January 1, 1970 GMT.",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceState",
+      "doc" : "Array of",
+      "type" : "resource-state",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceStatus",
+      "doc" : "Array of",
+      "type" : "resource-data-collection-status",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceHealth",
+      "doc" : "Array of",
+      "type" : "resource-health",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "parentId",
+      "doc" : "Array of UUID of object that are the parent resource in a parent child relationship.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "credentialId",
+      "doc" : "Array of  that identify Credentials",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "resourceId",
+      "doc" : "Resource identifiers.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "propertyName",
+      "doc" : "Name of property.  Query only supports filtering for a single property.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "propertyValue",
+      "doc" : "Value of property named by . Omitting the  will check for existence\n of the  on the resource.\n <b>NOTE:</b> Use 'propertyConditions' to specify lookup of Resource using multiple properties.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Name of resource StatKey  to validate value is within a range.\n <br>Use with ,  and  to create comparison conditions\n <b>NOTE:</b> Use 'statConditions' to specify lookup of Resource using multiple stat keys.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKeyLowerBound",
+      "doc" : "StatKey value matching range lower bound",
+      "type" : "double",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKeyUpperBound",
+      "doc" : "StatKey value matching range upper bound",
+      "type" : "double",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKeyInclusive",
+      "doc" : "Filtering by statKey values is inclusive or exclusive of boundary values.  Defaults to true",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "includeRelated",
+      "doc" : "None null value specifies to include related resource ids of given relationship type in resource result.\n Uses the RelationshipType.representation value.<br/>\n Allowed values are: PARENT, CHILD.",
+      "type" : "relationship-type",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_resource",
+    "url" : "/api/resources",
+    "http_method" : "PUT",
+    "doc" : "Updates a Resource in the system.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_resource_using_adapter_kind",
+    "url" : "/api/resources/adapterkinds/{adapterKindKey}",
+    "http_method" : "POST",
+    "doc" : "Creates a new Resource in the system associated with the specified adapter kind. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "create_resource_using_adapter_instance",
+    "url" : "/api/resources/adapters/{adapterInstanceId}",
+    "http_method" : "POST",
+    "doc" : "Creates a new Resource in the system associated with an existing adapter instance.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterInstanceId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_resources",
+    "url" : "/api/resources/bulk",
+    "http_method" : "DELETE",
+    "doc" : "Deletes multiple Resources.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_resources_relationships",
+    "url" : "/api/resources/bulk/relationships",
+    "http_method" : "POST",
+    "doc" : "Gets resources that satisfy filtering criteria and are related to specified list",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "mark_resources_as_being_maintained",
+    "url" : "/api/resources/maintained",
+    "http_method" : "PUT",
+    "doc" : "Puts all the specified Resource in Maintenance.<br/>",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "Resource identifier",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    }, {
+      "name" : "duration",
+      "doc" : "Duration for which this resource will be in maintenance (In Minutes)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "unmark_resources_as_being_maintained",
+    "url" : "/api/resources/maintained",
+    "http_method" : "DELETE",
+    "doc" : "Bring the specified set of Resources out of Maintenance manually.<br/>",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "A collection of Resource identifiers",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "start_monitoring_resources",
+    "url" : "/api/resources/monitoringstate/start",
+    "http_method" : "PUT",
+    "doc" : "Inform one or more or all Adapters to start monitoring a Collection of Resources.<br/>",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "The Resource identifiers that no longer need to be monitoried",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    }, {
+      "name" : "adapterId",
+      "doc" : "Collection of adapter instance identifiers that should start monitoring the Resources",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "stop_monitoring_resources",
+    "url" : "/api/resources/monitoringstate/stop",
+    "http_method" : "PUT",
+    "doc" : "Inform one or more or all Adapters to stop monitoring a Collection of Resources.<br/>",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "The Resource identifiers that no longer need to be monitoried",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    }, {
+      "name" : "adapterId",
+      "doc" : "Collection of adapter instance identifiers that should stop monitoring the Resources",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_resource_properties_list",
+    "url" : "/api/resources/properties",
+    "http_method" : "GET",
+    "doc" : "Gets all the Properties and their current (latest) values for the specified Resources.<br/>",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "The Collection of Resource Identifiers",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_latest_properties_of_resources",
+    "url" : "/api/resources/properties/latest/query",
+    "http_method" : "POST",
+    "doc" : "Gets current (latest) values of requested properties for the specified resources.</br>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_matching_resources",
+    "url" : "/api/resources/query",
+    "http_method" : "POST",
+    "doc" : "Gets a listing of resources based on the query spec specified.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_stat_keys_of_resources",
+    "url" : "/api/resources/statkeys",
+    "http_method" : "GET",
+    "doc" : "Gets all the available Stat Keys and their details for the specified set of Resources.</br>",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "The identifiers of the Resources to retrieve a list of available for",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "searchstring",
+      "doc" : "an optional wildcard search string that allows\n                     user to refine the list of returned Stat Key details by\n                     key name. Usage is similar to a LIKE \"<tt>%searchstring%</tt>\"",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_stats_of_resources",
+    "url" : "/api/resources/stats",
+    "http_method" : "GET",
+    "doc" : "Gets stats for one or more Resources using the specific query spec.</br>",
+    "query_params" : [ {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC\n <br/><br/>NOTE: If not provided, 24 hour rearward of ending date is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "currentOnly",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "dt",
+      "doc" : "Indicates that the requested stats are based on some dynamic threshold.\n <b>Defaults to false which indicates that stats are not based on dynamic\n threshold.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>Long value is number of milliseconds since January 1, 1970 00:00:00 UTC\n <br>\n <br/>NOTE: The ending date must not be less than the beginning date.\n <br/>      If not provided, current time as UTC milliseconds is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalQuantifier",
+      "doc" : "Number for the interval type",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalType",
+      "doc" : "Interval type requested by the user (e.g: Days, Weeks, Months etc.)",
+      "type" : "intervalType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "latestMaxSamples",
+      "doc" : "the maximum number of samples to return when querying latest.\n When processing the get latest stats query if it is omitted a value of 1 is assumed.\n <br/>\n A query for the latest samples is not compatible with specifying the RollUpType value.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "rollUpType",
+      "doc" : "Rollup Type requested by the user (e.g.: AVG, MIN, MAX etc.)",
+      "type" : "rollUpType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_stats_of_resources_csv",
+    "url" : "/api/resources/stats",
+    "http_method" : "GET",
+    "doc" : "Gets Stats (time-series) data of several Resources in CSV format.<br/>",
+    "query_params" : [ {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC\n <br/><br/>NOTE: If not provided, 24 hour rearward of ending date is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "currentOnly",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "dt",
+      "doc" : "Indicates that the requested stats are based on some dynamic threshold.\n <b>Defaults to false which indicates that stats are not based on dynamic\n threshold.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>Long value is number of milliseconds since January 1, 1970 00:00:00 UTC\n <br>\n <br/>NOTE: The ending date must not be less than the beginning date.\n <br/>      If not provided, current time as UTC milliseconds is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalQuantifier",
+      "doc" : "Number for the interval type",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalType",
+      "doc" : "Interval type requested by the user (e.g: Days, Weeks, Months etc.)",
+      "type" : "intervalType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "latestMaxSamples",
+      "doc" : "the maximum number of samples to return when querying latest.\n When processing the get latest stats query if it is omitted a value of 1 is assumed.\n <br/>\n A query for the latest samples is not compatible with specifying the RollUpType value.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "rollUpType",
+      "doc" : "Rollup Type requested by the user (e.g.: AVG, MIN, MAX etc.)",
+      "type" : "rollUpType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "add_stats_for_resources",
+    "url" : "/api/resources/stats",
+    "http_method" : "POST",
+    "doc" : "Adds Stats to a Collection of Resources.<br/>",
+    "query_params" : [ {
+      "name" : "disableAnalyticsProcessing",
+      "doc" : "Whether the current data set\n goes through Analytics processing (Threshold checking, Alert generation) or not.<br/>\n Defaults to false. But when set to true will result in no evaluation of Alerts\n but the data gets stored.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "add_stats_for_resources_using_push_adapter_kind",
+    "url" : "/api/resources/stats/adapterkinds/{adapterKind}",
+    "http_method" : "POST",
+    "doc" : "Adds Stats to a Collection of Resources along with associating an adapter instance of the specified",
+    "query_params" : [ {
+      "name" : "disableAnalyticsProcessing",
+      "doc" : "Whether the current data set\n goes through Analytics processing (Threshold checking, Alert generation) or not.<br/>\n Defaults to false. But when set to true will result in no evaluation of Alerts\n but the data gets stored.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "adapterKind",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_stats_and_dt_for_resources",
+    "url" : "/api/resources/stats/dt/query",
+    "http_method" : "POST",
+    "doc" : "Get Stats and Dynamic Threshold values for one or more StatKeys and for a Collection of Resources.</br>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_stats_and_dt_for_resources_csv",
+    "url" : "/api/resources/stats/dt/query",
+    "http_method" : "POST",
+    "doc" : "Gets Stats (time-series) data and Dynamic Threshold values for one or more StatKeys",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_latest_stats_of_resources",
+    "url" : "/api/resources/stats/latest",
+    "http_method" : "GET",
+    "doc" : "Gets Latest stats of one or more Resources using the query spec that is specified.<br/>",
+    "query_params" : [ {
+      "name" : "currentOnly",
+      "doc" : "Indicates whether to report only \"current\" stat values, i.e. skip the stat-s that haven't published any value\n during recent collection cycles.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "maxSamples",
+      "doc" : "The maximum number of samples to return when querying latest stats. <br>\n Defaults to 1 so that when processing the query if it is omitted\n the response would contain a single sample",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics (does not include instanced stats)",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the latest stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the latest stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_latest_stats_of_resources_csv",
+    "url" : "/api/resources/stats/latest",
+    "http_method" : "GET",
+    "doc" : "Gets Latest Stats data (most recent data points) of several Resources in CSV format.<br/>",
+    "query_params" : [ {
+      "name" : "currentOnly",
+      "doc" : "Indicates whether to report only \"current\" stat values, i.e. skip the stat-s that haven't published any value\n during recent collection cycles.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "maxSamples",
+      "doc" : "The maximum number of samples to return when querying latest stats. <br>\n Defaults to 1 so that when processing the query if it is omitted\n the response would contain a single sample",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics (does not include instanced stats)",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the latest stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the latest stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_latest_stats_of_resources",
+    "url" : "/api/resources/stats/latest/query",
+    "http_method" : "POST",
+    "doc" : "Retrieves the last \"maxSamples\" stats values for specified one or more Resources.</br>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_stats_for_resources",
+    "url" : "/api/resources/stats/query",
+    "http_method" : "POST",
+    "doc" : "Gets stats for one or more Resources using the specific query spec.</br>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_top_n_stats_of_resources",
+    "url" : "/api/resources/stats/topn",
+    "http_method" : "GET",
+    "doc" : "Gets the Top-N stats data for one or more Resources and a set of StatKeys. <br/>",
+    "query_params" : [ {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC\n <br/><br/>NOTE: If not provided, 24 hour rearward of ending date is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "currentOnly",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "dt",
+      "doc" : "Indicates that the requested stats are based on some dynamic threshold.\n <b>Defaults to false which indicates that stats are not based on dynamic\n threshold.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>Long value is number of milliseconds since January 1, 1970 00:00:00 UTC\n <br>\n <br/>NOTE: The ending date must not be less than the beginning date.\n <br/>      If not provided, current time as UTC milliseconds is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "groupBy",
+      "doc" : "",
+      "type" : "groupBy",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalQuantifier",
+      "doc" : "Number for the interval type",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalType",
+      "doc" : "Interval type requested by the user (e.g: Days, Weeks, Months etc.)",
+      "type" : "intervalType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "latestMaxSamples",
+      "doc" : "the maximum number of samples to return when querying latest.\n When processing the get latest stats query if it is omitted a value of 1 is assumed.\n <br/>\n A query for the latest samples is not compatible with specifying the RollUpType value.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "rollUpType",
+      "doc" : "Rollup Type requested by the user (e.g.: AVG, MIN, MAX etc.)",
+      "type" : "rollUpType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "sortOrder",
+      "doc" : "",
+      "type" : "sort-order",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "topN",
+      "doc" : "",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_resource",
+    "url" : "/api/resources/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets the Resource for the specified identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_resource",
+    "url" : "/api/resources/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a Resource with the given identifier. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "update_geo_location_of_resource",
+    "url" : "/api/resources/{id}/geolocation",
+    "http_method" : "PUT",
+    "doc" : "Updates the geographical location of the Resource.",
+    "query_params" : [ {
+      "name" : "latitude",
+      "doc" : "latitude of the location.",
+      "type" : "double",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "longitude",
+      "doc" : "longitude of the location",
+      "type" : "double",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "mark_resource_as_being_maintained",
+    "url" : "/api/resources/{id}/maintained",
+    "http_method" : "PUT",
+    "doc" : "Put the specific Resource in Maintenance.<br/>",
+    "query_params" : [ {
+      "name" : "duration",
+      "doc" : "Duration for which this resource will be in maintenance (In Minutes)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "unmark_resource_as_being_maintained",
+    "url" : "/api/resources/{id}/maintained",
+    "http_method" : "DELETE",
+    "doc" : "Bring the Resource out of Maintenance manually.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "start_monitoring_resource",
+    "url" : "/api/resources/{id}/monitoringstate/start",
+    "http_method" : "PUT",
+    "doc" : "Inform one or more or all Adapters to start monitoring this Resource.<br/>",
+    "query_params" : [ {
+      "name" : "adapterId",
+      "doc" : "Collection of adapter instance identifiers that should start monitoring this Resource",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "stop_monitoring_resource",
+    "url" : "/api/resources/{id}/monitoringstate/stop",
+    "http_method" : "PUT",
+    "doc" : "Inform one or more or all Adapters to stop monitoring this Resource.<br/>",
+    "query_params" : [ {
+      "name" : "adapterId",
+      "doc" : "Collection of adapter instance identifiers that should stop monitoring this Resource",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_resource_properties",
+    "url" : "/api/resources/{id}/properties",
+    "http_method" : "GET",
+    "doc" : "Get all the properties for the specified Resource.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_properties",
+    "url" : "/api/resources/{id}/properties",
+    "http_method" : "POST",
+    "doc" : "Adds Properties to a Resource. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_properties_using_push_adapter_kind",
+    "url" : "/api/resources/{id}/properties/adapterkinds/{adapterKind}",
+    "http_method" : "POST",
+    "doc" : "Adds Properties to a Resource along with associating an adapter instance of the specified",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterKind",
+      "type" : null,
+      "doc" : ""
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_relationships",
+    "url" : "/api/resources/{id}/relationships",
+    "http_method" : "GET",
+    "doc" : "Gets <i>ALL</i> the related resources of a particular Relationship Type for a Resource.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "relationshipType",
+      "doc" : "The type of relationship of the objects; Uses the RelationshipType.representation value.<br/>\n                         Allowed values are: PARENT, CHILD, ALL.",
+      "type" : "relationship-type",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "set_relationship",
+    "url" : "/api/resources/{id}/relationships/{relationshipType}",
+    "http_method" : "PUT",
+    "doc" : "Set (Replace) Resources as <i>RelationshipType</i> of a specific Resource. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "relationshipType",
+      "type" : null,
+      "doc" : "The type of relationship that we want to establish\n            between the resources, valid values are parents, children"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_relationship",
+    "url" : "/api/resources/{id}/relationships/{relationshipType}",
+    "http_method" : "POST",
+    "doc" : "Add relationships of given type to the resource with specified resourceId. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "relationshipType",
+      "type" : null,
+      "doc" : "The type of relationship that we want to establish\n            between the resources, valid values are parents, children"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_relationship",
+    "url" : "/api/resources/{id}/relationships/{relationshipType}",
+    "http_method" : "GET",
+    "doc" : "Gets the related resources of a particular Relationship Type for a Resource.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "relationshipType",
+      "type" : null,
+      "doc" : "The type of relationship that we want to establish\n            between the resources, valid values are parents, children"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_relationship",
+    "url" : "/api/resources/{id}/relationships/{relationshipType}/{relatedId}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes (removes) a Resource as <i>RelationshipType</i> of a specific Resource. <br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "relatedId",
+      "type" : null,
+      "doc" : "The UUID of the resource to remove from relationship"
+    }, {
+      "name" : "relationshipType",
+      "type" : null,
+      "doc" : "The type of relationship that we want to establish\n            between the resources, valid values are parents, children"
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_stat_keys",
+    "url" : "/api/resources/{id}/statkeys",
+    "http_method" : "GET",
+    "doc" : "Get all the stat keys for the specified Resource.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_stats",
+    "url" : "/api/resources/{id}/stats",
+    "http_method" : "POST",
+    "doc" : "Adds Stats to a Resource. <br/>",
+    "query_params" : [ {
+      "name" : "disableAnalyticsProcessing",
+      "doc" : "Whether the current data set\n goes through Analytics processing (Threshold checking, Alert generation) or not.<br/>\n Defaults to false. But when set to true will result in no evaluation of Alerts\n but the data gets stored.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_stats_of_resource",
+    "url" : "/api/resources/{id}/stats",
+    "http_method" : "GET",
+    "doc" : "Look up stats of a group of objects with the resource ids.",
+    "query_params" : [ {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC\n <br/><br/>NOTE: If not provided, 24 hour rearward of ending date is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "currentOnly",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "dt",
+      "doc" : "Indicates that the requested stats are based on some dynamic threshold.\n <b>Defaults to false which indicates that stats are not based on dynamic\n threshold.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>Long value is number of milliseconds since January 1, 1970 00:00:00 UTC\n <br>\n <br/>NOTE: The ending date must not be less than the beginning date.\n <br/>      If not provided, current time as UTC milliseconds is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalQuantifier",
+      "doc" : "Number for the interval type",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalType",
+      "doc" : "Interval type requested by the user (e.g: Days, Weeks, Months etc.)",
+      "type" : "intervalType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "latestMaxSamples",
+      "doc" : "the maximum number of samples to return when querying latest.\n When processing the get latest stats query if it is omitted a value of 1 is assumed.\n <br/>\n A query for the latest samples is not compatible with specifying the RollUpType value.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "rollUpType",
+      "doc" : "Rollup Type requested by the user (e.g.: AVG, MIN, MAX etc.)",
+      "type" : "rollUpType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_stats_using_push_adapter_kind",
+    "url" : "/api/resources/{id}/stats/adapterkinds/{adapterKind}",
+    "http_method" : "POST",
+    "doc" : "Adds Stats to a Resource along with associating an adapter instance of the specified",
+    "query_params" : [ {
+      "name" : "disableAnalyticsProcessing",
+      "doc" : "Whether the current data set\n goes through Analytics processing (Threshold checking, Alert generation) or not.<br/>\n Defaults to false. But when set to true will result in no evaluation of Alerts\n but the data gets stored.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "adapterKind",
+      "type" : null,
+      "doc" : ""
+    }, {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_dt_stats_of_resource",
+    "url" : "/api/resources/{id}/stats/dt",
+    "http_method" : "GET",
+    "doc" : "Get Stats and Dynamic Threshold values for one or more StatKeys and for a Collection of Resources.</br>",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "Collection of Resource identifiers for which Stats and DT values need to be retrieved",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    }, {
+      "name" : "statKey",
+      "doc" : "Collection of StatKeys for which Stats and DT values need to be retrieved",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : true
+    }, {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>long value is number of milliseconds since January 1, 1970 00:00:00 UTC",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "showSmooth",
+      "doc" : "indicates whether stats should be smoothened or not. default value is true",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "smoothFactor",
+      "doc" : "the smooth precision, default value is 2.0",
+      "type" : "double",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_latest_stats",
+    "url" : "/api/resources/{id}/stats/latest",
+    "http_method" : "GET",
+    "doc" : "Get the latest stat for a given Resource and given a set of attributes.",
+    "query_params" : [ {
+      "name" : "currentOnly",
+      "doc" : "Indicates whether to report only \"current\" stat values, i.e. skip the stat-s that haven't published any value\n during recent collection cycles.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "maxSamples",
+      "doc" : "The maximum number of samples to return when querying latest stats. <br>\n Defaults to 1 so that when processing the query if it is omitted\n the response would contain a single sample",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics (does not include instanced stats)",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the latest stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the latest stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_stats_for_resource",
+    "url" : "/api/resources/{id}/stats/query",
+    "http_method" : "POST",
+    "doc" : "Look up stats of a group of objects with the resource ids.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_top_n_stats_of_resource",
+    "url" : "/api/resources/{id}/stats/topn",
+    "http_method" : "GET",
+    "doc" : "Get the TopN stats for a given Resource and given a set of attributes.",
+    "query_params" : [ {
+      "name" : "begin",
+      "doc" : "The beginning date as a long value of the range of stats to return\n <br>Value measures the number of milliseconds since January 1, 1970 00:00:00 UTC\n <br/><br/>NOTE: If not provided, 24 hour rearward of ending date is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "currentOnly",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "dt",
+      "doc" : "Indicates that the requested stats are based on some dynamic threshold.\n <b>Defaults to false which indicates that stats are not based on dynamic\n threshold.",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "end",
+      "doc" : "The ending date as a long value of the range of stats to return\n <br>Long value is number of milliseconds since January 1, 1970 00:00:00 UTC\n <br>\n <br/>NOTE: The ending date must not be less than the beginning date.\n <br/>      If not provided, current time as UTC milliseconds is used",
+      "type" : "long",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "groupBy",
+      "doc" : "",
+      "type" : "groupBy",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalQuantifier",
+      "doc" : "Number for the interval type",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "intervalType",
+      "doc" : "Interval type requested by the user (e.g: Days, Weeks, Months etc.)",
+      "type" : "intervalType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "latestMaxSamples",
+      "doc" : "the maximum number of samples to return when querying latest.\n When processing the get latest stats query if it is omitted a value of 1 is assumed.\n <br/>\n A query for the latest samples is not compatible with specifying the RollUpType value.",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "metrics",
+      "doc" : "Indicates whether specified statKey-s of query should be forcibly treated as metrics",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of Resource ids to fetch the stats for",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "rollUpType",
+      "doc" : "Rollup Type requested by the user (e.g.: AVG, MIN, MAX etc.)",
+      "type" : "rollUpType",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "sortOrder",
+      "doc" : "",
+      "type" : "sort-order",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "statKey",
+      "doc" : "Array of stat keys to return the stats for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "topN",
+      "doc" : "",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_solutions",
+    "url" : "/api/solutions",
+    "http_method" : "GET",
+    "doc" : "get all solutions registered with the product. get data about all the solutions associated with vRealize Operations instance. Data includes name, version , vendor and adapterKinds of the solution",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_solution",
+    "url" : "/api/solutions/{solutionId}",
+    "http_method" : "GET",
+    "doc" : "get solution data for the solutionId. get solution data for the solutionId. Data includes name, version , vendor and adapterKinds of the solution",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "solutionId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_adapter_kinds_for_solution",
+    "url" : "/api/solutions/{solutionId}/adapterkinds",
+    "http_method" : "GET",
+    "doc" : "get adapterkinds details for the solutionId. get data about the adapterKinds for the solutionId",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "solutionId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "add_license_keys_to_solution",
+    "url" : "/api/solutions/{solutionId}/licenses",
+    "http_method" : "POST",
+    "doc" : "Add a license key for a solution.. Only licenseKey needs to be populated in the request object. Other fields will be set as a part of response.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "solutionId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_license_keys_for_solution",
+    "url" : "/api/solutions/{solutionId}/licenses",
+    "http_method" : "GET",
+    "doc" : "Get all the licenses that are currently available for a solution.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "solutionId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "delete_license_key",
+    "url" : "/api/solutions/{solutionId}/licenses/{licenseId}",
+    "http_method" : "DELETE",
+    "doc" : "deletes the licenseId for the solutionid from the system.. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "licenseId",
+      "type" : null,
+      "doc" : "the Id of the license"
+    }, {
+      "name" : "solutionId",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_super_metrics",
+    "url" : "/api/supermetrics",
+    "http_method" : "GET",
+    "doc" : "Gets a collection of SuperMetrics based on search parameters.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "id",
+      "doc" : "SuperMetrics based on identifiers",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "name",
+      "doc" : "SuperMetrics based on names",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_super_metric",
+    "url" : "/api/supermetrics",
+    "http_method" : "POST",
+    "doc" : "Creates a SuperMetric with the given name, formula and description.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_super_metric",
+    "url" : "/api/supermetrics",
+    "http_method" : "PUT",
+    "doc" : "Update a SuperMetric with the given name, formula and description.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_super_metric",
+    "url" : "/api/supermetrics/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a SuperMetric.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "Identifier of the SuperMetric to delete"
+    } ]
+  }, {
+    "name" : "get_super_metric",
+    "url" : "/api/supermetrics/{id}",
+    "http_method" : "GET",
+    "doc" : "Get a SuperMetric with the given id.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "Identifier of the SuperMetric to delete"
+    } ]
+  }, {
+    "name" : "create_symptom_definition",
+    "url" : "/api/symptomdefinitions",
+    "http_method" : "POST",
+    "doc" : "Create the Symptom Definition.  The symptom definition identifier  must be null and will be generated by the system.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_symptom_definition",
+    "url" : "/api/symptomdefinitions",
+    "http_method" : "PUT",
+    "doc" : "Update an existing Symptom Definition",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_symptom_definitions",
+    "url" : "/api/symptomdefinitions",
+    "http_method" : "GET",
+    "doc" : "Get Symptom Definitions",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "adapterKind",
+      "doc" : "The adapter kind identifier of the symptom definitions to search for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "id",
+      "doc" : "The identifier(s) of the symptom definitions to search for.  Exact match.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "name",
+      "doc" : "The substring of the symptom definition's name to search for.  Case-insensitive.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceKind",
+      "doc" : "The resource kind identifier of the symptom definitions to search for",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_symptom_definition",
+    "url" : "/api/symptomdefinitions/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Deletes a Symptom Definition.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the Symptom Definition to delete"
+    } ]
+  }, {
+    "name" : "get_symptom_definition_by_key",
+    "url" : "/api/symptomdefinitions/{id}",
+    "http_method" : "GET",
+    "doc" : "Get Symptom Definition specified by id",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The identifier of the Symptom Definition to delete"
+    } ]
+  }, {
+    "name" : "get_symptoms",
+    "url" : "/api/symptoms",
+    "http_method" : "GET",
+    "doc" : "Look up all Symptoms in the system.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "Array of resource identifiers for which Symptoms need to be looked up",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    }, {
+      "name" : "activeOnly",
+      "doc" : "Boolean that determines if the results should include inactive Symptoms",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_symptoms",
+    "url" : "/api/symptoms/query",
+    "http_method" : "POST",
+    "doc" : "Look up a set of Symptoms using a query object.<br/>",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_tasks_status",
+    "url" : "/api/tasks",
+    "http_method" : "GET",
+    "doc" : "Look up a list of task objects.<br/>",
+    "query_params" : [ {
+      "name" : "taskId",
+      "doc" : "",
+      "type" : "collection",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "taskState",
+      "doc" : "",
+      "type" : "collection",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_task_status",
+    "url" : "/api/tasks/{id}",
+    "http_method" : "GET",
+    "doc" : "Look up a task with the given identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "get_supported_application_versions",
+    "url" : "/api/versions",
+    "http_method" : "GET",
+    "doc" : "Enumerates all Supported Versions by the Service.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_supported_application_versions_0",
+    "url" : "/api/versions",
+    "http_method" : "GET",
+    "doc" : "Enumerates all Supported Versions by the Service.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_current_version_of_server",
+    "url" : "/api/versions/current",
+    "http_method" : "GET",
+    "doc" : "Gets the current version of the Service.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_api_endpoints",
+    "url" : "/api/versions/current/endpoints",
+    "http_method" : "GET",
+    "doc" : "Enumerates the API end points supported by the Service.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "upload_adapter_zip",
+    "url" : "/internal/adapterkinds",
+    "http_method" : "POST",
+    "doc" : "Uploads Adapter zip file (via file upload) and returns an object to monitor progress.<br/>",
+    "query_params" : [ {
+      "name" : "file",
+      "doc" : "",
+      "type" : "binary",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "forceUpload",
+      "doc" : "True to force install of adapter binary and files,\n                  false to only install newer versions",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "forceContentUpdate",
+      "doc" : "",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_describe_xml",
+    "url" : "/internal/adapterkinds/describe",
+    "http_method" : "POST",
+    "doc" : "Updates the describe document and triggers a Describe operation. <br/>",
+    "query_params" : [ {
+      "name" : "forceDescribe",
+      "doc" : "Forces the describe to occur (ignores version check)",
+      "type" : "boolean",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "upload_describe_document",
+    "url" : "/internal/adapterkinds/describeupload",
+    "http_method" : "POST",
+    "doc" : "Updates the describe document via file upload and triggers a Describe operation. <br/>",
+    "query_params" : [ {
+      "name" : "describeFile",
+      "doc" : "The describe document file that was uploaded",
+      "type" : "binary",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "forceDescribe",
+      "doc" : "Forces the describe to occur (ignores document version check)",
+      "type" : "boolean",
+      "optional" : false,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_resource_kind",
+    "url" : "/internal/adapterkinds/{adapterKindKey}/resourcekinds",
+    "http_method" : "POST",
+    "doc" : "Creates a new Resource Kind in the system.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "adapterKindKey",
+      "type" : null,
+      "doc" : ""
+    } ]
+  }, {
+    "name" : "upgrade_agent",
+    "url" : "/internal/agent/upgrade",
+    "http_method" : "POST",
+    "doc" : "Upgrades a specific agent in the system.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "set_namespace_values",
+    "url" : "/internal/deployment/config/properties/{namespace}",
+    "http_method" : "POST",
+    "doc" : "set default key/values for the given namespace. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : "namespace"
+    } ]
+  }, {
+    "name" : "update_namespace_values",
+    "url" : "/internal/deployment/config/properties/{namespace}",
+    "http_method" : "PUT",
+    "doc" : "update default key/values for the given namespace. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : "namespace"
+    } ]
+  }, {
+    "name" : "delete_namespace_key_0",
+    "url" : "/internal/deployment/config/properties/{namespace}/{key}",
+    "http_method" : "DELETE",
+    "doc" : "delete key and values from namespace. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "key",
+      "type" : null,
+      "doc" : "key to delete"
+    }, {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : "namespace"
+    } ]
+  }, {
+    "name" : "update_namespace_key_values_0",
+    "url" : "/internal/deployment/config/properties/{namespace}/{key}/{value}",
+    "http_method" : "PUT",
+    "doc" : "update values for the given namespace key. ",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "value",
+      "type" : null,
+      "doc" : "comma-separated string of values"
+    }, {
+      "name" : "key",
+      "type" : null,
+      "doc" : "key to delete"
+    }, {
+      "name" : "namespace",
+      "type" : null,
+      "doc" : "namespace"
+    } ]
+  }, {
+    "name" : "get_metering_policies",
+    "url" : "/internal/metering",
+    "http_method" : "GET",
+    "doc" : "Gets a listing of metering policies.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_metering_policy",
+    "url" : "/internal/metering",
+    "http_method" : "POST",
+    "doc" : "Creates a new metering policy.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "update_metering_policy",
+    "url" : "/internal/metering",
+    "http_method" : "PUT",
+    "doc" : "Updates the specified metering policy.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_resources_metering",
+    "url" : "/internal/metering/price",
+    "http_method" : "GET",
+    "doc" : "Gets a listing of resources metering.<br/>",
+    "query_params" : [ {
+      "name" : "startTime",
+      "doc" : "Start time",
+      "type" : "long",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "endTime",
+      "doc" : "End time",
+      "type" : "long",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "policyId",
+      "doc" : "UUID of the policy which should be used for metering calculation",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "List of Object UUIDs for which metering calculation should be done",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_metering_policy",
+    "url" : "/internal/metering/{id}",
+    "http_method" : "GET",
+    "doc" : "Gets the metering policy for the specified identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The metering policy identifier"
+    } ]
+  }, {
+    "name" : "delete_metering_policy",
+    "url" : "/internal/metering/{id}",
+    "http_method" : "DELETE",
+    "doc" : "Delete the metering policy for the specified identifier.<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : "The metering policy identifier"
+    } ]
+  }, {
+    "name" : "get_policies",
+    "url" : "/internal/policies",
+    "http_method" : "GET",
+    "doc" : "Get all policies available in vRealize Operations Manager<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "apply_policy",
+    "url" : "/internal/policies/apply",
+    "http_method" : "POST",
+    "doc" : "Apply policy to the given groups<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "export_policies",
+    "url" : "/internal/policies/export",
+    "http_method" : "GET",
+    "doc" : "Export the content of policies into ZIP archive<br/>",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "Policy identifiers to export",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "import_policies",
+    "url" : "/internal/policies/import",
+    "http_method" : "POST",
+    "doc" : "Import policy content from an archive of ZIP format<br/>",
+    "query_params" : [ {
+      "name" : "policy",
+      "doc" : "An archive of policy content to be imported",
+      "type" : "binary",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "forceImport",
+      "doc" : "true to overwrite the existing policies, false to skip importing when there is a conflict",
+      "type" : "boolean",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_bootstrap_status_for_resources",
+    "url" : "/internal/resources/bootstrapStatus",
+    "http_method" : "GET",
+    "doc" : "Returns bootstrap statuses for given resources",
+    "query_params" : [ {
+      "name" : "id",
+      "doc" : "the resource ids of resources of interest",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "set_bootstrap_status_for_resources",
+    "url" : "/internal/resources/bootstrapStatus",
+    "http_method" : "PUT",
+    "doc" : "Sets bootstrap statuses for given resources",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_custom_group",
+    "url" : "/internal/resources/groups",
+    "http_method" : "POST",
+    "doc" : "Create a new custom group definition.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_custom_groups",
+    "url" : "/internal/resources/groups",
+    "http_method" : "GET",
+    "doc" : "Query for custom groups based on groupId and whether they are dynamic or static.",
+    "query_params" : [ {
+      "name" : "groupId",
+      "doc" : "identifier of the group.",
+      "type" : "uuid",
+      "optional" : true,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "modify_custom_group",
+    "url" : "/internal/resources/groups",
+    "http_method" : "PUT",
+    "doc" : "Modify an existing custom group definition.",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "create_static_custom_group",
+    "url" : "/internal/resources/groups/static",
+    "http_method" : "POST",
+    "doc" : "Create a static group.<br/>",
+    "query_params" : [ {
+      "name" : "name",
+      "doc" : "name of the group",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "adapterKind",
+      "doc" : "description of the group.",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "resourceKind",
+      "doc" : "description of the group.",
+      "type" : "string",
+      "optional" : false,
+      "repeating" : false
+    }, {
+      "name" : "description",
+      "doc" : "description of the group.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "resourceId",
+      "doc" : "",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_custom_group",
+    "url" : "/internal/resources/groups/{groupId}",
+    "http_method" : "DELETE",
+    "doc" : "Delete a custom group.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "get_custom_group",
+    "url" : "/internal/resources/groups/{groupId}",
+    "http_method" : "GET",
+    "doc" : "Retrieve a custom group definition using its identifier.",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "replaced_excluded_resources_of_custom_group",
+    "url" : "/internal/resources/groups/{groupId}/excludedResources",
+    "http_method" : "PUT",
+    "doc" : "Replace the list of resources excluded from a group.",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "list of resources to be set as the <i>'excludedResources'</i>",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "exclude_more_resources_from_custom_group",
+    "url" : "/internal/resources/groups/{groupId}/excludedResources",
+    "http_method" : "POST",
+    "doc" : "Append more resources to the custom groups' excludedResources list.",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "included_more_resources_into_custom_group",
+    "url" : "/internal/resources/groups/{groupId}/includedResources",
+    "http_method" : "POST",
+    "doc" : "Append more resources to the custom groups' includedResources list.",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "list of resources that need to be included in the group.",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "replaced_included_resources_of_custom_group",
+    "url" : "/internal/resources/groups/{groupId}/includedResources",
+    "http_method" : "PUT",
+    "doc" : "Replace the list of resources in the included resources list.",
+    "query_params" : [ {
+      "name" : "resourceId",
+      "doc" : "list of resources to be set as the <i>'includedResources'</i>",
+      "type" : "uuid",
+      "optional" : false,
+      "repeating" : true
+    } ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "get_members_of_group",
+    "url" : "/internal/resources/groups/{groupId}/members",
+    "http_method" : "GET",
+    "doc" : "Get the list of (computed/static) members of the group.",
+    "query_params" : [ {
+      "name" : "page",
+      "doc" : "Page number from which data needs to be displayed (0-based)",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "pageSize",
+      "doc" : "Expected number of entries per page",
+      "type" : "int",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ {
+      "name" : "groupId",
+      "type" : null,
+      "doc" : "identifier of the group."
+    } ]
+  }, {
+    "name" : "get_group_types",
+    "url" : "/internal/resources/grouptype",
+    "http_method" : "GET",
+    "doc" : "Get Group Types<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "add_group_type",
+    "url" : "/internal/resources/grouptype",
+    "http_method" : "POST",
+    "doc" : "Add a new Group Type<br/>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "delete_group_type",
+    "url" : "/internal/resources/grouptype/{name}",
+    "http_method" : "DELETE",
+    "doc" : "Delete the Group Type<br/>",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "name",
+      "type" : null,
+      "doc" : "Name of the Group Type to delete"
+    } ]
+  }, {
+    "name" : "merge_resources",
+    "url" : "/internal/resources/merge",
+    "http_method" : "PUT",
+    "doc" : "Merge data from new to old resource.  If new resource does not exist operates as an identity change",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "query_property_changes_of_resources",
+    "url" : "/internal/resources/properties/query",
+    "http_method" : "POST",
+    "doc" : "Gets the value changes of requested properties for the specified resources in a given time interval.</br>",
+    "query_params" : [ ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_view_definitions",
+    "url" : "/internal/viewdefinitions",
+    "http_method" : "GET",
+    "doc" : "Return the view definitions based on the view definition query object , if the query is null all views are",
+    "query_params" : [ {
+      "name" : "description",
+      "doc" : "description to filter with.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "name",
+      "doc" : "view name to filter with.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "owner",
+      "doc" : "owner name to filter with.",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    }, {
+      "name" : "type",
+      "doc" : "view type to filter with",
+      "type" : "string",
+      "optional" : true,
+      "repeating" : false
+    } ],
+    "template_params" : [ ]
+  }, {
+    "name" : "get_view_definition_by_id",
+    "url" : "/internal/viewdefinitions/{id}",
+    "http_method" : "GET",
+    "doc" : "Returns a view definition based on the id",
+    "query_params" : [ ],
+    "template_params" : [ {
+      "name" : "id",
+      "type" : null,
+      "doc" : ""
+    } ]
+  } ]
+}
