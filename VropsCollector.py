@@ -6,7 +6,7 @@ sys.path.append('./module')
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
-import tools.get_modules
+from tools.get_modules import get_modules
 
 
 def do_GET(self):
@@ -51,10 +51,12 @@ class VropsCollector:
         self._target = target
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-        modules = tools.get_modules.get_modules()
+        modules = get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
         for module in self._modules:
+            if os.environ['DEBUG'] == '1':
+                print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def collect(self):
