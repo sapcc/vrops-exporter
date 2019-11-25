@@ -20,7 +20,13 @@ if __name__ == '__main__':
     if options.password:
         os.environ['PASSWORD'] = options.password
     if options.debug:
-        os.environ['DEBUG'] = True
+        os.environ['DEBUG'] = "1"
+        print('DEBUG enabled')
+    else:
+        if 'DEBUG' not in os.environ.keys():
+            os.environ['DEBUG'] = "0"
+        else:
+            print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
 
