@@ -1,19 +1,21 @@
-from tools.get_resources import get_resources
-from resources.Cluster import Cluster
+from tools import get_resources
+from resources.Datacenter import Datacenter
 
 
 class Vcenter:
 
-    def __init__(self):
-        self.uuid = get_resources(self, resourcetype='adapter')['uuid']
-        self.name = get_resources(self, resourcetype='adapter')['name']
-        self.clusters = list()
-        self.datacenter = get_resources(self, resourcetype='resources', resourcekind='datacenter', parentid=self.uuid)
+    def __init__(self, target, user, password, name, uuid):
+        self._target = target
+        self._user = user
+        self._password = password
+        self.uuid = uuid
+        self.name = name
+        self.datacenter = list()
 
-    def add_cluster(self):
-        self.datacenter = get_resources(self, resourcetype='resources', resourcekind='datacenter')
-
-        for cluster in get_resources(self, resourcetype='resources', resourcekind='ClusterComputeResource'):
-            self.clusters.append(Cluster(cluster['name'], cluster['uuid']))
+    def add_datacenter(self):
+        for dc in get_resources(self, target=self._target, user=self._user, password=self._password,
+                                resourcetype='resources', resourcekind='Datacenter', parentid=self.uuid):
+            self.datacenter.append(Datacenter(target=self._target, user=self._user, password=self._password,
+                                              name=dc['name'], uuid=dc['uuid']))
 
 

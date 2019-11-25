@@ -3,9 +3,8 @@ import urllib3
 from requests.auth import HTTPBasicAuth
 
 
-def get_resources(self, resourcetype, resourcekind=None, parentid=None):
-
-    url = "https://" + self._target + "/suite-api/api/" + resourcetype
+def get_resources(self, target, user, password, resourcetype, resourcekind=None, parentid=None):
+    url = "https://" + target + "/suite-api/api/" + resourcetype
 
     querystring = {
         'parentId': parentid,
@@ -24,8 +23,9 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
     resources = list()
 
     if resourcekind:
+
         response = requests.get(url,
-                                auth=HTTPBasicAuth(self._user, self._password),
+                                auth=HTTPBasicAuth(user, password),
                                 params=querystring,
                                 verify=False,
                                 headers=headers)
@@ -37,8 +37,9 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
             resources.append(res)
 
     else:
+
         response = requests.get(url,
-                                auth=HTTPBasicAuth(self._user, self._password),
+                                auth=HTTPBasicAuth(user, password),
                                 verify=False,
                                 headers=headers)
 

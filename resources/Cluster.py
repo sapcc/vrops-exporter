@@ -4,14 +4,19 @@ from resources.Host import Host
 
 class Cluster:
 
-    def __init__(self, name, uuid):
-        self.name = name
+    def __init__(self, target, user, password, name, uuid):
+        self._target = target
+        self._user = user
+        self._password = password
         self.uuid = uuid
+        self.name = name
         self.hosts = list()
 
     def add_host(self):
 
-        for hosts in get_resources(self, resourcetype='resources', resourcekind='HostSystem'):
-            self.hosts.append(Host(hosts['name'], hosts['uuid']))
+        for hosts in get_resources(self, target=self._target, user=self._user, password=self._password,
+                                   resourcetype='resources', resourcekind='HostSystem', parentid=self.uuid):
+            self.hosts.append(Host(target=self._target,user=self._user, password=self._password,
+                                   name=hosts['name'], uuid=hosts['uuid']))
 
 

@@ -2,7 +2,9 @@ import json
 import os
 import importlib
 import sys
+
 sys.path.append('./module')
+
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
@@ -64,3 +66,5 @@ class VropsCollector:
             res = func(self._target, self._user, self._password).collect()
             for i in res:
                 yield i
+
+
