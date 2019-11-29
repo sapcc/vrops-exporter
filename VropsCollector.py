@@ -2,11 +2,13 @@ import json
 import os
 import importlib
 import sys
-sys.path.append('./module')
+from tools.get_resources import get_resources
+from resources.Vcenter import Vcenter
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
-from tools.get_modules import get_modules
+
+sys.path.append('./module')
 
 
 def do_GET(self):
@@ -63,6 +65,30 @@ class VropsCollector:
             if os.environ['DEBUG'] == '1':
                 print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
+        resources = self.resource_collecting()
+
+    def resource_collecting(self):
+        resources = list()
+        if os.environ['DEBUG'] == '1':
+            print('collecting resources...')
+        for vc in get_resources(self, target=self._target, resourcetype='adapters'):
+            resources.append(Vcenter(target=self._target, name=vc['name'], uuid=['uuid']))
+        for vc_object in resources:
+            vc_object.add_cluster()
+            if os.environ['DEBUG'] == '1':
+                print("Collecting Vcenter: " + vc_object.name)
+                for cl_object in vc_object.clusters:
+                    cl_object.add_host()
+                    if os.environ['DEBUG'] == '1':
+                        print("Collecting Cluster: " + cl_object.name)
+                    for hs_object in cl_object.hosts:
+                        hs_object.add_vm()
+                        if os.environ['DEBUG'] == '1':
+                            print("Collecting Hosts: " + hs_object.name)
+                        for vm_object in hs_object.vms:
+                            if os.environ['DEBUG'] == '1':
+                                print("Collecting VM: " + vm_object.name)
+        return resources
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -74,7 +100,13 @@ class VropsCollector:
                 continue
             file = file[:-3]
             files.append(file)
-        return (target_dir, files)
+        if os.environ['DEBUG'] == '1':
+            print('target dir ' + target_dir)
+        return target_dir, files
+
+
+
+
 
     def collect(self):
         for module in self._modules_dict.keys():

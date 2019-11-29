@@ -1,11 +1,12 @@
+import os
 import requests
 import urllib3
 from requests.auth import HTTPBasicAuth
 
 
-def get_resources(self, resourcetype, resourcekind=None, parentid=None):
+def get_resources(self, target, resourcetype, resourcekind=None, parentid=None):
 
-    url = "https://" + self._target + "/suite-api/api/" + resourcetype
+    url = "https://" + target + "/suite-api/api/" + resourcetype
 
     querystring = {
         'parentId': parentid,
@@ -25,7 +26,7 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
 
     if resourcekind:
         response = requests.get(url,
-                                auth=HTTPBasicAuth(self._user, self._password),
+                                auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                 params=querystring,
                                 verify=False,
                                 headers=headers)
@@ -38,7 +39,7 @@ def get_resources(self, resourcetype, resourcekind=None, parentid=None):
 
     else:
         response = requests.get(url,
-                                auth=HTTPBasicAuth(self._user, self._password),
+                                auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                 verify=False,
                                 headers=headers)
 

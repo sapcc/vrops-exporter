@@ -4,16 +4,36 @@ from resources.Cluster import Cluster
 
 class Vcenter:
 
-    def __init__(self):
-        self.uuid = get_resources(self, resourcetype='adapter')['uuid']
-        self.name = get_resources(self, resourcetype='adapter')['name']
+    def __init__(self, target, name, uuid):
+        self.target = target
+        self.uuid = uuid
+        self.name = name
         self.clusters = list()
-        self.datacenter = get_resources(self, resourcetype='resources', resourcekind='datacenter', parentid=self.uuid)
+        self.datacenter = get_resources(self, target=self.target,
+                                        resourcetype='resources',
+                                        resourcekind='Datacenter',
+                                        parentid=self.uuid)
 
     def add_cluster(self):
-        self.datacenter = get_resources(self, resourcetype='resources', resourcekind='datacenter')
+        for cluster in get_resources(self, target=self.target,
+                                     resourcetype='resources',
+                                     resourcekind='ClusterComputeResource',
+                                     parentid=self.uuid):
+            self.clusters.append(Cluster(target=self.target, name=cluster['name'], uuid=cluster['uuid']))
 
-        for cluster in get_resources(self, resourcetype='resources', resourcekind='ClusterComputeResource'):
-            self.clusters.append(Cluster(cluster['name'], cluster['uuid']))
+    """
+        def get_project_ids(self):
+        # collect project_ids
 
+        for project in get_resources(resourcetype='resources',
+                                                  resourcekind='VMFolder',
+                                                  parentid=self.uuid):
+            if project['name'].startswith('Project'):
+                p_ids = dict()
+                p_ids['project_id'] = project['name'][project['name'].find("(") + 1:project['name'].find(")")]
+                p_ids['uuid'] = project['uuid']
+                self.project_ids.append(p_ids)
+
+        return self.project_ids
+    """
 
