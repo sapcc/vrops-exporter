@@ -12,10 +12,10 @@ from tools.get_modules import get_modules
 def do_GET(self):
     registry = CollectorRegistry()
     params = parse_qs(urlparse(self.path).query)
-    print(params)
     if len(params.keys()) != 0:
         try:
-            print(params['target'])
+            if os.environ['DEBUG'] == '1':
+                print(params['target'])
             collector = VropsCollector(params['target'][0])
         except Exception as e:
             print("obviously missing params: " + json.dumps(params))
@@ -49,15 +49,32 @@ class VropsCollector:
 
     def __init__(self, target):
         self._target = target
+        envvars = os.environ.keys()
+        if 'USER' not in envvars:
+            raise ValueError('USER not set')
+        if 'PASSWORD' not in envvars:
+            raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-        modules = get_modules()
+        modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
         for module in self._modules:
             if os.environ['DEBUG'] == '1':
                 print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
+
+    def get_modules(self):
+        current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        target_dir = current_dir.replace('/vrops-exporter', '/vrops-exporter/module')
+        all_files = os.listdir(target_dir)
+        files = list()
+        for file in all_files:
+            if file.startswith('__') or file.startswith('.'):
+                continue
+            file = file[:-3]
+            files.append(file)
+        return (target_dir, files)
 
     def collect(self):
         for module in self._modules_dict.keys():

@@ -32,5 +32,13 @@ PORT
 ## Service discovery way of querying
 Query with: ``http://localhost:1234/?target=yourDNSName``
 
+
+## Testing
+Test module is called using ENV variables. Specifying these on the fly would look like this:
+
+```
+PORT="9001" DEBUG=0 PASSWORD="yourpassword" TARGET="vrops.url.com" USER="sometechnicaluser" python3 tests/TestCollectors.py
+```
+
 ## Resources
 ![Class Diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/christopherhans/uml/master/vrops-exporter.puml)

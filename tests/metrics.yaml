@@ -1,0 +1,3 @@
+SampleCollector:
+   metrics:
+   - 'vrops_ressource_gauge{entityname="vmentityname",target="testhost.test"}'
