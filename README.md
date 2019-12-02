@@ -9,15 +9,17 @@ The container is defaulting to /vrops-exporter path. Use vrops-exporter.py with 
 
 ```
 Usage: vrops-exporter.py [options]
-
-Options:
-  -h, --help            show this help message and exit
-  -u USER, --user=USER  specify user to log in
-  -p PASSWORD, --password=PASSWORD
-                        specify password to log in
-  -o PORT, --port=PORT  specify exporter port
-  -d, --debug           enable debug
 ```
+Options:
+
+short | long | description
+--- | --- | ---
+  -h | --help |           show this help message and exit
+  -u USER | --user=USER | specify user to log in
+  -p PASSWORD | --password=PASSWORD | specify password to log in
+  -o PORT | --port=PORT | specify exporter port
+  -d | --debug    |       enable debug
+
 
 2. Enviroment variables
 
@@ -37,3 +39,6 @@ Test module is called using ENV variables. Specifying these on the fly would loo
 ```
 PORT="9001" DEBUG=0 PASSWORD="yourpassword" TARGET="vrops.url.com" USER="sometechnicaluser" python3 tests/TestCollectors.py
 ```
+
+## Resources
+![Class Diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/christopherhans/uml/master/vrops-exporter.puml)
