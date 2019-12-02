@@ -58,9 +58,7 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-        resource = self.resource_collecting()
-        if os.environ['DEBUG'] == '1':
-            print(resource)
+        resource = self.create_resource_objects()
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -69,34 +67,23 @@ class VropsCollector:
                 print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
-    def resource_collecting(self):
-        if os.environ['DEBUG'] == '1':
-            print('collecting resources...')
+    def create_resource_objects(self):
         for adapter in get_resources(target=self._target, resourcetype='adapters'):
             if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
-                vc = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
-                print(vc.name)
-                print(vc.uuid)
-
-                
-        """
-        for vc_object i:
-            vc_object.add_cluster()
-            if os.environ['DEBUG'] == '1':
-                print("Collecting Vcenter: " + vc_object.name)
-            for cl_object in vc_object.clusters:
-                cl_object.add_host()
-                if os.environ['DEBUG'] == '1':
-                    print("Collecting Cluster: " + cl_object.name)
-                for hs_object in cl_object.hosts:
-                    hs_object.add_vm()
-                    if os.environ['DEBUG'] == '1':
-                        print("Collecting Hosts: " + hs_object.name)
-                    for vm_object in hs_object.vms:
-                        if os.environ['DEBUG'] == '1':
-                            print("Collecting VM: " + vm_object.name)
-        """
-        return vc
+                vcenter = Vcenter(vcenter=adapter, name=adapter['name'], uuid=adapter['uuid'])
+                print(vcenter.name, vcenter.uuid)
+                vcenter.add_datacenter()
+                for dc_object in vcenter.datacenter:
+                    print("Collecting Datacenter: " + dc_object.name)
+                    dc_object.add_cluster()
+                    for cl_object in dc_object.clusters:
+                        print("Collecting Cluster: " + cl_object.name)
+                        cl_object.add_host()
+                        for hs_object in cl_object.hosts:
+                            print("Collecting Hosts: " + hs_object.name)
+                            for vm_object in hs_object.vms:
+                                print("Collecting VM: " + vm_object.name)
+                                return vcenter
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -108,8 +95,6 @@ class VropsCollector:
                 continue
             file = file[:-3]
             files.append(file)
-        if os.environ['DEBUG'] == '1':
-            print('target dir ' + target_dir)
         return target_dir, files
 
     def collect(self):
