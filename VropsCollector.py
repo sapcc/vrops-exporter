@@ -3,7 +3,7 @@ import os
 import importlib
 import sys
 from tools.get_resources import get_resources
-from resources.Vcenter import Vcenter
+from resources import *
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
@@ -58,11 +58,9 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-
-        resources = self.resource_collecting()
+        resource = self.resource_collecting()
         if os.environ['DEBUG'] == '1':
-            print(resources[0])
-
+            print(resource)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -72,27 +70,33 @@ class VropsCollector:
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def resource_collecting(self):
-        resources = list()
         if os.environ['DEBUG'] == '1':
             print('collecting resources...')
-        for vc in get_resources(self, target=self._target, resourcetype='adapters'):
-            resources.append(Vcenter(target=self._target, name=vc['name'], uuid=['uuid']))
-        for vc_object in resources:
+        for adapter in get_resources(target=self._target, resourcetype='adapters'):
+            if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
+                vc = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
+                print(vc.name)
+                print(vc.uuid)
+
+                
+        """
+        for vc_object i:
             vc_object.add_cluster()
             if os.environ['DEBUG'] == '1':
                 print("Collecting Vcenter: " + vc_object.name)
-                for cl_object in vc_object.clusters:
-                    cl_object.add_host()
+            for cl_object in vc_object.clusters:
+                cl_object.add_host()
+                if os.environ['DEBUG'] == '1':
+                    print("Collecting Cluster: " + cl_object.name)
+                for hs_object in cl_object.hosts:
+                    hs_object.add_vm()
                     if os.environ['DEBUG'] == '1':
-                        print("Collecting Cluster: " + cl_object.name)
-                    for hs_object in cl_object.hosts:
-                        hs_object.add_vm()
+                        print("Collecting Hosts: " + hs_object.name)
+                    for vm_object in hs_object.vms:
                         if os.environ['DEBUG'] == '1':
-                            print("Collecting Hosts: " + hs_object.name)
-                        for vm_object in hs_object.vms:
-                            if os.environ['DEBUG'] == '1':
-                                print("Collecting VM: " + vm_object.name)
-        return resources
+                            print("Collecting VM: " + vm_object.name)
+        """
+        return vc
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -107,10 +111,6 @@ class VropsCollector:
         if os.environ['DEBUG'] == '1':
             print('target dir ' + target_dir)
         return target_dir, files
-
-
-
-
 
     def collect(self):
         for module in self._modules_dict.keys():
