@@ -15,11 +15,7 @@ from tools.YamlRead import YamlRead
 from VropsCollector import VropsCollector
 
 class TestCollectors(unittest.TestCase):
-    USER        = os.getenv('USER')
-    PASSWORD    = os.getenv('PASSWORD')
-    # PORT        = int(os.getenv('PORT'))
     TARGET      = os.getenv('TARGET')
-
 
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
