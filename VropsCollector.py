@@ -58,6 +58,11 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
+
+        resources = self.resource_collecting()
+        if os.environ['DEBUG'] == '1':
+            print(resources[0])
+
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -65,7 +70,6 @@ class VropsCollector:
             if os.environ['DEBUG'] == '1':
                 print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
-        resources = self.resource_collecting()
 
     def resource_collecting(self):
         resources = list()
