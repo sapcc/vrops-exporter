@@ -6,16 +6,16 @@ import http.client
 from unittest.mock import MagicMock
 from threading import Thread
 
-sys.path.append('../vrops-exporter')
-sys.path.append('../vrops-exporter/tools')
-sys.path.append('../vrops-exporter/modules')
+sys.path.append('.')
 
 from vrops_exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from VropsCollector import VropsCollector
 
 class TestCollectors(unittest.TestCase):
-    TARGET      = os.getenv('TARGET')
+    def test_environment(self):
+        self.assertTrue(os.getenv('USER'),'no dummy USER set')
+        self.assertTrue(os.getenv('PASSWORD'),'no dummy PASSWORD set')
 
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
