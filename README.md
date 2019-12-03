@@ -27,7 +27,7 @@ short | long | description
 USER
 PASSWORD
 PORT
-```
+```  
 
 ## Service discovery way of querying
 Query with: ``http://localhost:1234/?target=yourDNSName``
