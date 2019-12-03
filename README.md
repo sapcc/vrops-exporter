@@ -37,8 +37,10 @@ Query with: ``http://localhost:1234/?target=yourDNSName``
 Test module is called using ENV variables. Specifying these on the fly would look like this:
 
 ```
-DEBUG=0 TARGET="vrops.url.com" python3 tests/TestCollectors.py
+DEBUG=0 USER=foo PW=bar python3 tests/TestCollectors.py
 ```
+
+Please note, that USER and PW don't do anything at all currently, they are just being passed because VropsCollector.py is checking that these are present.
 
 ## Resources
 ![Class Diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/christopherhans/uml/master/vrops-exporter.puml)
