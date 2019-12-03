@@ -7,6 +7,7 @@ from prometheus_client import start_http_server
 from optparse import OptionParser
 from VropsCollector import VropsCollector
 
+
 def parse_params():
     parser = OptionParser()
     parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
