@@ -4,7 +4,7 @@ import urllib3
 from requests.auth import HTTPBasicAuth
 
 
-def get_resources(self, target, resourcetype, resourcekind=None, parentid=None):
+def get_resources(target, resourcetype, resourcekind=None, parentid=None):
 
     url = "https://" + target + "/suite-api/api/" + resourcetype
 
