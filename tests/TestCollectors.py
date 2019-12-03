@@ -5,6 +5,7 @@ import random
 import http.client
 from unittest.mock import MagicMock
 from threading import Thread
+import time
 
 sys.path.append('.')
 
@@ -31,7 +32,9 @@ class TestCollectors(unittest.TestCase):
             thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))
             thread.daemon = True
             thread.start()
-            
+            #give grandpa thread some time to get prometheus started
+            time.sleep(1)
+
             c = http.client.HTTPConnection("localhost:"+str(random_prometheus_port))
             c.request("GET", "/?target=testhost.test")
             r = c.getresponse()
