@@ -1,11 +1,11 @@
 from tools.get_resources import get_resources
-from resources import *
+from resources.VirtualMachine import VirtualMachine
 
 
 class Host:
 
-    def __init__(self, vcenter, name, uuid):
-        self.vcenter = vcenter
+    def __init__(self, target, name, uuid):
+        self.target = target
         self.uuid = uuid
         self.name = name
         self.vms = list()
@@ -26,7 +26,7 @@ class Host:
                                                    project_id=project_id['project_id']))
         """
 
-        for vm in get_resources(target=self.vcenter.target,
+        for vm in get_resources(target=self.target,
                                 resourcetype="resources",
                                 resourcekind="VirtualMachine",
                                 parentid=self.uuid):

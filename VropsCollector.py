@@ -3,7 +3,7 @@ import os
 import importlib
 import sys
 from tools.get_resources import get_resources
-from resources import *
+from resources.Vcenter import Vcenter
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
@@ -59,8 +59,6 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         resource = self.create_resource_objects()
-        if os.environ['DEBUG'] == '1':
-            print('collected resource: ' + resource.name)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -72,11 +70,8 @@ class VropsCollector:
     def create_resource_objects(self):
         for adapter in get_resources(target=self._target, resourcetype='adapters'):
             if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
-                print(adapter['name'], adapter['uuid'])
-
-                vcenter = Vcenter(vcenter=adapter, name=adapter['name'], uuid=adapter['uuid'])
+                vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
                 vcenter.add_datacenter()
-                """
                 for dc_object in vcenter.datacenter:
                     print("Collecting Datacenter: " + dc_object.name)
                     dc_object.add_cluster()
@@ -85,9 +80,9 @@ class VropsCollector:
                         cl_object.add_host()
                         for hs_object in cl_object.hosts:
                             print("Collecting Hosts: " + hs_object.name)
+                            hs_object.add_vm()
                             for vm_object in hs_object.vms:
                                 print("Collecting VM: " + vm_object.name)
-                """
                 return vcenter
 
     def get_modules(self):

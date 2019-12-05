@@ -1,21 +1,21 @@
 from tools import get_resources
-from resources import *
+from resources.Cluster import Cluster
 
 
 class Datacenter:
 
-    def __init__(self, vcenter, name, uuid):
-        self.vcenter = vcenter
+    def __init__(self, target, name, uuid):
+        self.target = target
         self.name = name
         self.uuid = uuid
         self.clusters = list()
 
-    def add_cluster(self, vc):
-        for cluster in get_resources(target=self.vcenter.target,
+    def add_cluster(self):
+        for cluster in get_resources(target=self.target,
                                      resourcetype='resources',
                                      resourcekind='ClusterComputeResource',
                                      parentid=self.uuid):
-            self.clusters.append(Cluster(vcenter=vc, name=cluster['name'], uuid=cluster['uuid']))
+            self.clusters.append(Cluster(target=self.target, name=cluster['name'], uuid=cluster['uuid']))
 
     """
         def get_project_ids(self):

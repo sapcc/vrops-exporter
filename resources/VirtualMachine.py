@@ -1,4 +1,4 @@
-class VirtualMachine():
+class VirtualMachine:
 
     def __init__(self, name, uuid, project_id):
         self.name = name
