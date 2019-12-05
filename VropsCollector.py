@@ -58,7 +58,8 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-        resource = self.create_resource_objects()
+        vcenter = self.create_resource_objects()
+        print('Output: ' + vcenter.datacenter[0].clusters[0].hosts[2].name)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
