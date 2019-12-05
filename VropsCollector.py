@@ -82,4 +82,5 @@ class VropsCollector:
             func = getattr(imported_module, module)
             res = func(self._target, self._user, self._password).collect()
             for i in res:
+                print(i)
                 yield i
