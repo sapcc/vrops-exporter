@@ -59,6 +59,8 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         resource = self.create_resource_objects()
+        if os.environ['DEBUG'] == '1':
+            print('collected resource: ' + resource.name)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -71,9 +73,10 @@ class VropsCollector:
         for adapter in get_resources(target=self._target, resourcetype='adapters'):
             if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
                 print(adapter['name'], adapter['uuid'])
+
                 vcenter = Vcenter(vcenter=adapter, name=adapter['name'], uuid=adapter['uuid'])
                 vcenter.add_datacenter()
-
+                """
                 for dc_object in vcenter.datacenter:
                     print("Collecting Datacenter: " + dc_object.name)
                     dc_object.add_cluster()
@@ -84,9 +87,8 @@ class VropsCollector:
                             print("Collecting Hosts: " + hs_object.name)
                             for vm_object in hs_object.vms:
                                 print("Collecting VM: " + vm_object.name)
-
-                                return vcenter
-
+                """
+                return vcenter
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
