@@ -5,7 +5,8 @@ from requests.auth import HTTPBasicAuth
 
 
 class Resources:
-    def get_resources(self, target, resourcekind, parentid=None):
+    
+    def get_resources(self, target, parentid, resourcekind):
         url = "https://" + target + "/suite-api/api/resources"
         querystring = {
             'parentId': parentid,
@@ -40,3 +41,17 @@ class Resources:
                 p_ids['uuid'] = project['uuid']
                 project_ids.append(p_ids)
         return project_ids
+
+    def get_datacenter(self, target, parentid):
+        self.get_resources(target, parentid, resourcekind="Datacenter")
+
+    def get_cluster(self, target, parentid):
+        self.get_resources(target, parentid, resourcekind="ClusterComputeResource")
+
+    def get_hosts(self, target, parentid):
+        self.get_resources(target, parentid, resourcekind="HostSystem")
+
+    def get_virtualmachines(self, target, parentid):
+        self.get_resources(target, parentid, resourcekind="VirtualMachine")
+
+
