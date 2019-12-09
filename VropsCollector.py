@@ -2,17 +2,14 @@ import json
 import os
 import importlib
 import sys
-
-import requests
 import urllib3
+import requests
+sys.path.append('./module')
 from requests.auth import HTTPBasicAuth
-
-from resources.Vcenter import Vcenter
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
-
-sys.path.append('./module')
+from resources.Vcenter import Vcenter
 
 
 def do_GET(self):
@@ -63,9 +60,9 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         vcenter = self.create_resource_objects()
-        for vmmmm in vcenter.datacenter[0].clusters[2].hosts[1].vms:
-            print('VM Name: ' + vmmmm.name)
-            print('VM UUID: ' + vmmmm.uuid)
+        # for hss in vcenter.datacenter[0].clusters[2].hosts:
+        #     print('Host Name: ' + hss.name)
+        #     print('Host UUID: ' + hss.uuid)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()

@@ -1,24 +1,24 @@
 import os
 import requests
-import urllib3
+from urllib3 import disable_warnings, exceptions
 from requests.auth import HTTPBasicAuth
 
 
 class Resources:
-    
-    def get_resources(self, target, parentid, resourcekind):
+
+    def get_resources(self, target, **kwargs):
         url = "https://" + target + "/suite-api/api/resources"
         querystring = {
-            'parentId': parentid,
+            'parentId': kwargs['parentid'],
             'adapterKind': 'VMware',
-            'resourceKind': resourcekind,
+            'resourceKind': kwargs['resourcekind'],
             'pageSize': '50000'
         }
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
         }
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        disable_warnings(exceptions.InsecureRequestWarning)
         resources = list()
         response = requests.get(url,
                                 auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
@@ -34,7 +34,7 @@ class Resources:
 
     def get_project_id(self, target):
         project_ids = list()
-        for project in self.get_resources(target=target, resourcekind='VMFolder'):
+        for project in self.get_vmfolders(target=target):
             if project['name'].startswith('Project'):
                 p_ids = dict()
                 p_ids['project_id'] = project['name'][project['name'].find("(") + 1:project['name'].find(")")]
@@ -43,15 +43,18 @@ class Resources:
         return project_ids
 
     def get_datacenter(self, target, parentid):
-        self.get_resources(target, parentid, resourcekind="Datacenter")
+        return self.get_resources(target, parentid=parentid, resourcekind="Datacenter")
 
     def get_cluster(self, target, parentid):
-        self.get_resources(target, parentid, resourcekind="ClusterComputeResource")
+        return self.get_resources(target, parentid=parentid, resourcekind="ClusterComputeResource")
 
     def get_hosts(self, target, parentid):
-        self.get_resources(target, parentid, resourcekind="HostSystem")
+        return self.get_resources(target, parentid=parentid, resourcekind="HostSystem")
 
     def get_virtualmachines(self, target, parentid):
-        self.get_resources(target, parentid, resourcekind="VirtualMachine")
+        return self.get_resources(target, parentid=parentid, resourcekind="VirtualMachine")
+
+    def get_vmfolders(self, target):
+        return self.get_resources(target, parentid=None, resourcekind="VMFolder")
 
 

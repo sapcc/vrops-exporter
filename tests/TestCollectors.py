@@ -12,7 +12,7 @@ sys.path.append('.')
 from vrops_exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from VropsCollector import VropsCollector
-from tools.get_resources import get_resources
+from tools.Resources import get_resources
 
 
 class TestCollectors(unittest.TestCase):

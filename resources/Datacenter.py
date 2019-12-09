@@ -1,4 +1,4 @@
-from tools.get_resources import Resources
+from tools.Resources import Resources
 from resources.Cluster import Cluster
 
 
@@ -11,11 +11,6 @@ class Datacenter:
         self.clusters = list()
 
     def add_cluster(self):
-        for cluster in Resources.get_resources(target=self.target,
-                                               resourcekind='ClusterComputeResource',
-                                               parentid=self.uuid):
+        res = Resources()
+        for cluster in res.get_cluster(target=self.target, parentid=self.uuid):
             self.clusters.append(Cluster(target=self.target, name=cluster['name'], uuid=cluster['uuid']))
-
-
-
-

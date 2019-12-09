@@ -7,7 +7,6 @@ from prometheus_client import start_http_server
 from optparse import OptionParser
 from VropsCollector import VropsCollector
 
-
 def parse_params():
     parser = OptionParser()
     parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
@@ -41,7 +40,6 @@ def parse_params():
         print("Can't start, please specify password with ENV or -p")
         sys.exit(0)
 
-
 def run_prometheus_server(port, *args):
     # Start the Prometheus http server.
     # start_http_server(int(os.environ['PORT']))
@@ -49,7 +47,6 @@ def run_prometheus_server(port, *args):
 
     while True:
         time.sleep(1)
-
 
 if __name__ == '__main__':
     parse_params()
