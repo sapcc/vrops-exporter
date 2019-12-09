@@ -2,7 +2,11 @@ import json
 import os
 import importlib
 import sys
-from tools.get_resources import get_resources
+
+import requests
+import urllib3
+from requests.auth import HTTPBasicAuth
+
 from resources.Vcenter import Vcenter
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
@@ -59,7 +63,9 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         vcenter = self.create_resource_objects()
-        print('Output: ' + vcenter.datacenter[0].clusters[0].hosts[2].name)
+        for vmmmm in vcenter.datacenter[0].clusters[2].hosts[1].vms:
+            print('VM Name: ' + vmmmm.name)
+            print('VM UUID: ' + vmmmm.uuid)
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -69,7 +75,7 @@ class VropsCollector:
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def create_resource_objects(self):
-        for adapter in get_resources(target=self._target, resourcetype='adapters'):
+        for adapter in self.get_adapter(target=self._target):
             if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
                 vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
                 vcenter.add_datacenter()
@@ -85,6 +91,25 @@ class VropsCollector:
                             for vm_object in hs_object.vms:
                                 print("Collecting VM: " + vm_object.name)
                 return vcenter
+
+    def get_adapter(self, target):
+        url = "https://" + target + "/suite-api/api/adapters"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        adapters = list()
+        response = requests.get(url,
+                                auth=HTTPBasicAuth(username=self._user, password=self._password),
+                                verify=False,
+                                headers=headers)
+        for resource in response.json()["adapterInstancesInfoDto"]:
+            res = dict()
+            res['name'] = resource["resourceKey"]["name"]
+            res['uuid'] = resource["id"]
+            adapters.append(res)
+        return adapters
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))

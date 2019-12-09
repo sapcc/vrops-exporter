@@ -1,4 +1,4 @@
-from tools.get_resources import get_resources
+from tools.get_resources import Resources
 from resources.VirtualMachine import VirtualMachine
 
 
@@ -11,23 +11,13 @@ class Host:
         self.vms = list()
 
     def add_vm(self):
-        # fetch the virtual machines depending on the project_id and add them to a host
-        """
-        for project_id in Datacenter:
-            for folder in get_resources(self, target=self._target, user=self._user, password=self._password,
-                                        resourcetype="resources",
-                                        resourcekind="VirtualMachine",
-                                        parentid=project_id['uuid']):
-                for vm in get_resources(self, target=self._target, user=self._user, password=self._password,
-                                        resourcetype="resources",
-                                        resourcekind="VirtualMachine",
-                                        parentid=folder['uuid']):
+        for vm in Resources.get_resources(target=self.target,
+                                          resourcekind="VirtualMachine",
+                                          parentid=self.uuid):
+            for project_id in Resources.get_project_id(target=self.target):
+                if project_id['uuid'] in vm:
                     self.vms.append(VirtualMachine(name=vm['name'], uuid=vm['uuid'],
                                                    project_id=project_id['project_id']))
-        """
-
-        for vm in get_resources(target=self.target,
-                                resourcetype="resources",
-                                resourcekind="VirtualMachine",
-                                parentid=self.uuid):
-            self.vms.append(VirtualMachine(name=vm['name'], uuid=vm['uuid'], project_id='default internal'))
+                else:
+                    self.vms.append(VirtualMachine(name=vm['name'], uuid=vm['uuid'],
+                                                   project_id='default internal'))
