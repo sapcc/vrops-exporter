@@ -4,6 +4,7 @@ import importlib
 import sys
 import urllib3
 import requests
+import traceback
 
 sys.path.append('./module')
 from requests.auth import HTTPBasicAuth
@@ -22,8 +23,9 @@ def do_GET(self):
                 print(params['target'])
             collector = VropsCollector(params['target'][0])
         except Exception as e:
-            print("obviously missing params: " + json.dumps(params))
-            print(e)
+            print("Problem instantiating VropsCollector:\n" + str(e))
+            print(sys.exc_info()[0])
+            traceback.print_exc()
             return
         try:
             registry.register(collector)
@@ -61,11 +63,6 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         vcenter = self.create_resource_objects()
-        for virtm in vcenter.datacenter[0].clusters[2].hosts[1].vms:
-            print('VM Name: ' + virtm.name)
-            print('VM UUID: ' + virtm.uuid)
-            print('VM Project ID: ' + virtm.project_id)
-            break
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -77,6 +74,7 @@ class VropsCollector:
     def create_resource_objects(self):
         for adapter in self.get_adapter(target=self._target):
             vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
+            print(adapter['name'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
                 print("Collecting Datacenter: " + dc_object.name)
