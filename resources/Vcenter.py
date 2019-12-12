@@ -13,5 +13,4 @@ class Vcenter:
     def add_datacenter(self):
         res = Resources()
         for dc in res.get_datacenter(target=self.target, parentid=self.uuid):
-            print(dc['name'], dc['uuid'])
             self.datacenter.append(Datacenter(target=self.target, name=dc['name'], uuid=dc['uuid']))

@@ -15,10 +15,9 @@ class Host:
         project_ids = res.get_project_id(target=self.target)
         for vm in res.get_virtualmachines(target=self.target, parentid=self.uuid):
             if vm['uuid'] in project_ids:
-                print(vm['uuid'] + ' is in project_ids')
+                print(vm['name'] + ' has project id: ' + project_ids['project_id'])
                 self.vms.append(VirtualMachine(name=vm['name'], uuid=vm['uuid'],
-                                               project_id=project_id['project_id']))
+                                               project_id=project_ids['project_id']))
             else:
-                print(vm['uuid'] + ' is not in project_ids')
                 self.vms.append(VirtualMachine(name=vm['name'], uuid=vm['uuid'],
                                                project_id='default internal'))

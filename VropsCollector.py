@@ -4,6 +4,7 @@ import importlib
 import sys
 import urllib3
 import requests
+
 sys.path.append('./module')
 from requests.auth import HTTPBasicAuth
 from prometheus_client import CollectorRegistry
@@ -60,9 +61,11 @@ class VropsCollector:
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
         vcenter = self.create_resource_objects()
-        # for hss in vcenter.datacenter[0].clusters[2].hosts:
-        #     print('Host Name: ' + hss.name)
-        #     print('Host UUID: ' + hss.uuid)
+        for virtm in vcenter.datacenter[0].clusters[2].hosts[1].vms:
+            print('VM Name: ' + virtm.name)
+            print('VM UUID: ' + virtm.uuid)
+            print('VM Project ID: ' + virtm.project_id)
+            break
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -73,24 +76,26 @@ class VropsCollector:
 
     def create_resource_objects(self):
         for adapter in self.get_adapter(target=self._target):
-            if adapter['name'].startswith('vc-') and adapter['name'].endswith('.sap'):
-                vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
-                vcenter.add_datacenter()
-                for dc_object in vcenter.datacenter:
-                    print("Collecting Datacenter: " + dc_object.name)
-                    dc_object.add_cluster()
-                    for cl_object in dc_object.clusters:
-                        print("Collecting Cluster: " + cl_object.name)
-                        cl_object.add_host()
-                        for hs_object in cl_object.hosts:
-                            print("Collecting Hosts: " + hs_object.name)
-                            hs_object.add_vm()
-                            for vm_object in hs_object.vms:
-                                print("Collecting VM: " + vm_object.name)
-                return vcenter
+            vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
+            vcenter.add_datacenter()
+            for dc_object in vcenter.datacenter:
+                print("Collecting Datacenter: " + dc_object.name)
+                dc_object.add_cluster()
+                for cl_object in dc_object.clusters:
+                    print("Collecting Cluster: " + cl_object.name)
+                    cl_object.add_host()
+                    for hs_object in cl_object.hosts:
+                        print("Collecting Hosts: " + hs_object.name)
+                        hs_object.add_vm()
+                        for vm_object in hs_object.vms:
+                            print("Collecting VM: " + vm_object.name)
+            return vcenter
 
     def get_adapter(self, target):
         url = "https://" + target + "/suite-api/api/adapters"
+        querystring = {
+            "adapterKindKey": "VMWARE"
+        }
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
@@ -99,12 +104,14 @@ class VropsCollector:
         adapters = list()
         response = requests.get(url,
                                 auth=HTTPBasicAuth(username=self._user, password=self._password),
+                                params=querystring,
                                 verify=False,
                                 headers=headers)
         for resource in response.json()["adapterInstancesInfoDto"]:
             res = dict()
             res['name'] = resource["resourceKey"]["name"]
             res['uuid'] = resource["id"]
+            res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
             adapters.append(res)
         return adapters
 
