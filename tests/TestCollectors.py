@@ -23,13 +23,13 @@ class TestCollectors(unittest.TestCase):
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
         print(metrics_yaml)
-        # every collector got to be tested in here
-        random_prometheus_port = random.randrange(9000, 9700, 1)
-        for collector in metrics_yaml.keys():
-            print()  # nicer output
-            print("Testing " + collector)
 
-            VropsCollector.get_adapter = MagicMock(return_value={'name': 'vcenter1', 'uuid': '5628-9ba1-55e847050814'})
+        #every collector got to be tested in here
+        random_prometheus_port = random.randrange(9000,9700,1)
+        print("chosen testport: " + str(random_prometheus_port))
+        for collector in metrics_yaml.keys():
+            print("\nTesting " + collector)
+
             VropsCollector.get_modules = MagicMock(return_value=('/vrops-exporter/module', [collector]))
 
             # test tool get_resources to create resource objects

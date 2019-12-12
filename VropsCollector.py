@@ -22,8 +22,10 @@ def do_GET(self):
                 print(params['target'])
             collector = VropsCollector(params['target'][0])
         except Exception as e:
-            print("obviously missing params: " + json.dumps(params))
-            print(e)
+            print("Problem instantiating VropsCollector:\n" + str(e))
+            import traceback
+            print(sys.exc_info()[0])
+            traceback.print_exc()
             return
         try:
             registry.register(collector)
