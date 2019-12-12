@@ -33,14 +33,14 @@ class TestCollectors(unittest.TestCase):
             VropsCollector.get_modules = MagicMock(return_value=('/vrops-exporter/module', [collector]))
 
             # test tool get_resources to create resource objects
+            #
+            # Resources.get_datacenter = MagicMock(return_value={'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'})
+            # Resources.get_cluster = MagicMock(return_value={'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'})
+            # Resources.get_hosts = MagicMock(return_value={'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'})
+            # Resources.get_vmfolders = MagicMock(return_value={'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'})
+            # Resources.get_virtualmachines = MagicMock(return_value={'name': 'vm1', 'uuid': '3628-93a1-56e8463404'})
 
-            Resources.get_datacenter = MagicMock(return_value={'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'})
-            Resources.get_cluster = MagicMock(return_value={'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'})
-            Resources.get_hosts = MagicMock(return_value={'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'})
-            Resources.get_vmfolders = MagicMock(return_value={'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'})
-            Resources.get_virtualmachines = MagicMock(return_value={'name': 'vm1', 'uuid': '3628-93a1-56e8463404'})
 
-            
 
             # start prometheus server to provide metrics later on
             thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))
