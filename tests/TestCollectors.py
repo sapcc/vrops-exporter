@@ -23,9 +23,9 @@ class TestCollectors(unittest.TestCase):
         print(metrics_yaml)
         #every collector got to be tested in here
         random_prometheus_port = random.randrange(9000,9700,1)
+        print("chosen testport: " + str(random_prometheus_port))
         for collector in metrics_yaml.keys():
-            print() #nicer output
-            print("Testing " + collector)
+            print("\nTesting " + collector)
             VropsCollector.get_modules = MagicMock(return_value=('/vrops-exporter/module', [collector]))
 
             #start prometheus server to provide metrics later on
