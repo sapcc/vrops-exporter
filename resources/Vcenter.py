@@ -1,5 +1,5 @@
-from tools.Resources import Resources
-from resources.Datacenter import Datacenter
+import tools.Resources
+import resources.Datacenter
 
 
 class Vcenter:
@@ -11,6 +11,5 @@ class Vcenter:
         self.datacenter = list()
 
     def add_datacenter(self):
-        res = Resources()
-        for dc in res.get_datacenter(target=self.target, parentid=self.uuid):
+        for dc in Resources.get_datacenter(target=self.target, parentid=self.uuid):
             self.datacenter.append(Datacenter(target=self.target, name=dc['name'], uuid=dc['uuid']))

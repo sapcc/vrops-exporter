@@ -1,35 +1,43 @@
 import os
 import requests
 from urllib3 import disable_warnings, exceptions
+from urllib3.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 
 
 class Resources:
 
-    def get_resources(self, target, **kwargs):
+    def get_resources(self, target, resourcekind, parentid):
         url = "https://" + target + "/suite-api/api/resources"
         querystring = {
-            'parentId': kwargs['parentid'],
+            'parentId': parentid,
             'adapterKind': 'VMware',
-            'resourceKind': kwargs['resourcekind'],
+            'resourceKind': resourcekind,
             'pageSize': '50000'
         }
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
         }
-        disable_warnings(exceptions.InsecureRequestWarning)
         resources = list()
-        response = requests.get(url,
-                                auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
-                                params=querystring,
-                                verify=False,
-                                headers=headers)
-        for resource in response.json()["resourceList"]:
-            res = dict()
-            res['name'] = resource["resourceKey"]["name"]
-            res['uuid'] = resource["identifier"]
-            resources.append(res)
+        try:
+            disable_warnings(exceptions.InsecureRequestWarning)
+            response = requests.get(url,
+                                    auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+            if hasattr(response.json(), "resourceList"):
+                for resource in response.json()["resourceList"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["identifier"]
+                    resources.append(res)
+            else:
+                raise AttributeError("There is no attribute: resourceList")
+        except HTTPError as err:
+            print("Request failed: ", err.args)
+
         return resources
 
     def get_project_id(self, target):

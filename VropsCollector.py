@@ -11,6 +11,7 @@ from requests.auth import HTTPBasicAuth
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
+from urllib3.exceptions import HTTPError
 from resources.Vcenter import Vcenter
 
 
@@ -98,19 +99,26 @@ class VropsCollector:
             'Content-Type': "application/json",
             'Accept': "application/json"
         }
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         adapters = list()
-        response = requests.get(url,
-                                auth=HTTPBasicAuth(username=self._user, password=self._password),
-                                params=querystring,
-                                verify=False,
-                                headers=headers)
-        for resource in response.json()["adapterInstancesInfoDto"]:
-            res = dict()
-            res['name'] = resource["resourceKey"]["name"]
-            res['uuid'] = resource["id"]
-            res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-            adapters.append(res)
+        try:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            response = requests.get(url,
+                                    auth=HTTPBasicAuth(username=self._user, password=self._password),
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+            if hasattr(response.json(), "adapterInstancesInfoDto"):
+                for resource in response.json()["adapterInstancesInfoDto"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["id"]
+                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                    adapters.append(res)
+            else:
+                raise AttributeError("There is no attribute: adapterInstancesInfoDto")
+        except HTTPError as err:
+            print("Request failed: ", err.args)
+
         return adapters
 
     def get_modules(self):

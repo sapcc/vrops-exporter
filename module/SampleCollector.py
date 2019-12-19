@@ -1,7 +1,6 @@
 from BaseCollector import BaseCollector
 import os
 from prometheus_client.core import GaugeMetricFamily
-from VropsCollector import VropsCollector
 
 
 class SampleCollector(BaseCollector):

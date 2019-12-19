@@ -5,7 +5,7 @@ import time
 import os
 from prometheus_client import start_http_server
 from optparse import OptionParser
-from VropsCollector import VropsCollector
+
 
 def parse_params():
     parser = OptionParser()
