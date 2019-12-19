@@ -100,8 +100,8 @@ class VropsCollector:
             'Accept': "application/json"
         }
         adapters = list()
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         try:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             response = requests.get(url,
                                     auth=HTTPBasicAuth(username=self._user, password=self._password),
                                     params=querystring,

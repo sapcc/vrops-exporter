@@ -20,8 +20,8 @@ class Resources:
             'Accept': "application/json"
         }
         resources = list()
+        disable_warnings(exceptions.InsecureRequestWarning)
         try:
-            disable_warnings(exceptions.InsecureRequestWarning)
             response = requests.get(url,
                                     auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                     params=querystring,
