@@ -2,11 +2,17 @@ import json
 import os
 import importlib
 import sys
+import requests
+import traceback
+
 sys.path.append('./module')
+from requests.auth import HTTPBasicAuth
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
-from tools.get_modules import get_modules
+from urllib3 import disable_warnings, exceptions
+from urllib3.exceptions import HTTPError
+from resources.Vcenter import Vcenter
 
 
 def do_GET(self):
@@ -19,7 +25,6 @@ def do_GET(self):
             collector = VropsCollector(params['target'][0])
         except Exception as e:
             print("Problem instantiating VropsCollector:\n" + str(e))
-            import traceback
             print(sys.exc_info()[0])
             traceback.print_exc()
             return
@@ -58,6 +63,7 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
+        vcenter = self.create_resource_objects()
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -65,6 +71,55 @@ class VropsCollector:
             if os.environ['DEBUG'] == '1':
                 print(module + ' does cool stuff now')
             self._modules_dict[module] = importlib.import_module(module, modules[0])
+
+    def create_resource_objects(self):
+        for adapter in self.get_adapter(target=self._target):
+            vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
+            print(adapter['name'])
+            vcenter.add_datacenter()
+            for dc_object in vcenter.datacenter:
+                print("Collecting Datacenter: " + dc_object.name)
+                dc_object.add_cluster()
+                for cl_object in dc_object.clusters:
+                    print("Collecting Cluster: " + cl_object.name)
+                    cl_object.add_host()
+                    for hs_object in cl_object.hosts:
+                        print("Collecting Hosts: " + hs_object.name)
+                        hs_object.add_vm()
+                        for vm_object in hs_object.vms:
+                            print("Collecting VM: " + vm_object.name)
+            return vcenter
+
+    def get_adapter(self, target):
+        url = "https://" + target + "/suite-api/api/adapters"
+        querystring = {
+            "adapterKindKey": "VMWARE"
+        }
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        adapters = list()
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.get(url,
+                                    auth=HTTPBasicAuth(username=self._user, password=self._password),
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+            if hasattr(response.json(), "adapterInstancesInfoDto"):
+                for resource in response.json()["adapterInstancesInfoDto"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["id"]
+                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                    adapters.append(res)
+            else:
+                raise AttributeError("There is no attribute: adapterInstancesInfoDto")
+        except HTTPError as err:
+            print("Request failed: ", err.args)
+
+        return adapters
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
@@ -76,7 +131,7 @@ class VropsCollector:
                 continue
             file = file[:-3]
             files.append(file)
-        return (target_dir, files)
+        return target_dir, files
 
     def collect(self):
         for module in self._modules_dict.keys():

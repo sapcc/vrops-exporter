@@ -1,7 +1,5 @@
 from BaseCollector import BaseCollector
-import requests
 import os
-from requests.auth import HTTPBasicAuth
 from prometheus_client.core import GaugeMetricFamily
 
 
@@ -14,6 +12,7 @@ class SampleCollector(BaseCollector):
 
     def collect(self):
         metric_list = list()
+
         if os.environ['DEBUG'] == '1':
             print('have some debug code in here')
 

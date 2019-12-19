@@ -43,4 +43,4 @@ DEBUG=0 USER=foo PW=bar python3 tests/TestCollectors.py
 Please note, that USER and PW don't do anything at all currently, they are just being passed because VropsCollector.py is checking that these are present.
 
 ## Resources
-![Class Diagram](http://www.plantuml.com/plantuml/proxy?src=https://raw.githubusercontent.com/christopherhans/uml/master/vrops-exporter.puml)
+![Class Diagram](https://yuml.me/032071b0.png)
