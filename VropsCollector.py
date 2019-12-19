@@ -2,7 +2,6 @@ import json
 import os
 import importlib
 import sys
-import urllib3
 import requests
 import traceback
 
@@ -11,6 +10,7 @@ from requests.auth import HTTPBasicAuth
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
+from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
 from resources.Vcenter import Vcenter
 
@@ -100,7 +100,7 @@ class VropsCollector:
             'Accept': "application/json"
         }
         adapters = list()
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
                                     auth=HTTPBasicAuth(username=self._user, password=self._password),
