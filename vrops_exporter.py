@@ -30,13 +30,13 @@ def parse_params():
     if options.port:
         os.environ['PORT'] = options.port
 
-    if "PORT" not in os.environ and not options.port:
+    if "PORT" not in os.environ and not options.port or os.environ["PORT"] == ' ':
         print("Can't start, please specify port with ENV or -o")
         sys.exit(0)
-    if "USER" not in os.environ and not options.user:
+    if "USER" not in os.environ and not options.user or os.environ["USER"] == ' ':
         print("Can't start, please specify user with ENV or -u")
         sys.exit(0)
-    if "PASSWORD" not in os.environ and not options.password:
+    if "PASSWORD" not in os.environ and not options.password or os.environ["PASSWORD"] == ' ':
         print("Can't start, please specify password with ENV or -p")
         sys.exit(0)
 
