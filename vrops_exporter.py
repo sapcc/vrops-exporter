@@ -40,13 +40,15 @@ def parse_params():
         print("Can't start, please specify password with ENV or -p")
         sys.exit(0)
 
+
 def run_prometheus_server(port, *args):
     # Start the Prometheus http server.
     # start_http_server(int(os.environ['PORT']))
     start_http_server(int(port))
-
+    print('prometheus http server up on port:' + os.environ['PORT'])
     while True:
         time.sleep(1)
+
 
 if __name__ == '__main__':
     parse_params()

@@ -63,7 +63,7 @@ class VropsCollector:
             raise ValueError('PASSWORD not set')
         self._user = os.environ['USER']
         self._password = os.environ['PASSWORD']
-        vcenter = self.create_resource_objects()
+        self._resources = self.create_resource_objects()
         modules = self.get_modules()
         self._modules = modules[1]
         self._modules_dict = dict()
@@ -137,6 +137,6 @@ class VropsCollector:
         for module in self._modules_dict.keys():
             imported_module = self._modules_dict[module]
             func = getattr(imported_module, module)
-            res = func(self._target, self._user, self._password).collect()
+            res = func(self._resources, self._target, self._user, self._password).collect()
             for i in res:
                 yield i
