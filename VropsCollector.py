@@ -107,15 +107,15 @@ class VropsCollector:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if hasattr(response.json(), "adapterInstancesInfoDto"):
-                for resource in response.json()["adapterInstancesInfoDto"]:
-                    res = dict()
-                    res['name'] = resource["resourceKey"]["name"]
-                    res['uuid'] = resource["id"]
-                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                    adapters.append(res)
-            else:
-                raise AttributeError("There is no attribute: adapterInstancesInfoDto")
+            # if hasattr(response.json(), "adapterInstancesInfoDto"):
+            for resource in response.json()["adapterInstancesInfoDto"]:
+                res = dict()
+                res['name'] = resource["resourceKey"]["name"]
+                res['uuid'] = resource["id"]
+                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                adapters.append(res)
+            # else:
+                # raise AttributeError("There is no attribute: adapterInstancesInfoDto")
         except HTTPError as err:
             print("Request failed: ", err.args)
 
