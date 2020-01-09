@@ -46,22 +46,12 @@ class TestLaunchExporter(TestCase):
             parse_params()
         self.assertEqual(se.exception.code, 2, 'PORT, USER or PASSWORD are not set properly in ENV or command line!')
 
-    """
-    def test_with_blank_params(self):
-        os.environ.clear()
-        sys.argv = ['prog', '-p', ' ', '-u', ' ', '-o', ' ']
-        with self.assertRaises(SystemExit) as se:
-            parse_params()
-        self.assertEqual(se.exception.code, 0, 'PORT, USER or PASSWORD are not set properly in ENV or command line!')
-    """
-
     def test_without_params(self):
         os.environ.clear()
         sys.argv = ['prog']
         with self.assertRaises(SystemExit) as se:
             parse_params()
         self.assertEqual(se.exception.code, 0, 'PORT, USER or PASSWORD are not set in ENV or command line!')
-
 
 if __name__ == '__main__':
     unittest.main()
