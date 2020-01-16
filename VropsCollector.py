@@ -78,16 +78,20 @@ class VropsCollector:
             print(adapter['name'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                print("Collecting Datacenter: " + dc_object.name)
+                if os.environ['DEBUG'] == '1':
+                    print("Collecting Datacenter: " + dc_object.name)
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    print("Collecting Cluster: " + cl_object.name)
+                    if os.environ['DEBUG'] == '1':
+                        print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        print("Collecting Hosts: " + hs_object.name)
+                        if os.environ['DEBUG'] == '1':
+                            print("Collecting Hosts: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            print("Collecting VM: " + vm_object.name)
+                            if os.environ['DEBUG'] == '1':
+                                print("Collecting VM: " + vm_object.name)
             return vcenter
 
     def get_adapter(self, target):
@@ -107,15 +111,15 @@ class VropsCollector:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            # if hasattr(response.json(), "adapterInstancesInfoDto"):
-            for resource in response.json()["adapterInstancesInfoDto"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["id"]
-                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                adapters.append(res)
-            # else:
-                # raise AttributeError("There is no attribute: adapterInstancesInfoDto")
+            try:
+                for resource in response.json()["adapterInstancesInfoDto"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["id"]
+                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                    adapters.append(res)
+            except AttributeError as ar:
+                print("There is no attribute adapterInstancesInfoDto " + str(ar.args))
         except HTTPError as err:
             print("Request failed: ", err.args)
 

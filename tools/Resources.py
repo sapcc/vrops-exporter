@@ -27,14 +27,14 @@ class Resources:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if hasattr(response.json(), "resourceList"):
+            try:
                 for resource in response.json()["resourceList"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
-            else:
-                raise AttributeError("There is no attribute: resourceList")
+            except AttributeError as ar:
+                print("There is no attribute: resourceList",  ar.args)
         except HTTPError as err:
             print("Request failed: ", err.args)
 
