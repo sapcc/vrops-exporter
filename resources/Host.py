@@ -1,9 +1,9 @@
 import os
-import tools.Resources
-import resources.VirtualMachine
+from tools.Resources import Resources
+from resources.VirtualMachine import VirtualMachine
 
 
-class Host:
+class Host(Resources):
 
     def __init__(self, target, name, uuid):
         self.target = target
@@ -12,8 +12,8 @@ class Host:
         self.vms = list()
 
     def add_vm(self):
-        project_ids = Resources.get_project_id(target=self.target)
-        for vm in Resources.get_virtualmachines(target=self.target, parentid=self.uuid):
+        project_ids = Resources.get_project_id(self, target=self.target)
+        for vm in Resources.get_virtualmachines(self, target=self.target, parentid=self.uuid):
             if vm['uuid'] in project_ids:
                 if os.environ['DEBUG'] == '1':
                     print(vm['name'] + ' has project id: ' + project_ids['project_id'])

@@ -1,9 +1,8 @@
-import tools.Resources
-import resources.Host
+from tools.Resources import Resources
+from resources.Host import Host
 
 
-
-class Cluster:
+class Cluster(Resources):
 
     def __init__(self, target, name, uuid):
         self.target = target
@@ -12,6 +11,6 @@ class Cluster:
         self.hosts = list()
 
     def add_host(self):
-        for hosts in Resources.get_hosts(target=self.target, parentid=self.uuid):
+        for hosts in Resources.get_hosts(self, target=self.target, parentid=self.uuid):
             self.hosts.append(Host(target=self.target, name=hosts['name'],
                                    uuid=hosts['uuid']))

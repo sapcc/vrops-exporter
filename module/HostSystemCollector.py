@@ -18,7 +18,7 @@ class HostSystemCollector(BaseCollector):
         g = GaugeMetricFamily('vrops_resource_gauge', 'HostSystemCollector',
                               labels=['target', 'name', 'uuid'])
 
-        for cluster in self._resources.datacenter[0].cluster:
+        for cluster in self._resources.datacenter[0].clusters:
             for host in cluster.hosts:
                 g.add_metric(labels=[self._target, host.name, host.uuid], value=randint(1, 632))
 

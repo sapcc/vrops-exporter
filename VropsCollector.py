@@ -5,8 +5,10 @@ import sys
 import requests
 import traceback
 
-sys.path.append('./module')
 from requests.auth import HTTPBasicAuth
+
+sys.path.append('./module')
+
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
@@ -52,10 +54,11 @@ def do_GET(self):
 MetricsHandler.do_GET = do_GET
 
 
-class VropsCollector:
+class VropsCollector():
 
     def __init__(self, target):
         self._target = target
+        self.get_token(target)
         envvars = os.environ.keys()
         if 'USER' not in envvars:
             raise ValueError('USER not set')
@@ -78,16 +81,20 @@ class VropsCollector:
             print(adapter['name'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                print("Collecting Datacenter: " + dc_object.name)
+                if os.environ['DEBUG'] == '1':
+                    print("Collecting Datacenter: " + dc_object.name)
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    print("Collecting Cluster: " + cl_object.name)
+                    if os.environ['DEBUG'] == '1':
+                        print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        print("Collecting Hosts: " + hs_object.name)
+                        if os.environ['DEBUG'] == '1':
+                            print("Collecting Hosts: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            print("Collecting VM: " + vm_object.name)
+                            if os.environ['DEBUG'] == '1':
+                                print("Collecting VM: " + vm_object.name)
             return vcenter
 
     def get_adapter(self, target):
@@ -97,29 +104,48 @@ class VropsCollector:
         }
         headers = {
             'Content-Type': "application/json",
-            'Accept': "application/json"
+            'Accept': "application/json",
+            'Authorisation': "vRealizeOpsToken " + os.environ['TOKEN']
         }
         adapters = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
-                                    auth=HTTPBasicAuth(username=self._user, password=self._password),
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            # if hasattr(response.json(), "adapterInstancesInfoDto"):
-            for resource in response.json()["adapterInstancesInfoDto"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["id"]
-                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                adapters.append(res)
-            # else:
-                # raise AttributeError("There is no attribute: adapterInstancesInfoDto")
+            try:
+                for resource in response.json()["adapterInstancesInfoDto"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["id"]
+                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                    adapters.append(res)
+            except AttributeError as ar:
+                print("There is no attribute adapterInstancesInfoDto")
         except HTTPError as err:
             print("Request failed: ", err.args)
 
         return adapters
+
+    def get_token(self, target):
+        url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
+                                     verify=False,
+                                     headers=headers)
+            try:
+                os.environ['TOKEN'] = response.json()["token"]
+            except AttributeError as ar:
+                print("There is no attribute token!")
+        except HTTPError as err:
+            print("Request failed: ", err.args)
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))

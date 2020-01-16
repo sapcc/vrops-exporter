@@ -11,15 +11,33 @@ sys.path.append('.')
 
 from vrops_exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
-from VropsCollector import VropsCollector
+from VropsCollector import VropsCollector, do_GET
 from tools.Resources import Resources
 from resources.Vcenter import Vcenter
 
 
 class TestCollectors(unittest.TestCase):
+
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
+
+    def test_do_GET(self):
+        random_prometheus_port = random.randrange(9000, 9700, 1)
+        thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))
+        thread.daemon = True
+        thread.start()
+        # give grandpa thread some time to get prometheus started
+        time.sleep(1)
+
+        TestCollectors.path = "testhost.test"
+        # TestCollectors.headers.get("Access")
+
+        with self.assertRaises(AttributeError) as err:
+            do_GET(self)
+        self.assertEqual(err.exception.args, ("'TestCollectors' object has no attribute 'headers'",))
+
+        thread.join(timeout=0)
 
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
@@ -37,18 +55,19 @@ class TestCollectors(unittest.TestCase):
 
             # test tool get_resources to create resource objects
 
-            Resources.get_datacenter = MagicMock(return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
-                                                 {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_datacenter = MagicMock(
+                return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
+                              {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
-                                              {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                            {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                            {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                          {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                              {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
-                                                      {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                                    {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
-                                                {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                              {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
 
             # start prometheus server to provide metrics later on
             thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))

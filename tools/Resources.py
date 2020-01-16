@@ -8,6 +8,7 @@ from requests.auth import HTTPBasicAuth
 class Resources:
 
     def get_resources(self, target, resourcekind, parentid):
+
         url = "https://" + target + "/suite-api/api/resources"
         querystring = {
             'parentId': parentid,
@@ -17,24 +18,24 @@ class Resources:
         }
         headers = {
             'Content-Type': "application/json",
-            'Accept': "application/json"
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + os.environ['TOKEN']
         }
         resources = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
-                                    auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if hasattr(response.json(), "resourceList"):
+            try:
                 for resource in response.json()["resourceList"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
-            else:
-                raise AttributeError("There is no attribute: resourceList")
+            except AttributeError as ar:
+                print("There is no attribute: resourceList")
         except HTTPError as err:
             print("Request failed: ", err.args)
 
@@ -64,5 +65,3 @@ class Resources:
 
     def get_vmfolders(self, target):
         return self.get_resources(target, parentid=None, resourcekind="VMFolder")
-
-
