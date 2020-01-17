@@ -5,8 +5,10 @@ import sys
 import requests
 import traceback
 
-sys.path.append('./module')
 from requests.auth import HTTPBasicAuth
+
+sys.path.append('./module')
+
 from prometheus_client import CollectorRegistry
 from prometheus_client.exposition import MetricsHandler, choose_encoder
 from urllib.parse import urlparse, parse_qs
@@ -53,7 +55,7 @@ def do_GET(self):
 MetricsHandler.do_GET = do_GET
 
 
-class VropsCollector:
+class VropsCollector():
 
     def __init__(self):
         envvars = os.environ.keys()
@@ -101,13 +103,13 @@ class VropsCollector:
         }
         headers = {
             'Content-Type': "application/json",
-            'Accept': "application/json"
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + os.environ['TOKEN']
         }
         adapters = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
-                                    auth=HTTPBasicAuth(username=self._user, password=self._password),
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
@@ -124,6 +126,30 @@ class VropsCollector:
             print("Request failed: ", err.args)
 
         return adapters
+
+    def get_token(self, target):
+        url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        payload = {
+            "username": os.environ['USER'],
+            "authSource": "Local",
+            "password": os.environ['PASSWORD']
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+            try:
+                os.environ['TOKEN'] = response.json()["token"]
+            except AttributeError as ar:
+                print("There is no attribute token!", ar.args)
+        except (HTTPError, KeyError) as err:
+            print("Request failed: ", err.args)
 
     def get_modules(self):
         current_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))

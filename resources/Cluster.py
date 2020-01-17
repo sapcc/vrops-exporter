@@ -1,4 +1,3 @@
-import os
 from tools.Resources import Resources
 from resources.Host import Host
 

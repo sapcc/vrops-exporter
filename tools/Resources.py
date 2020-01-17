@@ -17,13 +17,13 @@ class Resources:
         }
         headers = {
             'Content-Type': "application/json",
-            'Accept': "application/json"
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + os.environ['TOKEN']
         }
         resources = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
-                                    auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
@@ -64,5 +64,4 @@ class Resources:
 
     def get_vmfolders(self):
         return self.get_resources(parentid=None, resourcekind="VMFolder")
-
 
