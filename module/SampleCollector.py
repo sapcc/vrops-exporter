@@ -5,9 +5,8 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
 
-    def __init__(self, resources, target, user, password):
+    def __init__(self, resources, user, password):
         self._resources = resources
-        self._target = target
         self._user = user
         self._password = password
 
@@ -21,7 +20,7 @@ class SampleCollector(BaseCollector):
 
         g = GaugeMetricFamily('vrops_ressource_gauge', 'Gauge Collector for vRops',
                               labels=['target', 'entityname'])
-        g.add_metric(labels=[self._target, entityname], value=1)
+        g.add_metric(labels=[os.environ["TARGET"], entityname], value=1)
 
         metric_list.append(g)
         return metric_list

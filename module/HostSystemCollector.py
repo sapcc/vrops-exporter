@@ -6,9 +6,8 @@ from tools.get_metrics import get_metric
 
 class HostSystemCollector(BaseCollector):
 
-    def __init__(self, resources, target, user, password):
+    def __init__(self, resources, user, password):
         self._resources = resources
-        self._target = target
         self._user = user
         self._password = password
         self._statkeys = [{"name": "Hardware|CPU Information|Number of CPUs (Cores)",
@@ -44,14 +43,14 @@ class HostSystemCollector(BaseCollector):
 
     def collect(self):
         metric_list = []
-        g = GaugeMetricFamily('HostSystemCollector', self._target,
+        g = GaugeMetricFamily('HostSystemCollector', os.environ["TARGET"],
                               labels=['name', 'statkey'])
         for cluster in self._resources.datacenter[0].clusters:
             for host in cluster.hosts:
                 for statkey in self._statkeys:
                     if os.environ['DEBUG'] == '1':
                         print(host.name, "--add statkey:", statkey["name"])
-                    value = get_metric(self._target, host.uuid, statkey["statkey"])
+                    value = get_metric(host.uuid, statkey["statkey"])
                     if value is not None:
                         g.add_metric(labels=[host.name, statkey["name"]],
                                      value=value)

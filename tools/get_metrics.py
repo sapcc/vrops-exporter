@@ -5,8 +5,8 @@ from urllib3.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 
 
-def get_metric(target, uuid, key):
-    url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
+def get_metric(uuid, key):
+    url = "https://" + os.environ["TARGET"] + "/suite-api/api/resources/" + uuid + "/stats/latest"
     headers = {
         'Content-Type': "application/json",
         'Accept': "application/json"

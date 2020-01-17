@@ -4,12 +4,11 @@ from resources.Datacenter import Datacenter
 
 class Vcenter(Resources):
 
-    def __init__(self, target, name, uuid):
-        self.target = target
+    def __init__(self, name, uuid):
         self.uuid = uuid
         self.name = name
         self.datacenter = list()
 
     def add_datacenter(self):
-        for dc in Resources.get_datacenter(self, target=self.target, parentid=self.uuid):
-            self.datacenter.append(Datacenter(target=self.target, name=dc['name'], uuid=dc['uuid']))
+        for dc in Resources.get_datacenter(self, parentid=self.uuid):
+            self.datacenter.append(Datacenter(name=dc['name'], uuid=dc['uuid']))

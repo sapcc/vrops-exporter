@@ -22,7 +22,8 @@ def do_GET(self):
         try:
             if os.environ['DEBUG'] == '1':
                 print(params['target'])
-            collector = VropsCollector(params['target'][0])
+            os.environ["TARGET"] = params['target'][0]
+            collector = VropsCollector()
         except Exception as e:
             print("Problem instantiating VropsCollector:\n" + str(e))
             print(sys.exc_info()[0])
@@ -54,8 +55,7 @@ MetricsHandler.do_GET = do_GET
 
 class VropsCollector:
 
-    def __init__(self, target):
-        self._target = target
+    def __init__(self):
         envvars = os.environ.keys()
         if 'USER' not in envvars:
             raise ValueError('USER not set')
@@ -73,8 +73,8 @@ class VropsCollector:
             self._modules_dict[module] = importlib.import_module(module, modules[0])
 
     def create_resource_objects(self):
-        for adapter in self.get_adapter(target=self._target):
-            vcenter = Vcenter(target=self._target, name=adapter['name'], uuid=adapter['uuid'])
+        for adapter in self.get_adapter():
+            vcenter = Vcenter(name=adapter['name'], uuid=adapter['uuid'])
             print(adapter['name'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
@@ -94,8 +94,8 @@ class VropsCollector:
                                 print("Collecting VM: " + vm_object.name)
             return vcenter
 
-    def get_adapter(self, target):
-        url = "https://" + target + "/suite-api/api/adapters"
+    def get_adapter(self):
+        url = "https://" + os.environ["TARGET"] + "/suite-api/api/adapters"
         querystring = {
             "adapterKindKey": "VMWARE"
         }
@@ -141,6 +141,6 @@ class VropsCollector:
         for module in self._modules_dict.keys():
             imported_module = self._modules_dict[module]
             func = getattr(imported_module, module)
-            res = func(self._resources, self._target, self._user, self._password).collect()
+            res = func(self._resources, self._user, self._password).collect()
             for i in res:
                 yield i

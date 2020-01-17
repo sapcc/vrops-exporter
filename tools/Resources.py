@@ -7,8 +7,8 @@ from requests.auth import HTTPBasicAuth
 
 class Resources:
 
-    def get_resources(self, target, resourcekind, parentid):
-        url = "https://" + target + "/suite-api/api/resources"
+    def get_resources(self, resourcekind, parentid):
+        url = "https://" + os.environ["TARGET"] + "/suite-api/api/resources"
         querystring = {
             'parentId': parentid,
             'adapterKind': 'VMware',
@@ -40,9 +40,9 @@ class Resources:
 
         return resources
 
-    def get_project_id(self, target):
+    def get_project_id(self):
         project_ids = list()
-        for project in self.get_vmfolders(target=target):
+        for project in self.get_vmfolders():
             if project['name'].startswith('Project'):
                 p_ids = dict()
                 p_ids['project_id'] = project['name'][project['name'].find("(") + 1:project['name'].find(")")]
@@ -50,19 +50,19 @@ class Resources:
                 project_ids.append(p_ids)
         return project_ids
 
-    def get_datacenter(self, target, parentid):
-        return self.get_resources(target, parentid=parentid, resourcekind="Datacenter")
+    def get_datacenter(self, parentid):
+        return self.get_resources(parentid=parentid, resourcekind="Datacenter")
 
-    def get_cluster(self, target, parentid):
-        return self.get_resources(target, parentid=parentid, resourcekind="ClusterComputeResource")
+    def get_cluster(self, parentid):
+        return self.get_resources(parentid=parentid, resourcekind="ClusterComputeResource")
 
-    def get_hosts(self, target, parentid):
-        return self.get_resources(target, parentid=parentid, resourcekind="HostSystem")
+    def get_hosts(self, parentid):
+        return self.get_resources(parentid=parentid, resourcekind="HostSystem")
 
-    def get_virtualmachines(self, target, parentid):
-        return self.get_resources(target, parentid=parentid, resourcekind="VirtualMachine")
+    def get_virtualmachines(self, parentid):
+        return self.get_resources(parentid=parentid, resourcekind="VirtualMachine")
 
-    def get_vmfolders(self, target):
-        return self.get_resources(target, parentid=None, resourcekind="VMFolder")
+    def get_vmfolders(self):
+        return self.get_resources(parentid=None, resourcekind="VMFolder")
 
 
