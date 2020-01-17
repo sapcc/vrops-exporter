@@ -59,6 +59,8 @@ class VropsCollector():
     def __init__(self, target):
         self._target = target
         self.get_token(target)
+        if os.environ['DEBUG'] == '1':
+            print(os.environ["TOKEN"])
         envvars = os.environ.keys()
         if 'USER' not in envvars:
             raise ValueError('USER not set')
@@ -105,7 +107,7 @@ class VropsCollector():
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
-            'Authorisation': "vRealizeOpsToken " + os.environ['TOKEN']
+            'Authorization': "vRealizeOpsToken " + os.environ['TOKEN']
         }
         adapters = list()
         disable_warnings(exceptions.InsecureRequestWarning)
@@ -123,7 +125,7 @@ class VropsCollector():
                     adapters.append(res)
             except AttributeError as ar:
                 print("There is no attribute adapterInstancesInfoDto")
-        except HTTPError as err:
+        except BaseException as err:
             print("Request failed: ", err.args)
 
         return adapters
@@ -134,17 +136,22 @@ class VropsCollector():
             'Content-Type': "application/json",
             'Accept': "application/json"
         }
+        payload = {
+            "username": os.environ['USER'],
+            "authSource": "Local",
+            "password": os.environ['PASSWORD']
+        }
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.post(url,
-                                     auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
+                                     data=json.dumps(payload),
                                      verify=False,
                                      headers=headers)
             try:
                 os.environ['TOKEN'] = response.json()["token"]
             except AttributeError as ar:
-                print("There is no attribute token!")
-        except HTTPError as err:
+                print("There is no attribute token!", ar.args)
+        except (HTTPError, KeyError) as err:
             print("Request failed: ", err.args)
 
     def get_modules(self):
