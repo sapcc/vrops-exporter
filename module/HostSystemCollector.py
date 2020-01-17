@@ -43,8 +43,8 @@ class HostSystemCollector(BaseCollector):
 
     def collect(self):
         metric_list = []
-        g = GaugeMetricFamily('HostSystemCollector', os.environ["TARGET"],
-                              labels=['name', 'statkey'])
+        g = GaugeMetricFamily('vrops_hostsystem_gauge', os.environ["TARGET"],
+                              labels=['datacenter', 'cluster', 'hostname', 'statkey'])
         for cluster in self._resources.datacenter[0].clusters:
             for host in cluster.hosts:
                 for statkey in self._statkeys:
@@ -52,10 +52,11 @@ class HostSystemCollector(BaseCollector):
                         print(host.name, "--add statkey:", statkey["name"])
                     value = get_metric(host.uuid, statkey["statkey"])
                     if value is None:
-                        g.add_metric(labels=[host.name, statkey["name"]],
+                        g.add_metric(labels=[self._resources.datacenter[0].name, cluster.name, host.name, statkey["name"]],
                                      value="0.0")
+                        metric_list.append(g)
                     else:
-                        g.add_metric(labels=[host.name, statkey["name"]],
+                        g.add_metric(labels=[self._resources.datacenter[0].name, cluster.name, host.name, statkey["name"]],
                                      value=value)
                         metric_list.append(g)
         return metric_list
