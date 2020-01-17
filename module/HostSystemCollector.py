@@ -10,35 +10,35 @@ class HostSystemCollector(BaseCollector):
         self._resources = resources
         self._user = user
         self._password = password
-        self._statkeys = [{"name": "Hardware|CPU Information|Number of CPUs (Cores)",
+        self._statkeys = [{"name": "hardware_number_of_cpu_cores_info",
                          "statkey": "hardware|cpuinfo|numCpuCores)"},
-                        {"name": "CPU|Number of CPU Sockets",
+                        {"name": "hardware_number_of_cpu_sockets_info",
                          "statkey": "cpu|numpackages"},
-                        {"name": "Memory|Swap Used (KB)",
+                        {"name": "memory_swap_used_kilobytes",
                          "statkey": "mem|swapused_average"},
-                        {"name": "Memory|Usable Memory (KB)",
+                        {"name": "memory_useable_kilobytes",
                          "statkey": "mem|host_usable"},
-                        {"name": "Memory|Usage (%)",
+                        {"name": "memory_usage_percentage",
                          "statkey": "mem|usage_average"},
-                        {"name": "Memory|Balloon (KB)",
+                        {"name": "memory_balloon_kilobytes",
                          "statkey": "mem|vmmemctl_average"},
-                        {"name": "Memory|Compressed (KB)",
+                        {"name": "memory_compressed_kilobytes",
                          "statkey": "mem|compressed_average"},
-                        {"name": "Memory|Guest Active (KB)",
+                        {"name": "memory_guest_active_kilobytes",
                          "statkey": "mem|active_average"},
-                        {"name": "Memory|Consumed (KB)",
+                        {"name": "memory_consumed_kilobytes",
                          "statkey": "mem|consumed_average"},
-                        {"name": "Memory|Capacity Available to VMs (KB)",
+                        {"name": "memory_capacity_available_to_vms_kilobytes",
                          "statkey": "mem|totalCapacity_average"},
-                        {"name": "Memory|Total Capacity (KB)",
+                        {"name": "memory_total_capacity_kilobytes",
                          "statkey": "mem|host_provisioned"},
-                        {"name": "Summary|Number of Running VMs",
+                        {"name": "summary_number_of_running_vms_kilobytes",
                          "statkey": "summary|number_running_vms"},
-                        {"name": "Network|Packets Dropped",
+                        {"name": "network_packets_dropped_rx_number",
                          "statkey": "net|droppedRx_summation"},
-                        {"name": "Network|Transmitted Packets Dropped",
+                        {"name": "network_packets_dropped_tx_number",
                          "statkey": "net|droppedTx_summation"},
-                        {"name": "Network|Packets Dropped (%)",
+                        {"name": "network_packets_dropped_percentage",
                          "statkey": "net|droppedPct"}]
 
     def collect(self):
@@ -51,7 +51,10 @@ class HostSystemCollector(BaseCollector):
                     if os.environ['DEBUG'] == '1':
                         print(host.name, "--add statkey:", statkey["name"])
                     value = get_metric(host.uuid, statkey["statkey"])
-                    if value is not None:
+                    if value is None:
+                        g.add_metric(labels=[host.name, statkey["name"]],
+                                     value="0.0")
+                    else:
                         g.add_metric(labels=[host.name, statkey["name"]],
                                      value=value)
                         metric_list.append(g)
