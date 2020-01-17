@@ -2,19 +2,18 @@ import os
 import requests
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
-from requests.auth import HTTPBasicAuth
 
 
 def get_metric(uuid, key):
     url = "https://" + os.environ["TARGET"] + "/suite-api/api/resources/" + uuid + "/stats/latest"
     headers = {
         'Content-Type': "application/json",
-        'Accept': "application/json"
+        'Accept': "application/json",
+        'Authorization': "vRealizeOpsToken " + os.environ['TOKEN']
     }
     disable_warnings(exceptions.InsecureRequestWarning)
     try:
         response = requests.get(url,
-                                auth=HTTPBasicAuth(username=os.environ['USER'], password=os.environ['PASSWORD']),
                                 verify=False,
                                 headers=headers)
         try:

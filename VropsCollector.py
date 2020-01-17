@@ -59,6 +59,7 @@ class VropsCollector():
 
     def __init__(self):
         envvars = os.environ.keys()
+        self.get_token()
         if 'USER' not in envvars:
             raise ValueError('USER not set')
         if 'PASSWORD' not in envvars:
@@ -127,8 +128,8 @@ class VropsCollector():
 
         return adapters
 
-    def get_token(self, target):
-        url = "https://" + target + "/suite-api/api/auth/token/acquire"
+    def get_token(self):
+        url = "https://" + os.environ["TARGET"] + "/suite-api/api/auth/token/acquire"
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"

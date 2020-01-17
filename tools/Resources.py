@@ -2,7 +2,6 @@ import os
 import requests
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
-from requests.auth import HTTPBasicAuth
 
 
 class Resources:
