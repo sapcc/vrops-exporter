@@ -5,7 +5,7 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
 
-    def __init__(self, target, user, password):
+    def __init__(self, resources, target, user, password):
         self._target = target
         self._user = user
         self._password = password
