@@ -11,25 +11,34 @@ from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
 from requests.auth import HTTPBasicAuth
 
-class ResourceCollector:
+class InventoryBuilder:
     def __init__(self, json):
         self.region = os.environ["REGION"]
         self.json = json
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
+        self.vcenter_list = list()
         self.get_vrops()
-        self.query_vrops()
+        # self.query_vrops()
+        # self.restify_object_tree()
 
-        # thread = Thread(target=self.run_rest_server)
-        # thread.start()
+        thread = Thread(target=self.run_rest_server)
+        thread.start()
+
+        self.query_inventory_permanent()
 
     def run_rest_server(self):
         app = Flask(__name__)
-        print('serving /vrops_list list on 8000')
+        print('serving /vrops_list on 8000')
         @app.route('/vrops_list', methods=['GET'])
         def vrops_list():
-            return self.vrops_list
-        WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+            return json.dumps(self.vrops_list)
+        print('serving /inventory on 8000')
+        @app.route('/inventory', methods=['GET'])
+        def inventory():
+            return self.rest_ready_tree
+        # WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+        WSGIServer(('0.0.0.0', 8000), app).serve_forever()
 
     def get_vrops(self):
         with open(self.json) as json_file:
@@ -41,11 +50,52 @@ class ResourceCollector:
                 vrops_list.append(vrops)
         self.vrops_list = vrops_list
 
+    def query_inventory_permanent(self):
+        iteration = 0
+        while True:
+            print("real " + str(iteration))
+            self.iteration = iteration
+            iteration += 1
+            self.query_vrops()
+            self.restify_object_tree()
+
+    def restify_object_tree(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+           tree[vcenter.uuid] = {
+                   'uuid': vcenter.uuid,
+                   'name': vcenter.name
+                   }
+
+           for datacenter in vcenter.datacenter:
+               tree[vcenter.uuid][datacenter.uuid] = {
+                      'uuid': datacenter.uuid,
+                      'name': datacenter.name
+                   }
+
+               for cluster in datacenter.clusters:
+                   tree[vcenter.uuid][datacenter.uuid][cluster.uuid] = {
+                           'uuid': cluster.uuid,
+                           'name': cluster.name
+                       }
+                   for host in cluster.hosts:
+                       tree[vcenter.uuid][datacenter.uuid][cluster.uuid][host.uuid] = {
+                               'uuid': host.uuid,
+                               'name': host.name
+                           }
+                       for vm in host.vms:
+                           tree[vcenter.uuid][datacenter.uuid][cluster.uuid][host.uuid][vm.uuid] = {
+                                   'uuid': vm.uuid,
+                                   'name': vm.name,
+                                   'project_id': vm.project_id 
+                               }
+        self.rest_ready_tree = tree
+
     def query_vrops(self):
         for vrops in self.vrops_list:
             print("querying " + vrops)
             vcenter = self.create_resource_objects(vrops)
-            print(vcenter)
+            self.vcenter_list.append(vcenter)
 
     def create_resource_objects(self, vrops):
         for adapter in self.get_adapter(target=vrops):
@@ -84,8 +134,8 @@ class ResourceCollector:
                                     headers=headers)
         except HTTPError as err:
             print("Request failed: ", err.args)
-        print(response.json())
-        if hasattr(response.json(), "adapterInstancesInfoDto"):
+        # print(response.json())
+        if 'adapterInstancesInfoDto' in response.json():
             for resource in response.json()["adapterInstancesInfoDto"]:
                 res = dict()
                 res['name'] = resource["resourceKey"]["name"]

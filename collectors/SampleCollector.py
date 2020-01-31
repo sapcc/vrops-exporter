@@ -5,10 +5,10 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
 
-    def __init__(self, resources, target, user, password):
-        self._target = target
-        self._user = user
-        self._password = password
+    def __init__(self):
+        # self._target = target
+        self._user = os.environ['USER']
+        self._password = os.environ['PASSWORD']
 
     def collect(self):
         metric_list = list()
