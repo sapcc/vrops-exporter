@@ -6,6 +6,7 @@ import os
 from prometheus_client import start_http_server
 from optparse import OptionParser
 from VropsCollector import VropsCollector
+from ResourceCollector import ResourceCollector
 
 def parse_params():
     parser = OptionParser()
@@ -50,4 +51,5 @@ def run_prometheus_server(port, *args):
 
 if __name__ == '__main__':
     parse_params()
-    run_prometheus_server(int(os.environ['PORT']))
+    ResourceCollector('./netbox_vcops01.json') 
+    # run_prometheus_server(int(os.environ['PORT']))
