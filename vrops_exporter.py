@@ -50,13 +50,15 @@ def run_prometheus_server(port, *args):
     start_http_server(int(port))
     #register all collectors
     REGISTRY.register(SampleCollector())
+    while True:
+        time.sleep(1)
 
 
     while True:
         time.sleep(1)
 
 if __name__ == '__main__':
-    # parse_params()
+    parse_params()
     thread = Thread(target=InventoryBuilder, args=('./netbox.json',))
     thread.start()
-    # run_prometheus_server(int(os.environ['PORT']))
+    run_prometheus_server(int(os.environ['PORT']))

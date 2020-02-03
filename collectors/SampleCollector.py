@@ -5,22 +5,15 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
 
-    def __init__(self):
-        # self._target = target
-        self._user = os.environ['USER']
-        self._password = os.environ['PASSWORD']
-
     def collect(self):
-        metric_list = list()
-
+        if self.iteration == 0:
+            time.sleep(10)
+            print("Sleeping for 10")
+            return
         if os.environ['DEBUG'] == '1':
             print('have some debug code in here')
 
-        entityname = "vmentityname"
-
-        g = GaugeMetricFamily('vrops_ressource_gauge', 'Gauge Collector for vRops',
-                              labels=['target', 'entityname'])
-        g.add_metric(labels=[self._target, entityname], value=1)
-
-        metric_list.append(g)
-        return metric_list
+        g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection', labels= ['vcenter'])
+        for vc in self.vcenters:
+            g.add_metric(labels=[vc['name']], value=self.iteration)
+        yield g

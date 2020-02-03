@@ -7,6 +7,7 @@ RUN git clone https://github.com/sapcc/vrops-exporter.git
 RUN pip3 install --upgrade pip
 RUN pip3 install --ignore-installed six
 RUN pip install --upgrade cffi
+RUN pip3 install flask gevent
 
 ADD . vrops-exporter/
 RUN pip3 install --upgrade -r vrops-exporter/requirements.txt
