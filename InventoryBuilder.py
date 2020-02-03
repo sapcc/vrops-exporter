@@ -51,8 +51,8 @@ class InventoryBuilder:
         def iteration():
             return str(self.iteration)
 
-        # WSGIServer(('127.0.0.1', 8000), app).serve_forever()
-        WSGIServer(('0.0.0.0', 8000), app).serve_forever()
+        WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+        # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
 
 
     def get_vrops(self):
@@ -76,7 +76,6 @@ class InventoryBuilder:
             self.get_hosts()
             self.get_vms()
             self.iteration += 1
-            # self.restify_object_tree()
 
     def get_vcenters(self):
         tree = dict()
@@ -142,39 +141,6 @@ class InventoryBuilder:
                                     }
         self.vms = tree
         return tree
-
-
-    # def restify_object_tree(self):
-        # tree = dict()
-        # for vcenter in self.vcenter_list:
-           # tree[vcenter.uuid] = {
-                   # 'uuid': vcenter.uuid,
-                   # 'name': vcenter.name
-                   # }
-
-           # for datacenter in vcenter.datacenter:
-               # tree[vcenter.uuid][datacenter.uuid] = {
-                      # 'uuid': datacenter.uuid,
-                      # 'name': datacenter.name
-                   # }
-
-               # for cluster in datacenter.clusters:
-                   # tree[vcenter.uuid][datacenter.uuid][cluster.uuid] = {
-                           # 'uuid': cluster.uuid,
-                           # 'name': cluster.name
-                       # }
-                   # for host in cluster.hosts:
-                       # tree[vcenter.uuid][datacenter.uuid][cluster.uuid][host.uuid] = {
-                               # 'uuid': host.uuid,
-                               # 'name': host.name
-                           # }
-                       # for vm in host.vms:
-                           # tree[vcenter.uuid][datacenter.uuid][cluster.uuid][host.uuid][vm.uuid] = {
-                                   # 'uuid': vm.uuid,
-                                   # 'name': vm.name,
-                                   # 'project_id': vm.project_id
-                               # }
-        # self.rest_ready_tree = tree
 
     def query_vrops(self):
         for vrops in self.vrops_list:

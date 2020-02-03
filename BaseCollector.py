@@ -9,7 +9,6 @@ class BaseCollector(ABC):
         pass
 
     def get_vcenters(self):
-        print("actually querying vcenters")
         request = requests.get(url = "http://localhost:8000/vcenters")
         self.vcenters = request.json()
         return self.vcenters
