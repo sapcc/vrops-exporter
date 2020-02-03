@@ -54,9 +54,6 @@ def run_prometheus_server(port, *args):
         time.sleep(1)
 
 
-    while True:
-        time.sleep(1)
-
 if __name__ == '__main__':
     parse_params()
     thread = Thread(target=InventoryBuilder, args=('./netbox.json',))
