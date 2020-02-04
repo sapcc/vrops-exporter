@@ -18,6 +18,7 @@ def parse_params():
     parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
     parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
     parser.add_option("-o", "--port", help="specify exporter port", action="store", dest="port")
+    parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     (options, args) = parser.parse_args()
 
@@ -46,6 +47,8 @@ def parse_params():
         print("Can't start, please specify password with ENV or -p")
         sys.exit(0)
 
+    return options
+
 def run_prometheus_server(port, *args):
     start_http_server(int(port))
     #register all collectors
@@ -55,7 +58,8 @@ def run_prometheus_server(port, *args):
 
 
 if __name__ == '__main__':
-    parse_params()
-    thread = Thread(target=InventoryBuilder, args=('./netbox.json',))
+    options = parse_params()
+    print(options.atlas)
+    thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     run_prometheus_server(int(os.environ['PORT']))
