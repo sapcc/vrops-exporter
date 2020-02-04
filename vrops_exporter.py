@@ -4,8 +4,14 @@ import sys
 import time
 import os
 from prometheus_client import start_http_server
+from prometheus_client.core import REGISTRY #GaugeMetricFamily, REGISTRY, CounterMetricFamily
 from optparse import OptionParser
-from VropsCollector import VropsCollector
+from threading import Thread
+
+
+# from VropsCollector import VropsCollector
+from InventoryBuilder import InventoryBuilder
+from collectors.SampleCollector import SampleCollector
 
 def parse_params():
     parser = OptionParser()
@@ -41,13 +47,15 @@ def parse_params():
         sys.exit(0)
 
 def run_prometheus_server(port, *args):
-    # Start the Prometheus http server.
-    # start_http_server(int(os.environ['PORT']))
     start_http_server(int(port))
-
+    #register all collectors
+    REGISTRY.register(SampleCollector())
     while True:
         time.sleep(1)
 
+
 if __name__ == '__main__':
     parse_params()
+    thread = Thread(target=InventoryBuilder, args=('./netbox.json',))
+    thread.start()
     run_prometheus_server(int(os.environ['PORT']))

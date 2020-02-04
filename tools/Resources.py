@@ -27,7 +27,9 @@ class Resources:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if hasattr(response.json(), "resourceList"):
+            # import json
+            # print(json.dumps(response.json(), sort_keys=True,indent=4))
+            if "resourceList" in response.json():
                 for resource in response.json()["resourceList"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
