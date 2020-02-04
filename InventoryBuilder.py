@@ -68,7 +68,8 @@ class InventoryBuilder:
     def query_inventory_permanent(self):
         self.iteration = 0
         while True:
-            print("real run " + str(self.iteration))
+            if os.environ['DEBUG'] == 1:
+                print("real run " + str(self.iteration))
             self.query_vrops()
             self.get_vcenters()
             self.get_datacenters()
@@ -144,14 +145,14 @@ class InventoryBuilder:
 
     def query_vrops(self):
         for vrops in self.vrops_list:
-            print("querying " + vrops)
+            if os.environ['DEBUG'] == 1:
+                print("querying " + vrops)
             vcenter = self.create_resource_objects(vrops)
             self.vcenter_list.append(vcenter)
 
     def create_resource_objects(self, vrops):
         for adapter in self.get_adapter(target=vrops):
             vcenter = Vcenter(target=vrops, name=adapter['name'], uuid=adapter['uuid'])
-            print(adapter['name'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
                 print("Collecting Datacenter: " + dc_object.name)

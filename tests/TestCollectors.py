@@ -11,8 +11,8 @@ sys.path.append('.')
 
 from vrops_exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
-from VropsCollector import VropsCollector
 from tools.Resources import Resources
+from InventoryBuilder import InventoryBuilder
 from resources.Vcenter import Vcenter
 
 
@@ -32,9 +32,7 @@ class TestCollectors(unittest.TestCase):
             print("\nTesting " + collector)
 
             Vcenter.add_datacenter = MagicMock()
-            VropsCollector.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
-            VropsCollector.get_modules = MagicMock(return_value=('/vrops-exporter/module', [collector]))
-
+            InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
             # test tool get_resources to create resource objects
 
             Resources.get_datacenter = MagicMock(return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
@@ -50,15 +48,19 @@ class TestCollectors(unittest.TestCase):
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
                                                 {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
 
+            thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
+            thread.daemon = True
+            thread.start()
+
             # start prometheus server to provide metrics later on
             thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))
             thread.daemon = True
             thread.start()
-            # give grandpa thread some time to get prometheus started
-            time.sleep(1)
+            # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
+            time.sleep(3)
 
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
-            c.request("GET", "/?target=testhost.test")
+            c.request("GET", "/")
             r = c.getresponse()
 
             self.assertEqual(r.status, 200, "HTTP server return code should be 200")
@@ -69,6 +71,12 @@ class TestCollectors(unittest.TestCase):
             metrics = list()
             for entry in data_array:
                 if entry.startswith('#'):
+                    continue
+                if entry.startswith('python_gc'):
+                    continue
+                if entry.startswith('process_'):
+                    continue
+                if entry.startswith('python_info'):
                     continue
                 split_entry = entry.split()
                 if len(split_entry) != 2:

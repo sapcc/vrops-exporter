@@ -9,9 +9,9 @@ class SampleCollector(BaseCollector):
         while not self.iteration:
             time.sleep(2)
             self.get_iteration()
-            if os.environ['DEBUG']:
+            if os.environ['DEBUG'] == 1:
                 print("waiting for iteration")
-        if os.environ['DEBUG']:
+        if os.environ['DEBUG'] == 1:
             print("done waiting for iteration")
 
     def collect(self):
