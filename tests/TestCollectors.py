@@ -9,7 +9,7 @@ import time
 
 sys.path.append('.')
 
-from vrops_exporter import run_prometheus_server
+from exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from tools.Resources import Resources
 from InventoryBuilder import InventoryBuilder

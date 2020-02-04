@@ -4,7 +4,7 @@ import unittest
 
 sys.path.append('.')
 from unittest import TestCase
-from vrops_exporter import parse_params
+from exporter import parse_params
 
 
 class TestLaunchExporter(TestCase):
