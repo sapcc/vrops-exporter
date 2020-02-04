@@ -13,8 +13,8 @@ from requests.auth import HTTPBasicAuth
 
 class InventoryBuilder:
     def __init__(self, json):
-        self.region = os.environ["REGION"]
         self.json = json
+        self.region = os.environ["REGION"]
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_list = list()

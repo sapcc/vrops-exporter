@@ -4,4 +4,4 @@ requests
 six
 pyyaml
 flask
-gevend
+gevent
