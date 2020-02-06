@@ -36,4 +36,5 @@ class BaseCollector(ABC):
     def get_iteration(self):
         request = requests.get(url = "http://localhost:8000/iteration")
         self.iteration = request.json()
+        print("test")
         return self.iteration
