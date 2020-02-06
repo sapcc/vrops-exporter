@@ -154,16 +154,20 @@ class InventoryBuilder:
             vcenter = Vcenter(target=vrops, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                print("Collecting Datacenter: " + dc_object.name)
+                if os.environ['DEBUG'] == '1':
+                    print("Collecting Datacenter: " + dc_object.name)
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    print("Collecting Cluster: " + cl_object.name)
+                    if os.environ['DEBUG'] == '1':
+                        print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        print("Collecting Hosts: " + hs_object.name)
+                        if os.environ['DEBUG'] == '1':
+                            print("Collecting Hosts: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            print("Collecting VM: " + vm_object.name)
+                            if os.environ['DEBUG'] == '1':
+                                print("Collecting VM: " + vm_object.name)
             return vcenter
 
     def get_adapter(self, target):

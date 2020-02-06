@@ -34,7 +34,6 @@ class BaseCollector(ABC):
         return self.vms
 
     def get_iteration(self):
-        print("actually querying")
         request = requests.get(url = "http://localhost:8000/iteration")
         self.iteration = request.json()
         return self.iteration

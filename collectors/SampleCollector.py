@@ -7,12 +7,10 @@ class SampleCollector(BaseCollector):
     def __init__(self):
         self.iteration = 0
         while not self.iteration:
-            time.sleep(2)
+            time.sleep(5)
             self.get_iteration()
-            if os.environ['DEBUG'] == 1:
-                print("waiting for iteration")
-        if os.environ['DEBUG'] == 1:
-            print("done waiting for iteration")
+            print("waiting for initial iteration")
+        print("done: initial query")
 
     def collect(self):
         if os.environ['DEBUG'] == '1':
