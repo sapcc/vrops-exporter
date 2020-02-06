@@ -57,7 +57,7 @@ class TestCollectors(unittest.TestCase):
             thread.daemon = True
             thread.start()
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
-            time.sleep(3)
+            time.sleep(10)
 
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")
