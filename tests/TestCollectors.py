@@ -32,6 +32,7 @@ class TestCollectors(unittest.TestCase):
             print("\nTesting " + collector)
 
             Vcenter.add_datacenter = MagicMock()
+            InventoryBuilder.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
             InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
             # test tool get_resources to create resource objects
 
