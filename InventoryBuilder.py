@@ -9,7 +9,6 @@ from resources.Vcenter import Vcenter
 from urllib.parse import urlparse, parse_qs
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
-from requests.auth import HTTPBasicAuth
 
 class InventoryBuilder:
     def __init__(self, json):
@@ -49,10 +48,12 @@ class InventoryBuilder:
         @app.route('/iteration', methods=['GET'])
         def iteration():
             return str(self.iteration)
+        @app.route('/token', methods=['GET'])
+        def token():
+            return self.token
 
         WSGIServer(('127.0.0.1', 8000), app).serve_forever()
         # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
-
 
     def get_vrops(self):
         with open(self.json) as json_file:
@@ -146,12 +147,13 @@ class InventoryBuilder:
         for vrops in self.vrops_list:
             if os.environ['DEBUG'] == 1:
                 print("querying " + vrops)
+            self.token = self.get_token(target=vrops)
             vcenter = self.create_resource_objects(vrops)
             self.vcenter_list.append(vcenter)
 
     def create_resource_objects(self, vrops):
-        for adapter in self.get_adapter(target=vrops):
-            vcenter = Vcenter(target=vrops, name=adapter['name'], uuid=adapter['uuid'])
+        for adapter in self.get_adapter(target=vrops, token=self.token):
+            vcenter = Vcenter(target=vrops, token=self.token, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
                 if os.environ['DEBUG'] == '1':
@@ -170,34 +172,57 @@ class InventoryBuilder:
                                 print("Collecting VM: " + vm_object.name)
             return vcenter
 
-    def get_adapter(self, target):
+    def get_adapter(self, target, token):
         url = "https://" + target + "/suite-api/api/adapters"
         querystring = {
             "adapterKindKey": "VMWARE"
         }
         headers = {
             'Content-Type': "application/json",
-            'Accept': "application/json"
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
         }
         adapters = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
-                                    auth=HTTPBasicAuth(username=self._user, password=self._password),
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
+            try:
+                for resource in response.json()["adapterInstancesInfoDto"]:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["id"]
+                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                    adapters.append(res)
+            except AttributeError as ar:
+                print("There is no attribute adapterInstancesInfoDto " + str(ar.args))
         except HTTPError as err:
             print("Request failed: ", err.args)
-        # print(response.json())
-        if 'adapterInstancesInfoDto' in response.json():
-            for resource in response.json()["adapterInstancesInfoDto"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["id"]
-                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                adapters.append(res)
-        else:
-            raise AttributeError("There is no attribute: adapterInstancesInfoDto")
 
         return adapters
+
+    def get_token(self, target):
+        url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        payload = {
+            "username": os.environ['USER'],
+            "authSource": "Local",
+            "password": os.environ['PASSWORD']
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+            try:
+                return response.json()["token"]
+            except AttributeError as ar:
+                print("There is no attribute token!", ar.args)
+        except (HTTPError, KeyError) as err:
+            print("Request failed: ", err.args)
