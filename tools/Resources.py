@@ -31,10 +31,10 @@ class Resources:
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
-            except:
-                raise AttributeError("There is no attribute adapterInstancesInfoDto ")
-        except:
-            raise HTTPError("request failed")
+            except AttributeError:
+                raise AttributeError("There is no attribute resourceList")
+        except HTTPError:
+            raise HTTPError("Request failed for resourceList: " + target)
 
         return resources
 

@@ -40,5 +40,5 @@ class BaseCollector(ABC):
 
     def get_token(self):
         request = requests.get(url="http://localhost:8000/token")
-        self.iteration = request.json()
-        return self.iteration
+        self.token = request.json()
+        return self.token
