@@ -10,6 +10,7 @@ from urllib.parse import urlparse, parse_qs
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
 
+
 class InventoryBuilder:
     def __init__(self, json):
         self.json = json
@@ -26,28 +27,37 @@ class InventoryBuilder:
     def run_rest_server(self):
         app = Flask(__name__)
         print('serving /vrops_list on 8000')
+
         @app.route('/vrops_list', methods=['GET'])
         def vrops_list():
             return json.dumps(self.vrops_list)
+
         print('serving /inventory on 8000')
+
         @app.route('/vcenters', methods=['GET'])
         def vcenters():
             return self.vcenters
+
         @app.route('/datacenters', methods=['GET'])
         def datacenters():
             return self.datacenters
+
         @app.route('/clusters', methods=['GET'])
         def clusters():
             return self.clusters
+
         @app.route('/hosts', methods=['GET'])
         def hosts():
             return self.hosts
+
         @app.route('/vms', methods=['GET'])
         def vms():
             return self.vms
+
         @app.route('/iteration', methods=['GET'])
         def iteration():
             return str(self.iteration)
+
         @app.route('/token', methods=['GET'])
         def token():
             return self.token
@@ -127,7 +137,6 @@ class InventoryBuilder:
         self.hosts = tree
         return tree
 
-
     def get_vms(self):
         tree = dict()
         for vcenter in self.vcenter_list:
@@ -196,10 +205,10 @@ class InventoryBuilder:
                     res['uuid'] = resource["id"]
                     res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                     adapters.append(res)
-            except AttributeError as ar:
-                print("There is no attribute adapterInstancesInfoDto " + str(ar.args))
-        except HTTPError as err:
-            print("Request failed: ", err.args)
+            except:
+                raise AttributeError("There is no attribute adapterInstancesInfoDto ")
+        except:
+            raise HTTPError("request failed")
 
         return adapters
 
