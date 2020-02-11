@@ -58,9 +58,13 @@ class InventoryBuilder:
         def iteration():
             return str(self.iteration)
 
+        @app.route('/target', methods=['GET'])
+        def target():
+            return json.dumps(self.target)
+
         @app.route('/token', methods=['GET'])
         def token():
-            return self.token
+            return json.dumps(self.token)
 
         WSGIServer(('127.0.0.1', 8000), app).serve_forever()
         # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
@@ -156,6 +160,7 @@ class InventoryBuilder:
         for vrops in self.vrops_list:
             if os.environ['DEBUG'] == 1:
                 print("querying " + vrops)
+            self.target = vrops
             self.token = self.get_token(target=vrops)
             vcenter = self.create_resource_objects(vrops)
             self.vcenter_list.append(vcenter)
@@ -231,7 +236,7 @@ class InventoryBuilder:
                                      headers=headers)
             try:
                 return response.json()["token"]
-            except AttributeError as ar:
-                print("There is no attribute token!", ar.args)
-        except (HTTPError, KeyError) as err:
-            print("Request failed: ", err.args)
+            except AttributeError:
+                raise AttributeError("There is no attribute token!")
+        except (HTTPError, KeyError):
+            raise HTTPError("Request failed on target: " + target)

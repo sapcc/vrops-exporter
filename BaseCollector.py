@@ -42,3 +42,8 @@ class BaseCollector(ABC):
         request = requests.get(url="http://localhost:8000/token")
         self.token = request.json()
         return self.token
+
+    def get_target(self):
+        request = requests.get(url="http://localhost:8000/target")
+        self.target = request.json()
+        return self.target
