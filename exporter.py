@@ -12,6 +12,7 @@ from threading import Thread
 # from VropsCollector import VropsCollector
 from InventoryBuilder import InventoryBuilder
 from collectors.SampleCollector import SampleCollector
+from collectors.HostSystemCollector import HostSystemCollector
 
 def parse_params():
     parser = OptionParser()
@@ -53,6 +54,7 @@ def run_prometheus_server(port, *args):
     start_http_server(int(port))
     #register all collectors
     REGISTRY.register(SampleCollector())
+    REGISTRY.register(HostSystemCollector())
     while True:
         time.sleep(1)
 

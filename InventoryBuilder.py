@@ -136,7 +136,9 @@ class InventoryBuilder:
                         tree[host.uuid] = {
                                 'uuid': host.uuid,
                                 'name': host.name,
-                                'parent_cluster': cluster.uuid
+                                'parent_cluster_uuid': cluster.uuid,
+                                'parent_cluster_name': cluster.name,
+                                'datacenter': dc.name,
                                 }
         self.hosts = tree
         return tree
@@ -179,7 +181,7 @@ class InventoryBuilder:
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
                         if os.environ['DEBUG'] == '1':
-                            print("Collecting Hosts: " + hs_object.name)
+                            print("Collecting Host: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] == '1':

@@ -1,3 +1,7 @@
+HostSystemCollector:
+   metrics:
+      - 'vrops_hostsystem{cluster="mbb44",datacenter="QA-DA",hostsystem="node00",statkey="number_of_cpu_cores_info"}'
+
 SampleCollector:
    metrics:
-   - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
+      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
