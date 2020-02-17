@@ -47,4 +47,4 @@ class HostSystemCollector(BaseCollector, Resources):
                 else:
                     g.add_metric(labels=[self.hosts[hs]['datacenter'], self.hosts[hs]['parent_cluster_name'],
                                          self.hosts[hs]['name'], statkey["name"]], value="0.0")
-                yield g
+        yield g

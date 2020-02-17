@@ -109,7 +109,8 @@ class InventoryBuilder:
                 tree[dc.name] = {
                         'uuid': dc.uuid,
                         'name': dc.name,
-                        'parent_vcenter': vcenter.uuid
+                        'parent_vcenter_uuid': vcenter.uuid,
+                        'parent_vcenter_name': vcenter.name
                         }
         self.datacenters = tree
         return tree
@@ -122,7 +123,9 @@ class InventoryBuilder:
                     tree[cluster.uuid] = {
                             'uuid': cluster.uuid,
                             'name': cluster.name,
-                            'parent_dc': dc.uuid
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name
                             }
         self.clusters = tree
         return tree
@@ -153,7 +156,10 @@ class InventoryBuilder:
                             tree[vm.uuid] = {
                                     'uuid': vm.uuid,
                                     'name': vm.name,
-                                    'parent_host': host.uuid
+                                    'parent_host_uuid': host.uuid,
+                                    'parent_host_name': host.name,
+                                    'cluster': cluster.name,
+                                    'datacenter': dc.name
                                     }
         self.vms = tree
         return tree

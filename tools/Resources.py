@@ -83,6 +83,3 @@ class Resources:
                 raise AttributeError("There is no attribute stat")
         except HTTPError:
             raise HTTPError("Request failed for statkey: " + key + " and target: " + target)
-
-
-
