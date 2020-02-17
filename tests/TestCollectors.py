@@ -13,7 +13,6 @@ from exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from tools.Resources import Resources
 from InventoryBuilder import InventoryBuilder
-from resources.Vcenter import Vcenter
 
 
 class TestCollectors(unittest.TestCase):
@@ -31,7 +30,6 @@ class TestCollectors(unittest.TestCase):
         for collector in metrics_yaml.keys():
             print("\nTesting " + collector)
 
-            Vcenter.add_datacenter = MagicMock()
             InventoryBuilder.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
             InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
             # test tool get_resources to create resource objects
@@ -48,6 +46,7 @@ class TestCollectors(unittest.TestCase):
                                                       {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
                                                 {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_metric = MagicMock(return_value=1.0)
 
             thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
             thread.daemon = True
@@ -85,7 +84,6 @@ class TestCollectors(unittest.TestCase):
                 metrics.append(split_entry[0])
 
             metrics_yaml_list = metrics_yaml[collector]['metrics']
-
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
             # check if all metrics from yaml are here
@@ -98,7 +96,6 @@ class TestCollectors(unittest.TestCase):
             self.assertTrue(set(metrics).issubset(metrics_yaml_list),
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
-
             thread.join(timeout=0)
             # we don't want to have any port locks if prometheus server thread is not shutting down
             random_prometheus_port += 1

@@ -31,6 +31,6 @@ HostSystemCollector:
       - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_compressed_kilobytes"}'
       - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_rx_number"}'
 
-#SampleCollector:
-#   metrics:
-#      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
+SampleCollector:
+   metrics:
+      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'

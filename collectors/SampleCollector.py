@@ -14,7 +14,7 @@ class SampleCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] == '1':
-            print('have some debug code in here')
+            print('SampleCollector is collecting...')
 
         g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
                               labels=['vcenter'])

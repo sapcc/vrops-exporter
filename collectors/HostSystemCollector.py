@@ -2,10 +2,10 @@ from BaseCollector import BaseCollector
 import os, time, json
 from pathlib import Path
 from prometheus_client.core import GaugeMetricFamily
-from tools.get_metric import get_metric
+from tools.Resources import Resources
 
 
-class HostSystemCollector(BaseCollector):
+class HostSystemCollector(BaseCollector, Resources):
     def __init__(self):
         self.iteration = 0
         while not self.iteration:
@@ -37,10 +37,10 @@ class HostSystemCollector(BaseCollector):
                                                                             'hostsystem', 'statkey'])
         for hs in self.get_hosts():
             for statkey in self.statkeys:
+                value = Resources.get_metric(self, target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
+                                             key=statkey["statkey"])
                 if os.environ['DEBUG'] == '1':
-                    print(self.hosts[hs]['name'], "--add statkey:", statkey["name"])
-                value = get_metric(target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
-                                   key=statkey["statkey"])
+                    print(self.hosts[hs]['name'], "--add statkey:", statkey["name"], str(value))
                 if value is not None:
                     g.add_metric(labels=[self.hosts[hs]['datacenter'], self.hosts[hs]['parent_cluster_name'],
                                          self.hosts[hs]['name'], statkey["name"]], value=value)

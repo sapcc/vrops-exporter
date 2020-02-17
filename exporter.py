@@ -53,8 +53,8 @@ def parse_params():
 def run_prometheus_server(port, *args):
     start_http_server(int(port))
     #register all collectors
-    REGISTRY.register(SampleCollector())
     REGISTRY.register(HostSystemCollector())
+    REGISTRY.register(SampleCollector())
     while True:
         time.sleep(1)
 
