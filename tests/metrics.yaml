@@ -1,7 +1,36 @@
 HostSystemCollector:
    metrics:
-      - 'vrops_hostsystem{cluster="mbb44",datacenter="QA-DA",hostsystem="node00",statkey="number_of_cpu_cores_info"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="hardware_number_of_cpu_cores_info"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="hardware_number_of_cpu_sockets_info"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_balloon_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_consumed_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_total_capacity_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="summary_number_of_running_vms_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_capacity_available_to_vms_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_usage_percentage"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_guest_active_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_swap_used_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="network_packets_dropped_tx_number"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_useable_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="network_packets_dropped_percentage"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_compressed_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem1",statkey="network_packets_dropped_rx_number"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="hardware_number_of_cpu_cores_info"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="hardware_number_of_cpu_sockets_info"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_balloon_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_consumed_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_total_capacity_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="summary_number_of_running_vms_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_capacity_available_to_vms_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_usage_percentage"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_guest_active_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_swap_used_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_tx_number"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_useable_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_percentage"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_compressed_kilobytes"}'
+      - 'vrops_hostsystem{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_rx_number"}'
 
-SampleCollector:
-   metrics:
-      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
+#SampleCollector:
+#   metrics:
+#      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
