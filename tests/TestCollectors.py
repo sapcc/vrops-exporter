@@ -13,7 +13,9 @@ from exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from tools.Resources import Resources
 from InventoryBuilder import InventoryBuilder
-from resources.Vcenter import Vcenter
+from collectors.SampleCollector import SampleCollector
+# from collectors.HostSystemCollector import HostSystemCollector
+from prometheus_client.core import REGISTRY
 
 
 class TestCollectors(unittest.TestCase):
@@ -23,17 +25,20 @@ class TestCollectors(unittest.TestCase):
 
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
-        print(metrics_yaml)
 
         # every collector got to be tested in here
         random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(random_prometheus_port))
+
+        InventoryBuilder.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
+        InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
+        thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
+        thread.daemon = True
+        thread.start()
+
         for collector in metrics_yaml.keys():
             print("\nTesting " + collector)
 
-            Vcenter.add_datacenter = MagicMock()
-            InventoryBuilder.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
-            InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
             # test tool get_resources to create resource objects
 
             Resources.get_datacenter = MagicMock(return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
@@ -48,18 +53,20 @@ class TestCollectors(unittest.TestCase):
                                                       {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
                                                 {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_metric = MagicMock(return_value=1.0)
 
-            thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
-            thread.daemon = True
-            thread.start()
+            thread_list = list()
 
             # start prometheus server to provide metrics later on
-            thread = Thread(target=run_prometheus_server, args=(random_prometheus_port,))
-            thread.daemon = True
-            thread.start()
+            collector_instance = globals()[collector]()
+            thread1 = Thread(target=run_prometheus_server, args=(random_prometheus_port,[collector_instance]))
+            thread1.daemon = True
+            thread1.start()
+            thread_list.append(thread1)
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
             time.sleep(10)
 
+            print("prometheus query port " + str(random_prometheus_port))
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")
             r = c.getresponse()
@@ -85,7 +92,6 @@ class TestCollectors(unittest.TestCase):
                 metrics.append(split_entry[0])
 
             metrics_yaml_list = metrics_yaml[collector]['metrics']
-
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
             # check if all metrics from yaml are here
@@ -99,9 +105,12 @@ class TestCollectors(unittest.TestCase):
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
 
-            thread.join(timeout=0)
+            for t in thread_list:
+                t.join(timeout=5)
+
             # we don't want to have any port locks if prometheus server thread is not shutting down
             random_prometheus_port += 1
+            REGISTRY.unregister(collector_instance)
 
 
 if __name__ == '__main__':
