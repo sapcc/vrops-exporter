@@ -31,10 +31,10 @@ class Resources:
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
-            except AttributeError:
-                raise AttributeError("There is no attribute resourceList")
-        except HTTPError:
-            raise HTTPError("Request failed for resourceList: " + target)
+            except AttributeError as e:
+                raise AttributeError("There is no attribute resourceList \nerror message: " + str(e))
+        except HTTPError as e:
+            raise HTTPError("Request failed for resourceList: " + target + "\nerror message: " + str(e))
 
         return resources
 
@@ -79,7 +79,8 @@ class Resources:
                 for statkey in response.json()["values"][0]["stat-list"]["stat"]:
                     if statkey["statKey"]["key"] is not None and statkey["statKey"]["key"] == key:
                         return statkey["data"][0]
-            except AttributeError:
-                raise AttributeError("There is no attribute stat")
-        except HTTPError:
-            raise HTTPError("Request failed for statkey: " + key + " and target: " + target)
+            except AttributeError as e:
+                raise AttributeError("There is no attribute stat" + "\nerror message: " + str(e))
+        except HTTPError as e:
+            raise HTTPError(
+                "Request failed for statkey: " + key + " and target: " + target + "\nerror message:" + str(e))

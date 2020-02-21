@@ -218,10 +218,10 @@ class InventoryBuilder:
                     res['uuid'] = resource["id"]
                     res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                     adapters.append(res)
-            except AttributeError:
-                raise AttributeError("There is no attribute adapterInstancesInfoDto")
-        except HTTPError:
-            raise HTTPError("Request failed for adapter: " + target)
+            except AttributeError as e:
+                raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " + str(e))
+        except HTTPError as e:
+            raise HTTPError("Request failed for adapter: " + target + "\nerror message: " + str(e))
 
         return adapters
 
