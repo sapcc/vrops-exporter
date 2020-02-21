@@ -211,15 +211,16 @@ class InventoryBuilder:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            try:
+            if response.status_code == 200:
                 for resource in response.json()["adapterInstancesInfoDto"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["id"]
                     res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                     adapters.append(res)
-            except AttributeError as e:
-                raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " + str(e))
+            else:
+                raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " +
+                                     response.json())
         except HTTPError as e:
             raise HTTPError("Request failed for adapter: " + target + "\nerror message: " + str(e))
 
@@ -242,9 +243,9 @@ class InventoryBuilder:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers)
-            try:
+            if response.status_code == 200:
                 return response.json()["token"]
-            except AttributeError as e:
-                raise AttributeError("There is no attribute token! \nerror message: " + str(e))
+            else:
+                raise AttributeError("There is no attribute token! \nerror message: " + response.json())
         except (HTTPError, KeyError) as e:
             raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))

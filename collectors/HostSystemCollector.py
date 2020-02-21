@@ -17,11 +17,10 @@ class HostSystemCollector(BaseCollector):
         self.target = self.get_target()
         self.statkeys = list()
         statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-        for label, skey in zip(statkey_yaml["HostSystemCollector"]["labels"],
-                               statkey_yaml["HostSystemCollector"]["statkey"]):
+        for metric in statkey_yaml["HostSystemCollector"]:
             stat = dict()
-            stat['label'] = label
-            stat['statkey'] = skey
+            stat['label'] = metric["label"]
+            stat['statkey'] = metric["statkey"]
             self.statkeys.append(stat)
 
     def collect(self):
