@@ -244,7 +244,7 @@ class InventoryBuilder:
                                      headers=headers)
             try:
                 return response.json()["token"]
-            except AttributeError:
-                raise AttributeError("There is no attribute token!")
-        except (HTTPError, KeyError):
-            raise HTTPError("Request failed on target: " + target)
+            except AttributeError as e:
+                raise AttributeError("There is no attribute token! \nerror message: " + str(e))
+        except (HTTPError, KeyError) as e:
+            raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))
