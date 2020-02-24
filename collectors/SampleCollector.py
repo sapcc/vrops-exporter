@@ -14,10 +14,12 @@ class SampleCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] == '1':
-            print('have some debug code in here')
+            print('SampleCollector is collecting...')
 
-        g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection', labels= ['vcenter'])
+        g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
+                              labels=['vcenter'])
         for vc in self.get_vcenters():
             self.get_iteration()
+
             g.add_metric(labels=[self.vcenters[vc]['name']], value=int(self.iteration))
         yield g

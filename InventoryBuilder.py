@@ -58,9 +58,13 @@ class InventoryBuilder:
         def iteration():
             return str(self.iteration)
 
+        @app.route('/target', methods=['GET'])
+        def target():
+            return json.dumps(self.target)
+
         @app.route('/token', methods=['GET'])
         def token():
-            return self.token
+            return json.dumps(self.token)
 
         WSGIServer(('127.0.0.1', 8000), app).serve_forever()
         # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
@@ -105,7 +109,8 @@ class InventoryBuilder:
                 tree[dc.name] = {
                         'uuid': dc.uuid,
                         'name': dc.name,
-                        'parent_vcenter': vcenter.uuid
+                        'parent_vcenter_uuid': vcenter.uuid,
+                        'parent_vcenter_name': vcenter.name
                         }
         self.datacenters = tree
         return tree
@@ -118,7 +123,9 @@ class InventoryBuilder:
                     tree[cluster.uuid] = {
                             'uuid': cluster.uuid,
                             'name': cluster.name,
-                            'parent_dc': dc.uuid
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name
                             }
         self.clusters = tree
         return tree
@@ -132,7 +139,9 @@ class InventoryBuilder:
                         tree[host.uuid] = {
                                 'uuid': host.uuid,
                                 'name': host.name,
-                                'parent_cluster': cluster.uuid
+                                'parent_cluster_uuid': cluster.uuid,
+                                'parent_cluster_name': cluster.name,
+                                'datacenter': dc.name,
                                 }
         self.hosts = tree
         return tree
@@ -147,7 +156,10 @@ class InventoryBuilder:
                             tree[vm.uuid] = {
                                     'uuid': vm.uuid,
                                     'name': vm.name,
-                                    'parent_host': host.uuid
+                                    'parent_host_uuid': host.uuid,
+                                    'parent_host_name': host.name,
+                                    'cluster': cluster.name,
+                                    'datacenter': dc.name
                                     }
         self.vms = tree
         return tree
@@ -156,6 +168,7 @@ class InventoryBuilder:
         for vrops in self.vrops_list:
             if os.environ['DEBUG'] == 1:
                 print("querying " + vrops)
+            self.target = vrops
             self.token = self.get_token(target=vrops)
             vcenter = self.create_resource_objects(vrops)
             self.vcenter_list.append(vcenter)
@@ -174,7 +187,7 @@ class InventoryBuilder:
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
                         if os.environ['DEBUG'] == '1':
-                            print("Collecting Hosts: " + hs_object.name)
+                            print("Collecting Host: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] == '1':
@@ -198,17 +211,18 @@ class InventoryBuilder:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            try:
+            if response.status_code == 200:
                 for resource in response.json()["adapterInstancesInfoDto"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["id"]
                     res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                     adapters.append(res)
-            except AttributeError:
-                raise AttributeError("There is no attribute adapterInstancesInfoDto")
-        except HTTPError:
-            raise HTTPError("Request failed for adapter: " + target)
+            else:
+                raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " +
+                                     response.json())
+        except HTTPError as e:
+            raise HTTPError("Request failed for adapter: " + target + "\nerror message: " + str(e))
 
         return adapters
 
@@ -229,9 +243,10 @@ class InventoryBuilder:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers)
-            try:
+            if response.status_code == 200:
                 return response.json()["token"]
-            except AttributeError as ar:
-                print("There is no attribute token!", ar.args)
-        except (HTTPError, KeyError) as err:
-            print("Request failed: ", err.args)
+            else:
+                raise AttributeError("There is no attribute token! \nerror message: " + response.json() +
+                                     "\ntarget: " + target)
+        except (HTTPError, KeyError) as e:
+            raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))

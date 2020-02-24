@@ -25,16 +25,16 @@ class Resources:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            try:
+            if response.status_code == 200:
                 for resource in response.json()["resourceList"]:
                     res = dict()
                     res['name'] = resource["resourceKey"]["name"]
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
-            except AttributeError:
-                raise AttributeError("There is no attribute resourceList")
-        except HTTPError:
-            raise HTTPError("Request failed for resourceList: " + target)
+            else:
+                raise AttributeError("There is no attribute resourceList \nerror message: " + response.json())
+        except HTTPError as e:
+            raise HTTPError("Request failed for resourceList: " + target + "\nerror message: " + str(e))
 
         return resources
 
@@ -63,4 +63,24 @@ class Resources:
     def get_vmfolders(self, target, token):
         return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
-
+    def get_latest_stat(self, target, token, uuid, key):
+        url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.get(url,
+                                    verify=False,
+                                    headers=headers)
+            if response.status_code == 200:
+                for statkey in response.json()["values"][0]["stat-list"]["stat"]:
+                    if statkey["statKey"]["key"] is not None and statkey["statKey"]["key"] == key:
+                        return statkey["data"][0]
+            else:
+                raise AttributeError("There is no attribute stat" + "\nerror message: " + response.json())
+        except HTTPError as e:
+            raise HTTPError(
+                "Request failed for statkey: " + key + " and target: " + target + "\nerror message:" + str(e))
