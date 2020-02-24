@@ -28,7 +28,7 @@ class HostSystemCollector(BaseCollector):
         for hs in self.get_hosts():
             for statkey in self.statkey_yaml["HostSystemCollector"]:
                 r = Resources()
-                value = r.get_latest_stat(self, target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
+                value = r.get_latest_stat(target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
                                           key=statkey["statkey"])
                 if value is None:
                     value = "0"
