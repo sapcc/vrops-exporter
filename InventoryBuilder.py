@@ -246,6 +246,7 @@ class InventoryBuilder:
             if response.status_code == 200:
                 return response.json()["token"]
             else:
-                raise AttributeError("There is no attribute token! \nerror message: " + response.json())
+                raise AttributeError("There is no attribute token! \nerror message: " + response.json() +
+                                     "\ntarget: " + target)
         except (HTTPError, KeyError) as e:
             raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))

@@ -53,7 +53,7 @@ class TestCollectors(unittest.TestCase):
                                                       {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
                                                 {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_metric = MagicMock(return_value=1.0)
+            Resources.get_value = MagicMock(return_value=1.0)
 
             thread_list = list()
 
