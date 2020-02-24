@@ -34,10 +34,10 @@ class HostSystemCollector(BaseCollector):
         for hs in self.get_hosts():
             for statkey in self.statkeys:
                 r = Resources()
-                value = r.get_value(self, target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
+                value = r.get_latest_stat(self, target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
                                     key=statkey["statkey"])
                 if value is None:
-                    value = "0.0"
+                    value = "0"
                 if os.environ['DEBUG'] == '1':
                     print(self.hosts[hs]['name'], "--add statkey:", statkey["label"], str(value))
                 g.add_metric(labels=[self.hosts[hs]['datacenter'], self.hosts[hs]['parent_cluster_name'],

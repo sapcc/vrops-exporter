@@ -63,7 +63,7 @@ class Resources:
     def get_vmfolders(self, target, token):
         return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
-    def get_value(self, target, token, uuid, key):
+    def get_latest_stat(self, target, token, uuid, key):
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
         headers = {
             'Content-Type': "application/json",
