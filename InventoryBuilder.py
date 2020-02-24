@@ -220,7 +220,7 @@ class InventoryBuilder:
                     adapters.append(res)
             else:
                 raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " +
-                                     response.json())
+                                     str(response.json()))
         except HTTPError as e:
             raise HTTPError("Request failed for adapter: " + target + "\nerror message: " + str(e))
 
@@ -246,7 +246,7 @@ class InventoryBuilder:
             if response.status_code == 200:
                 return response.json()["token"]
             else:
-                raise AttributeError("There is no attribute token! \nerror message: " + response.json() +
+                raise AttributeError("There is no attribute token! \nerror message: " + str(response.json()) +
                                      "\ntarget: " + target)
         except (HTTPError, KeyError) as e:
             raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))
