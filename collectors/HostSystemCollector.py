@@ -13,23 +13,20 @@ class HostSystemCollector(BaseCollector):
             self.get_iteration()
             print("waiting for initial iteration")
         print("done: initial query")
-        self.token = self.get_token()
-        self.target = self.get_target()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
     def collect(self):
         if os.environ['DEBUG'] == '1':
             print('HostSystemCollector ist start collecting metrics')
-            print("Target: " + str(self.target))
-            print("Token: " + str(self.token))
 
-        g = GaugeMetricFamily('vrops_hostsystem', str(self.target), labels=['datacenter', 'cluster',
-                                                                            'hostsystem', 'statkey'])
+        g = GaugeMetricFamily('vrops_hostsystem', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
+
         for hs in self.get_hosts():
+            target = self.hosts[hs]['target']
             for statkey in self.statkey_yaml["HostSystemCollector"]:
                 r = Resources()
-                value = r.get_latest_stat(target=self.target, token=self.token, uuid=self.hosts[hs]['uuid'],
-                                          key=statkey["statkey"])
+                print("looking at " + str(self.hosts[hs]))
+                value = r.get_latest_stat(target=target, token=self.hosts[hs]['token'], uuid=self.hosts[hs]['uuid'], key=statkey["statkey"])
                 if value is None:
                     value = "0"
                 if os.environ['DEBUG'] == '1':
