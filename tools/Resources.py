@@ -71,7 +71,7 @@ class Resources:
             'Authorization': "vRealizeOpsToken " + token
         }
         disable_warnings(exceptions.InsecureRequestWarning)
-        if os.environ['DEBUG'] == '1':
+        if os.environ['DEBUG'] >= '1':
             print("querying url: " + url)
         try:
             response = requests.get(url,

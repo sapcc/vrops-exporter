@@ -79,7 +79,7 @@ class InventoryBuilder:
     def query_inventory_permanent(self):
         self.iteration = 0
         while True:
-            if os.environ['DEBUG'] == 1:
+            if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
             self.query_vrops()
             self.get_vcenters()
@@ -88,6 +88,7 @@ class InventoryBuilder:
             self.get_hosts()
             self.get_vms()
             self.iteration += 1
+            time.sleep(180)
 
     #FIXME: add target and token to every element
     def get_vcenters(self):
@@ -108,7 +109,9 @@ class InventoryBuilder:
                         'uuid': dc.uuid,
                         'name': dc.name,
                         'parent_vcenter_uuid': vcenter.uuid,
-                        'parent_vcenter_name': vcenter.name
+                        'parent_vcenter_name': vcenter.name,
+                        'target': dc.target,
+                        'token': dc.token,
                         }
         self.datacenters = tree
         return tree
@@ -123,7 +126,9 @@ class InventoryBuilder:
                             'name': cluster.name,
                             'parent_dc_uuid': dc.uuid,
                             'parent_dc_name': dc.name,
-                            'vcenter': vcenter.name
+                            'vcenter': vcenter.name,
+                            'target': cluster.target,
+                            'token': cluster.token,
                             }
         self.clusters = tree
         return tree
@@ -159,14 +164,16 @@ class InventoryBuilder:
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
-                                    'datacenter': dc.name
+                                    'datacenter': dc.name,
+                                    'target': vm.target,
+                                    'token': vm.token,
                                     }
         self.vms = tree
         return tree
 
     def query_vrops(self):
         for vrops in self.vrops_list:
-            if os.environ['DEBUG'] == 1:
+            if os.environ['DEBUG'] >= '1':
                 print("querying " + vrops)
             # self.target = vrops
             token = self.get_token(target=vrops)
@@ -178,20 +185,19 @@ class InventoryBuilder:
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                #FIXME: this should be DEBUGLEVEL 2. Condition to >= 2, DEBUG 1 to >= 1
-                if os.environ['DEBUG'] == '1':
+                if os.environ['DEBUG'] >= '2':
                     print("Collecting Datacenter: " + dc_object.name)
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    if os.environ['DEBUG'] == '1':
+                    if os.environ['DEBUG'] >= '2':
                         print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        if os.environ['DEBUG'] == '1':
+                        if os.environ['DEBUG'] >= '2':
                             print("Collecting Host: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            if os.environ['DEBUG'] == '1':
+                            if os.environ['DEBUG'] >= '2':
                                 print("Collecting VM: " + vm_object.name)
             return vcenter
 

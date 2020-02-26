@@ -16,7 +16,7 @@ class HostSystemCollector(BaseCollector):
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
     def collect(self):
-        if os.environ['DEBUG'] == '1':
+        if os.environ['DEBUG'] >= '1':
             print('HostSystemCollector ist start collecting metrics')
 
         g = GaugeMetricFamily('vrops_hostsystem', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
@@ -25,11 +25,12 @@ class HostSystemCollector(BaseCollector):
             target = self.hosts[hs]['target']
             for statkey in self.statkey_yaml["HostSystemCollector"]:
                 r = Resources()
-                print("looking at " + str(self.hosts[hs]))
+                if os.environ['DEBUG'] >= '2':
+                    print("looking at " + str(self.hosts[hs]))
                 value = r.get_latest_stat(target=target, token=self.hosts[hs]['token'], uuid=self.hosts[hs]['uuid'], key=statkey["statkey"])
                 if value is None:
                     value = "0"
-                if os.environ['DEBUG'] == '1':
+                if os.environ['DEBUG'] >= '1':
                     print(self.hosts[hs]['name'], "--add statkey:", statkey["label"], str(value))
                 g.add_metric(labels=[self.hosts[hs]['datacenter'], self.hosts[hs]['parent_cluster_name'],
                                      self.hosts[hs]['name'], statkey["label"]], value=value)

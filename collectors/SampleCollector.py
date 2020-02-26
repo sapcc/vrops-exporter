@@ -13,7 +13,7 @@ class SampleCollector(BaseCollector):
         print("done: initial query")
 
     def collect(self):
-        if os.environ['DEBUG'] == '1':
+        if os.environ['DEBUG'] >= '1':
             print('SampleCollector is collecting...')
 
         g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
