@@ -107,6 +107,7 @@ class InventoryBuilder:
                 return False
             vcenter = self.create_resource_objects(vrops, token)
             self.vcenter_list.append(vcenter)
+            return True
 
     def create_resource_objects(self, vrops, token):
         for adapter in self.get_adapter(target=vrops, token=token):
