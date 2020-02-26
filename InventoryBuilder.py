@@ -63,7 +63,10 @@ class InventoryBuilder:
         # def token():
             # return json.dumps(self.token)
 
-        WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+        if os.environ['DEBUG'] >= '2':
+            WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+        else:
+            WSGIServer(('127.0.0.1', 8000), app, log=None).serve_forever()
         # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
 
     def get_vrops(self):
@@ -81,7 +84,11 @@ class InventoryBuilder:
         while True:
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
-            self.query_vrops()
+            if not self.query_vrops():
+                timeout = 10
+                print("retrying fetching token in " + str(timeout))
+                time.sleep(timeout)
+                continue
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
@@ -90,93 +97,14 @@ class InventoryBuilder:
             self.iteration += 1
             time.sleep(180)
 
-    #FIXME: add target and token to every element
-    def get_vcenters(self):
-        tree = dict()
-        for vcenter in self.vcenter_list:
-            tree[vcenter.uuid] = {
-                    'uuid': vcenter.uuid,
-                    'name': vcenter.name
-                    }
-        self.vcenters = tree
-        return tree
-
-    def get_datacenters(self):
-        tree = dict()
-        for vcenter in self.vcenter_list:
-            for dc in vcenter.datacenter:
-                tree[dc.name] = {
-                        'uuid': dc.uuid,
-                        'name': dc.name,
-                        'parent_vcenter_uuid': vcenter.uuid,
-                        'parent_vcenter_name': vcenter.name,
-                        'target': dc.target,
-                        'token': dc.token,
-                        }
-        self.datacenters = tree
-        return tree
-
-    def get_clusters(self):
-        tree = dict()
-        for vcenter in self.vcenter_list:
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    tree[cluster.uuid] = {
-                            'uuid': cluster.uuid,
-                            'name': cluster.name,
-                            'parent_dc_uuid': dc.uuid,
-                            'parent_dc_name': dc.name,
-                            'vcenter': vcenter.name,
-                            'target': cluster.target,
-                            'token': cluster.token,
-                            }
-        self.clusters = tree
-        return tree
-
-    def get_hosts(self):
-        tree = dict()
-        for vcenter in self.vcenter_list:
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        tree[host.uuid] = {
-                                'uuid': host.uuid,
-                                'name': host.name,
-                                'parent_cluster_uuid': cluster.uuid,
-                                'parent_cluster_name': cluster.name,
-                                'datacenter': dc.name,
-                                'target': host.target,
-                                'token': host.token,
-                                }
-        self.hosts = tree
-        return tree
-
-    def get_vms(self):
-        tree = dict()
-        for vcenter in self.vcenter_list:
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        for vm in host.vms:
-                            tree[vm.uuid] = {
-                                    'uuid': vm.uuid,
-                                    'name': vm.name,
-                                    'parent_host_uuid': host.uuid,
-                                    'parent_host_name': host.name,
-                                    'cluster': cluster.name,
-                                    'datacenter': dc.name,
-                                    'target': vm.target,
-                                    'token': vm.token,
-                                    }
-        self.vms = tree
-        return tree
 
     def query_vrops(self):
         for vrops in self.vrops_list:
             if os.environ['DEBUG'] >= '1':
                 print("querying " + vrops)
-            # self.target = vrops
             token = self.get_token(target=vrops)
+            if not token:
+                return False
             vcenter = self.create_resource_objects(vrops, token)
             self.vcenter_list.append(vcenter)
 
@@ -250,10 +178,96 @@ class InventoryBuilder:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers)
-            if response.status_code == 200:
-                return response.json()["token"]
-            else:
-                raise AttributeError("There is no attribute token! \nerror message: " + str(response.json()) +
-                                     "\ntarget: " + target)
-        except (HTTPError, KeyError) as e:
-            raise HTTPError("Request failed on target: " + target + "\nerror message: " + str(e))
+                                     # headers=headers,
+                                     # timeout=1)
+        except Exception as e:
+            print("Problem connecting to " + target + ' Error: ' + str(e))
+            return False
+
+        if response.status_code == 200:
+            return response.json()["token"]
+        else:
+            print("problem getting token " + str(target))
+            return False
+
+    def get_vcenters(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            tree[vcenter.uuid] = {
+                    'uuid': vcenter.uuid,
+                    'name': vcenter.name,
+                    'target': vcenter.target,
+                    'token': vcenter.token,
+                    }
+        self.vcenters = tree
+        return tree
+
+    def get_datacenters(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            for dc in vcenter.datacenter:
+                tree[dc.name] = {
+                        'uuid': dc.uuid,
+                        'name': dc.name,
+                        'parent_vcenter_uuid': vcenter.uuid,
+                        'parent_vcenter_name': vcenter.name,
+                        'target': dc.target,
+                        'token': dc.token,
+                        }
+        self.datacenters = tree
+        return tree
+
+    def get_clusters(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            for dc in vcenter.datacenter:
+                for cluster in dc.clusters:
+                    tree[cluster.uuid] = {
+                            'uuid': cluster.uuid,
+                            'name': cluster.name,
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name,
+                            'target': cluster.target,
+                            'token': cluster.token,
+                            }
+        self.clusters = tree
+        return tree
+
+    def get_hosts(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            for dc in vcenter.datacenter:
+                for cluster in dc.clusters:
+                    for host in cluster.hosts:
+                        tree[host.uuid] = {
+                                'uuid': host.uuid,
+                                'name': host.name,
+                                'parent_cluster_uuid': cluster.uuid,
+                                'parent_cluster_name': cluster.name,
+                                'datacenter': dc.name,
+                                'target': host.target,
+                                'token': host.token,
+                                }
+        self.hosts = tree
+        return tree
+
+    def get_vms(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            for dc in vcenter.datacenter:
+                for cluster in dc.clusters:
+                    for host in cluster.hosts:
+                        for vm in host.vms:
+                            tree[vm.uuid] = {
+                                    'uuid': vm.uuid,
+                                    'name': vm.name,
+                                    'parent_host_uuid': host.uuid,
+                                    'parent_host_name': host.name,
+                                    'cluster': cluster.name,
+                                    'datacenter': dc.name,
+                                    'target': vm.target,
+                                    'token': vm.token,
+                                    }
+        self.vms = tree
+        return tree
