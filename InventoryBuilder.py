@@ -58,13 +58,10 @@ class InventoryBuilder:
         def iteration():
             return str(self.iteration)
 
-        @app.route('/target', methods=['GET'])
-        def target():
-            return json.dumps(self.target)
-
-        @app.route('/token', methods=['GET'])
-        def token():
-            return json.dumps(self.token)
+        #FIXME: this could basically be the always active token list. no active token? refresh!
+        # @app.route('/token', methods=['GET'])
+        # def token():
+            # return json.dumps(self.token)
 
         WSGIServer(('127.0.0.1', 8000), app).serve_forever()
         # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
@@ -82,7 +79,7 @@ class InventoryBuilder:
     def query_inventory_permanent(self):
         self.iteration = 0
         while True:
-            if os.environ['DEBUG'] == 1:
+            if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
             self.query_vrops()
             self.get_vcenters()
@@ -91,7 +88,9 @@ class InventoryBuilder:
             self.get_hosts()
             self.get_vms()
             self.iteration += 1
+            time.sleep(180)
 
+    #FIXME: add target and token to every element
     def get_vcenters(self):
         tree = dict()
         for vcenter in self.vcenter_list:
@@ -110,7 +109,9 @@ class InventoryBuilder:
                         'uuid': dc.uuid,
                         'name': dc.name,
                         'parent_vcenter_uuid': vcenter.uuid,
-                        'parent_vcenter_name': vcenter.name
+                        'parent_vcenter_name': vcenter.name,
+                        'target': dc.target,
+                        'token': dc.token,
                         }
         self.datacenters = tree
         return tree
@@ -125,7 +126,9 @@ class InventoryBuilder:
                             'name': cluster.name,
                             'parent_dc_uuid': dc.uuid,
                             'parent_dc_name': dc.name,
-                            'vcenter': vcenter.name
+                            'vcenter': vcenter.name,
+                            'target': cluster.target,
+                            'token': cluster.token,
                             }
         self.clusters = tree
         return tree
@@ -142,6 +145,8 @@ class InventoryBuilder:
                                 'parent_cluster_uuid': cluster.uuid,
                                 'parent_cluster_name': cluster.name,
                                 'datacenter': dc.name,
+                                'target': host.target,
+                                'token': host.token,
                                 }
         self.hosts = tree
         return tree
@@ -159,38 +164,40 @@ class InventoryBuilder:
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
-                                    'datacenter': dc.name
+                                    'datacenter': dc.name,
+                                    'target': vm.target,
+                                    'token': vm.token,
                                     }
         self.vms = tree
         return tree
 
     def query_vrops(self):
         for vrops in self.vrops_list:
-            if os.environ['DEBUG'] == 1:
+            if os.environ['DEBUG'] >= '1':
                 print("querying " + vrops)
-            self.target = vrops
-            self.token = self.get_token(target=vrops)
-            vcenter = self.create_resource_objects(vrops)
+            # self.target = vrops
+            token = self.get_token(target=vrops)
+            vcenter = self.create_resource_objects(vrops, token)
             self.vcenter_list.append(vcenter)
 
-    def create_resource_objects(self, vrops):
-        for adapter in self.get_adapter(target=vrops, token=self.token):
-            vcenter = Vcenter(target=vrops, token=self.token, name=adapter['name'], uuid=adapter['uuid'])
+    def create_resource_objects(self, vrops, token):
+        for adapter in self.get_adapter(target=vrops, token=token):
+            vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                if os.environ['DEBUG'] == '1':
+                if os.environ['DEBUG'] >= '2':
                     print("Collecting Datacenter: " + dc_object.name)
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    if os.environ['DEBUG'] == '1':
+                    if os.environ['DEBUG'] >= '2':
                         print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        if os.environ['DEBUG'] == '1':
+                        if os.environ['DEBUG'] >= '2':
                             print("Collecting Host: " + hs_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            if os.environ['DEBUG'] == '1':
+                            if os.environ['DEBUG'] >= '2':
                                 print("Collecting VM: " + vm_object.name)
             return vcenter
 
