@@ -1,6 +1,46 @@
 # vrops-exporter
 Prometheus exporter to scrape metrics from vRealize Operations Manager
 
+## Setup test environment
+
+##### 1. Fork this repository
+
+Forking a repository allows you to freely experiment with changes without affecting the original project.
+
+##### 2. Clone your copied repository
+
+```
+git clone https://github.com/nmap/nmap.git
+``` 
+
+##### 3. Docker
+
+```
+docker run -it -p PORT:PORT -v $PATH_TO_YOUR_WORKDIR/:/vropsexporter $YOUR_DOCKER_HUB
+```
+##### 4. Establish a connection to your infrastructure 
+
+##### 5. Provide a json configfile for testing
+ 
+```json
+ [
+      {
+           "labels": {
+               "job": "vrops",
+               "metrics_label": "vrops",
+               "server_name": "VROPS_DNS_NAME" 
+           }
+      }
+ ]
+```
+
+## How to develop a collector
+
+##### 1. Create a new collector.py file in the folder collector
+
+
+
+
 ## Running the exporter
 
 The container is defaulting to /vrops-exporter path. Use vrops-exporter.py with one of the two ways of specifying the necessary credentials. They could also be mixed of course.
@@ -8,7 +48,7 @@ The container is defaulting to /vrops-exporter path. Use vrops-exporter.py with 
 1. CLI
 
 ```
-Usage: vrops-exporter.py [options]
+Usage: pyhton3 exporter.py [options]
 ```
 Options:
 
