@@ -38,12 +38,17 @@ class BaseCollector(ABC):
         self.iteration = request.json()
         return self.iteration
 
-    def get_token(self):
-        request = requests.get(url="http://localhost:8000/token")
-        self.token = request.json()
-        return self.token
+    # def get_token(self):
+        # request = requests.get(url="http://localhost:8000/token")
+        # self.token = request.json()
+        # return self.token
 
     def get_target(self):
         request = requests.get(url="http://localhost:8000/target")
+        self.target = request.json()
+        return self.target
+
+    def get_targets(self):
+        request = requests.get(url="http://localhost:8000/vrops_list")
         self.target = request.json()
         return self.target
