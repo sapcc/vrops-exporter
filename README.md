@@ -36,9 +36,42 @@ docker run -it -p PORT:PORT -v $PATH_TO_YOUR_WORKDIR/:/vropsexporter $YOUR_DOCKE
 
 ## How to develop a collector
 
-##### 1. Create a new collector.py file in the folder collector
+```
+├── BaseCollector.py
+├── Dockerfile
+├── InventoryBuilder.py
+├── LICENSE
+├── Makefile
+├── README.md
+├── collectors
+│   ├── HostSystemCollector.py
+│   ├── SampleCollector.py
+│   ├── __init__.py
+│   └── statkey.yaml
+├── exporter.py
+├── requirements.txt
+├── resources
+│   ├── Cluster.py
+│   ├── Datacenter.py
+│   ├── Host.py
+│   ├── Vcenter.py
+│   ├── VirtualMachine.py
+│   └── __init__.py
+├── tests
+│   ├── TestCollectors.py
+│   ├── TestLaunchExporter.py
+│   ├── __init__.py
+│   ├── metrics.yaml
+│   └── test.json
+└── tools
+    ├── Resources.py
+    ├── YamlRead.py
+    └── __init__.py
+```
 
+##### 1. Create a new `collector.py` file in 
 
+##### 2. 
 
 
 ## Running the exporter
