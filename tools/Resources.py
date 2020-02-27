@@ -114,6 +114,6 @@ class Resources:
         if response.status_code == 200:
             return response.json()['values']
         else:
-            print("Return code not 200 for " + str(key) + ": " + response.json())
+            print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
