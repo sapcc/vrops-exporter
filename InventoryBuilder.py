@@ -17,6 +17,7 @@ class InventoryBuilder:
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_list = list()
+        self.target_tokens = dict()
         self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
@@ -59,9 +60,9 @@ class InventoryBuilder:
             return str(self.iteration)
 
         #FIXME: this could basically be the always active token list. no active token? refresh!
-        # @app.route('/token', methods=['GET'])
-        # def token():
-            # return json.dumps(self.token)
+        @app.route('/target_tokens', methods=['GET'])
+        def token():
+            return json.dumps(self.target_tokens)
 
         if os.environ['DEBUG'] >= '2':
             WSGIServer(('127.0.0.1', 8000), app).serve_forever()
@@ -105,6 +106,7 @@ class InventoryBuilder:
             token = self.get_token(target=vrops)
             if not token:
                 return False
+            self.target_tokens[vrops] = token
             vcenter = self.create_resource_objects(vrops, token)
             self.vcenter_list.append(vcenter)
             return True

@@ -55,6 +55,14 @@ class TestCollectors(unittest.TestCase):
                                                 {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
 
+            #mocking all values from yaml
+            statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+            multiple_metrics_generated = list()
+            for statkey_pair in statkey_yaml["HostSystemCollector"]:
+                multiple_metrics_generated.append({ "resourceId": "3628-93a1-56e84634050814", "stat-list": { "stat": [{ "timestamps": [ 1582797716394 ], "statKey": { "key": statkey_pair['statkey'] }, "data": [ 88.0 ] }] } })
+                multiple_metrics_generated.append({ "resourceId": "5628-9ba1-55e847050814"  , "stat-list": { "stat": [{ "timestamps": [ 1582797716394 ], "statKey": { "key": statkey_pair['statkey'] }, "data": [ 44.0 ] }] } })
+            Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
+
             thread_list = list()
 
             # start prometheus server to provide metrics later on
