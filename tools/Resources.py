@@ -1,4 +1,4 @@
-import requests
+import requests, json
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
 
@@ -63,6 +63,7 @@ class Resources:
     def get_vmfolders(self, target, token):
         return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
+    #not recommended
     def get_latest_stat(self, target, token, uuid, key):
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
         headers = {
@@ -86,3 +87,33 @@ class Resources:
         except HTTPError as e:
             raise HTTPError(
                 "Request failed for statkey: " + key + " and target: " + target + "\nerror message:" + str(e))
+
+    def get_latest_stat_multiple(target, token, uuids, key):
+
+        url = "https://" + target + "/suite-api/api/resources/stats/latest/query"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        payload = {
+                "resourceId": uuids,
+                "statKey": [key]
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+        except Exception as e:
+            print("Problem getting stats Error: " + str(e))
+            return False
+
+        if response.status_code == 200:
+            print("hitting 200")
+            return response.json()['values']
+        else:
+            print(response.json())
+            return False
+
