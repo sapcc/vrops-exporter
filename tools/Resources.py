@@ -1,4 +1,4 @@
-import requests
+import requests, os
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
 
