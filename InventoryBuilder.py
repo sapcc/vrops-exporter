@@ -85,11 +85,9 @@ class InventoryBuilder:
         while True:
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
-            if not self.query_vrops():
-                timeout = 10
-                print("retrying fetching token in " + str(timeout))
-                time.sleep(timeout)
-                continue
+            for vrops in self.vrops_list:
+                if not self.query_vrops(vrops):
+                    print("retrying connection to " + vrops + " in next iteration")
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
@@ -99,17 +97,16 @@ class InventoryBuilder:
             time.sleep(180)
 
 
-    def query_vrops(self):
-        for vrops in self.vrops_list:
-            if os.environ['DEBUG'] >= '1':
-                print("querying " + vrops)
-            token = self.get_token(target=vrops)
-            if not token:
-                return False
-            self.target_tokens[vrops] = token
-            vcenter = self.create_resource_objects(vrops, token)
-            self.vcenter_list.append(vcenter)
-            return True
+    def query_vrops(self, vrops):
+        if os.environ['DEBUG'] >= '1':
+            print("querying " + vrops)
+        token = self.get_token(target=vrops)
+        if not token:
+            return False
+        self.target_tokens[vrops] = token
+        vcenter = self.create_resource_objects(vrops, token)
+        self.vcenter_list.append(vcenter)
+        return True
 
     def create_resource_objects(self, vrops, token):
         for adapter in self.get_adapter(target=vrops, token=token):
@@ -180,9 +177,8 @@ class InventoryBuilder:
             response = requests.post(url,
                                      data=json.dumps(payload),
                                      verify=False,
-                                     headers=headers)
-                                     # headers=headers,
-                                     # timeout=1)
+                                     headers=headers,
+                                     timeout=10)
         except Exception as e:
             print("Problem connecting to " + target + ' Error: ' + str(e))
             return False
