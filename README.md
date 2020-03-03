@@ -33,7 +33,7 @@ They could also be mixed of course.
     ```
 ### Architecture
 
-![](images/architecture.bmp)
+![](images/architecture.jpeg)
 
 ### How to develop a collector
 
