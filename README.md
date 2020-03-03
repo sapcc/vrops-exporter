@@ -20,7 +20,7 @@ They could also be mixed of course.
       -u USER | --user=USER | specify user to log in
       -p PASSWORD | --password=PASSWORD | specify password to log in
       -o PORT | --port=PORT | specify exporter port
-      -a CONFIGFILE | --atlas | specify atlas configfile 
+      -a | --atlas | specify atlas configfile 
       -d | --debug    |       enable debug
 
 
