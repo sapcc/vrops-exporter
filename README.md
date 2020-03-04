@@ -37,7 +37,7 @@ They could also be mixed of course.
 
 ### How to develop a collector
 
-1. [optional] Provide a simple configfile that contains at least one resource in the structure shown below to the main directory. 
+1. [optional] Provide a simple JSON configfile that contains at least one resource in the structure shown below to the main directory. 
 
     ```json
     [
