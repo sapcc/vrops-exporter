@@ -70,7 +70,7 @@ follows best practices as it should appear in prometheus.
     **[Option 2]** Add *properties* to `property.yaml` using the same logic as **[Option 1]**. 
     
     property:
-    [Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations-Manager/7.5/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
+    [VMWARE Documentation | Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations-Manager/7.5/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
 
     ```yaml
     HostSystemCollector:
