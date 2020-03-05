@@ -37,7 +37,7 @@ They could also be mixed of course.
 
 ### How to develop a collector
 
-1. [optional] Provide a simple configfile that contains at least one resource in the structure shown below to the main directory. 
+1. [optional] Provide a simple JSON configfile that contains at least one resource in the structure shown below to the main directory. 
 
     ```json
     [
@@ -49,8 +49,9 @@ They could also be mixed of course.
        }
     ]
     ```
-2. Add the desired *statkeys* that the collector should collect to `statkey.yaml`. This is where pairs of a *statkey* 
-and a *label* are described. The *statkey* follows VMWARE notation and the *label* follows best practices as it should appear in prometheus.
+2. **[Option 1]** Add the desired *statkeys* that the collector should collect in a dedicated category to `statkey.yaml`. 
+This is where pairs of a *statkey* and a *label* are described. The *statkey* follows VMWARE notation and the *label* 
+follows best practices as it should appear in prometheus.
     
     statkey:
     [VMWARE Documentation | Metrics for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations-Manager/7.5/com.vmware.vcom.metrics.doc/GUID-9DB18E49-5E00-4534-B5FF-6276948D5A09.html)
@@ -65,7 +66,20 @@ and a *label* are described. The *statkey* follows VMWARE notation and the *labe
        - label: "summary_running_VMs_number"
          statkey: "summary|number_running_vms"
     ```
+   
+    **[Option 2]** Add *properties* to `property.yaml` using the same logic as **[Option 1]**. 
     
+    property:
+    [VMWARE Documentation | Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations-Manager/7.5/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
+
+    ```yaml
+    HostSystemCollector:
+       - label: "hardware_cpuInfo_biosVersion"
+         property: "hardware|cpuInfo|biosVersion"
+       - label: "runtime_connectionState"
+         property: "runtime|connectionState"
+    ```
+
 3. Create a new collector in the folder `/collectors/`
 4. Import `Resources` to get query methods for *stats* or *properties* to vROps.
 There are methods for querying **one** *statkey* or  **one** *property* for **multiple** resources. 
@@ -90,3 +104,6 @@ checks whether these are present.
 
 The test generates dummy return values for the queries to vROps and checks the functionality of the collectors. 
 It compares whether the metrics as a result of the collector match the expected metrics in `metrics.yaml`. 
+
+The developed collector must pass the test before it can be added to the master branch. 
+When a pull request is opened, this test is performed automatically.
