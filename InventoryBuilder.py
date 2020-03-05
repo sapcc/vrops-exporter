@@ -146,18 +146,20 @@ class InventoryBuilder:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if response.status_code == 200:
-                for resource in response.json()["adapterInstancesInfoDto"]:
-                    res = dict()
-                    res['name'] = resource["resourceKey"]["name"]
-                    res['uuid'] = resource["id"]
-                    res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                    adapters.append(res)
-            else:
-                raise AttributeError("There is no attribute adapterInstancesInfoDto \nerror message: " +
-                                     str(response.json()))
-        except HTTPError as e:
-            raise HTTPError("Request failed for adapter: " + target + "\nerror message: " + str(e))
+        except Exception as e:
+            print("Problem connecting to " + target + ' Error: ' + str(e))
+            return False
+
+        if response.status_code == 200:
+            for resource in response.json()["adapterInstancesInfoDto"]:
+                res = dict()
+                res['name'] = resource["resourceKey"]["name"]
+                res['uuid'] = resource["id"]
+                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                adapters.append(res)
+        else:
+            print("problem getting adapter " + str(target))
+            return False
 
         return adapters
 

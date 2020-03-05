@@ -1,0 +1,12 @@
+HostSystemProperties:
+  - label: "config_diskSpace_bytes"
+    property: "config|diskSpace"
+  - label: "config_network_number_of_nnic"
+    property: "config|network|nnic"
+  - label: "config_product_apiVersion"
+    property: "config|product|apiVersion"
+  - label: "runtime_memory_capacity_kilobytes"
+    property: "runtime|memoryCap"
+  - label: "cpu_speed_Mhz"
+    property: "cpu|speed"
+

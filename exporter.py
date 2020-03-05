@@ -13,6 +13,7 @@ from threading import Thread
 from InventoryBuilder import InventoryBuilder
 from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemCollector import HostSystemCollector
+from collectors.HostSystemProperties import HostSystemProperties
 
 def parse_params():
     parser = OptionParser()
@@ -66,6 +67,7 @@ if __name__ == '__main__':
     thread.start()
     collectors = [
                 HostSystemCollector(),
-                SampleCollector()
+                SampleCollector(),
+                HostSystemProperties()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
