@@ -60,7 +60,7 @@ follows best practices as it should appear in prometheus.
     [Prometheus | Metric and label naming](https://prometheus.io/docs/practices/naming/)
     
     ```yaml
-    HostSystemCollector:
+    HostSystemStatsCollector:
        - label: "memory_usage_average_percentage"
          statkey: "mem|usage_average"
        - label: "summary_running_VMs_number"
@@ -73,11 +73,24 @@ follows best practices as it should appear in prometheus.
     [VMWARE Documentation | Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations-Manager/7.5/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
 
     ```yaml
-    HostSystemCollector:
-       - label: "hardware_cpuInfo_biosVersion"
-         property: "hardware|cpuInfo|biosVersion"
-       - label: "runtime_connectionState"
-         property: "runtime|connectionState"
+    HostSystemPropertiesCollector:
+       enum_metrics:
+           - label: "runtime_powerState"
+             expected: "Powered On"
+             property: "runtime|powerState"
+           - label: "runtime_connectionState"
+             expected: "connected"
+             property: "runtime|connectionState"
+       info_metrics:
+           - label: "config_product_apiVersion"
+             property: "config|product|apiVersion"
+           - label: "cpu_cpu_model"
+             property: "cpu|cpuModel"
+       number_metrics:
+           - label: "config_diskSpace_bytes"
+             property: "config|diskSpace"
+           - label: "config_network_number_of_nnic"
+             property: "config|network|nnic"
     ```
 
 3. Create a new collector in the folder `/collectors/`
