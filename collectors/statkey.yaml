@@ -1,4 +1,4 @@
-HostSystemCollector:
+HostSystemStatsCollector:
     - label: "hardware_number_of_cpu_cores_info"
       statkey: "hardware|cpuinfo|num_CpuCores"
     - label: "hardware_number_of_cpu_sockets_info"

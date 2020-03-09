@@ -96,7 +96,6 @@ class InventoryBuilder:
             self.iteration += 1
             time.sleep(180)
 
-
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
             print("querying " + vrops)

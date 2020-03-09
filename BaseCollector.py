@@ -48,3 +48,13 @@ class BaseCollector(ABC):
         self.target_tokens = request.json()
         return self.target_tokens
 
+    def get_hosts_by_target(self):
+        self.target_hosts = dict()
+        host_dict = self.get_hosts()
+        for uuid in host_dict:
+            host = host_dict[uuid]
+            if host['target'] not in self.target_hosts.keys():
+                self.target_hosts[host['target']] = list()
+            self.target_hosts[host['target']].append(uuid)
+        return self.target_hosts
+
