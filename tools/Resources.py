@@ -221,7 +221,7 @@ class Resources:
                 if 'values' in resource['property-contents']['property-content'][0]:
                     latest_state = resource['property-contents']['property-content'][0]['values'][0]
                 else:
-                    latest_state = "None"
+                    latest_state = "unknown"
                 if latest_state == expected:
                     d['data'] = 0
                 else:
