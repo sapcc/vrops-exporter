@@ -17,7 +17,7 @@ class HostSystemPropertiesCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemPropertiesCollector ist start collecting metrics')
+            print('HostSystemPropertiesCollector ist start collecting porperties')
 
         metric_list = list()
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
@@ -45,7 +45,6 @@ class HostSystemPropertiesCollector(BaseCollector):
                         labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                 self.hosts[host_id]['name'], property_label],
                         value=data)
-                    metric_list.append(g)
 
             for property_pair in self.property_yaml["HostSystemPropertiesCollector"]['enum_metrics']:
                 property_label = property_pair['label']
@@ -62,8 +61,6 @@ class HostSystemPropertiesCollector(BaseCollector):
                         labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                 self.hosts[host_id]['name'], property_label + ": " + latest_state],
                         value=data)
-
-                    metric_list.append(g)
 
             for property_pair in self.property_yaml["HostSystemPropertiesCollector"]['info_metrics']:
                 property_label = property_pair['label']
@@ -86,9 +83,7 @@ class HostSystemPropertiesCollector(BaseCollector):
                             labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                     self.hosts[host_id]['name'], property_label + ": " + info],
                             value=info_value)
-                    metric_list.append(g)
 
-        for i in metric_list:
-            yield i
+            yield g
 
 

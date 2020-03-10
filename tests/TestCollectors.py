@@ -59,7 +59,6 @@ class TestCollectors(unittest.TestCase):
 
             if 'Stats' in collector:
                 # mocking all values from yaml
-                print("generating dummy return values for", collector)
                 statkey_yaml = YamlRead('collectors/statkey.yaml').run()
                 multiple_metrics_generated = list()
                 for statkey_pair in statkey_yaml[collector]:
@@ -70,7 +69,6 @@ class TestCollectors(unittest.TestCase):
                 Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
 
             if "Properties" in collector:
-                print("generating dummy return values for ", collector)
                 propkey_yaml = YamlRead('collectors/property.yaml').run()
                 multiple_enum_properties_generated = list()
                 for propkey_pair in propkey_yaml[collector]['enum_metrics']:
@@ -86,7 +84,7 @@ class TestCollectors(unittest.TestCase):
                     return_value=multiple_enum_properties_generated)
 
                 multiple_number_properties_generated = list()
-                for propkey_pair in propkey_yaml["HostSystemPropertiesCollector"]['number_metrics']:
+                for propkey_pair in propkey_yaml[collector]['number_metrics']:
                     multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                  'propkey': propkey_pair['property'],
                                                                  'data': 19.54})
@@ -97,10 +95,10 @@ class TestCollectors(unittest.TestCase):
                     return_value=multiple_number_properties_generated)
 
                 multiple_info_properties_generated = list()
-                for propkey_pair in propkey_yaml["HostSystemPropertiesCollector"]['info_metrics']:
+                for propkey_pair in propkey_yaml[collector]['info_metrics']:
                     multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                'propkey': propkey_pair['property'],
-                                                               'data': 'Intel(R) Xeon(R) CPU'})
+                                                               'data': '6.6a-92b1'})
                     multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                'propkey': propkey_pair['property'],
                                                                'data': 'EXM4.4.0.2a'})
@@ -156,7 +154,6 @@ class TestCollectors(unittest.TestCase):
             self.assertTrue(set(metrics).issubset(metrics_yaml_list),
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
-
             for t in thread_list:
                 t.join(timeout=5)
 
