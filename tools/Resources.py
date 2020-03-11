@@ -1,4 +1,4 @@
-import requests, os, json
+import requests, json
 
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
@@ -57,6 +57,9 @@ class Resources:
 
     def get_hosts(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="HostSystem")
+
+    def get_datastores(self, target, token, parentid):
+        return self.get_resources(target, token, parentid=parentid, resourcekind="Datastore")
 
     def get_virtualmachines(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="VirtualMachine")
@@ -117,8 +120,9 @@ class Resources:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
-    def get_latest_property(target, token, uuid, key):
-        url = "https://" + target + "/suite-api/api/resources/" + uuid + "properties"
+    # this is for a single query of a property
+    def get_property(target, token, uuid, key):
+        url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",

@@ -28,6 +28,11 @@ class BaseCollector(ABC):
         self.hosts = request.json()
         return self.hosts
 
+    def get_datastores(self):
+        request = requests.get(url = "http://localhost:8000/datastores")
+        self.datastores = request.json()
+        return self.datastores
+
     def get_vms(self):
         request = requests.get(url = "http://localhost:8000/vms")
         self.vms = request.json()

@@ -5,7 +5,7 @@ from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 
 
-class HostSystemStatsCollector(BaseCollector):
+class DatastoreStatsCollector(BaseCollector):
     def __init__(self):
         self.iteration = 0
         while not self.iteration:
@@ -17,7 +17,7 @@ class HostSystemStatsCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemStatsCollector starts with collecting the metrics')
+            print('DatastoreStatsCollector starts with collecting the metrics')
 
         g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
 

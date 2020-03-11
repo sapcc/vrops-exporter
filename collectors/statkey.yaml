@@ -28,3 +28,7 @@ HostSystemStatsCollector:
     - label: "network_packets_dropped_percentage"
       statkey: "net|droppedPct"
 
+ClusterComputeStatsCollector:
+  - label:
+    statkey:
+

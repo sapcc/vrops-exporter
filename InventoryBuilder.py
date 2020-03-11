@@ -51,6 +51,10 @@ class InventoryBuilder:
         def hosts():
             return self.hosts
 
+        @app.route('/datastores', methods=['GET'])
+        def datastores():
+            return self.datastores
+
         @app.route('/vms', methods=['GET'])
         def vms():
             return self.vms
@@ -122,6 +126,10 @@ class InventoryBuilder:
                     for hs_object in cl_object.hosts:
                         if os.environ['DEBUG'] >= '2':
                             print("Collecting Host: " + hs_object.name)
+                        hs_object.add_datastore()
+                        for ds_object in hs_object.datastores:
+                            if os.environ['DEBUG'] >= '2':
+                                print("Collecting Datastore: " + ds_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] >= '2':
@@ -250,6 +258,26 @@ class InventoryBuilder:
                                 'token': host.token,
                                 }
         self.hosts = tree
+        return tree
+
+    def get_datastores(self):
+        tree = dict()
+        for vcenter in self.vcenter_list:
+            for dc in vcenter.datacenter:
+                for cluster in dc.clusters:
+                    for host in cluster.hosts:
+                        for ds in host.datastores:
+                            tree[ds.uuid] = {
+                                    'uuid': ds.uuid,
+                                    'name': ds.name,
+                                    'parent_host_uuid': host.uuid,
+                                    'parent_host_name': host.name,
+                                    'cluster': cluster.name,
+                                    'datacenter': dc.name,
+                                    'target': ds.target,
+                                    'token': ds.token,
+                                    }
+        self.datastores = tree
         return tree
 
     def get_vms(self):

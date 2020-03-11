@@ -17,7 +17,7 @@ class HostSystemPropertiesCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemPropertiesCollector ist start collecting porperties')
+            print('HostSystemPropertiesCollector starts with collecting the metrics')
 
         metric_list = list()
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',

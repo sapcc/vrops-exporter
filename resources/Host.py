@@ -1,5 +1,6 @@
 import os
 from tools.Resources import Resources
+from resources.Datastore import Datastore
 from resources.VirtualMachine import VirtualMachine
 
 
@@ -10,7 +11,13 @@ class Host:
         self.token = token
         self.uuid = uuid
         self.name = name
+        self.datastores = list()
         self.vms = list()
+
+    def add_datastore(self):
+        r = Resources()
+        for vm in r.get_datastores(target=self.target, token=self.token, parentid=self.uuid):
+            self.vms.append(Datastore(target=self.target, token=self.token, name=vm['name'], uuid=vm['uuid']))
 
     def add_vm(self):
         r = Resources()
