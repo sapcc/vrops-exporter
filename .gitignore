@@ -1,4 +1,4 @@
 *.pyc
 *.pyo
 netbox.json
-.DS_Store
+*.DS_Store
