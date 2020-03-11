@@ -1,4 +1,4 @@
-import requests, os, json
+import requests, json
 
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
@@ -117,8 +117,9 @@ class Resources:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
-    def get_latest_property(target, token, uuid, key):
-        url = "https://" + target + "/suite-api/api/resources/" + uuid + "properties"
+    # this is for a single query of a property
+    def get_property(target, token, uuid, key):
+        url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
@@ -186,7 +187,7 @@ class Resources:
 
     # if the property describes a status that has several states
     # the expected status returns a 0, all others become 1
-    def get_latest_enum_properties_multiple(target, token, uuids, propkey, expected):
+    def get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state):
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -222,7 +223,7 @@ class Resources:
                     latest_state = resource['property-contents']['property-content'][0]['values'][0]
                 else:
                     latest_state = "unknown"
-                if latest_state == expected:
+                if latest_state == expected_state:
                     d['data'] = 0
                 else:
                     d['data'] = 1

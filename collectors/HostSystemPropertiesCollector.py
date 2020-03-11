@@ -17,13 +17,11 @@ class HostSystemPropertiesCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemPropertiesCollector ist start collecting porperties')
+            print('HostSystemPropertiesCollector starts with collecting the metrics')
 
-        metric_list = list()
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
                               labels=['datacenter', 'cluster', 'hostsystem', 'propkey'])
 
-        # make one big request per stat id with all resource id's in its belly
         for target in self.get_hosts_by_target():
             token = self.get_target_tokens()
             token = token[target]

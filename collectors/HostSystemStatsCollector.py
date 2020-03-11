@@ -17,7 +17,7 @@ class HostSystemStatsCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemStatsCollector ist start collecting metrics')
+            print('HostSystemStatsCollector starts with collecting the metrics')
 
         g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
 
