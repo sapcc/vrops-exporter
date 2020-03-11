@@ -34,14 +34,12 @@ class DatastoreStatsCollector(BaseCollector):
                 print("skipping " + target + " in " + self.__class__.__name__ + " , no token")
 
             uuids = self.target_datastores[target]
-            print(uuids)
             for statkey_pair in self.statkey_yaml[self.__class__.__name__]:
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
-                print(statkey)
                 values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
                 if not values:
-                    print("skipping statkey " + str(statkey) + self.__class__.__name__ + " , no return")
+                    print("skipping statkey " + str(statkey) + " in " + self.__class__.__name__ + " , no return")
                     continue
                 for value_entry in values:
                     #there is just one, because we are querying latest only

@@ -65,7 +65,7 @@ class BaseCollector(ABC):
 
     def get_datastores_by_target(self):
         self.target_datastores = dict()
-        datastore_dict = self.get_hosts()
+        datastore_dict = self.get_datastores()
         for uuid in datastore_dict:
             host = datastore_dict[uuid]
             if host['target'] not in self.target_datastores.keys():

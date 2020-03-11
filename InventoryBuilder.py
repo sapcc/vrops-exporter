@@ -133,11 +133,11 @@ class InventoryBuilder:
                         for ds_object in hs_object.datastores:
                             if os.environ['DEBUG'] >= '2':
                                 print("Collecting Datastore: " + ds_object.name)
-                        """hs_object.add_vm()
+                        hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] >= '2':
-                                print("Collecting VM: " + vm_object.name)"""
-                return vcenter
+                                print("Collecting VM: " + vm_object.name)
+            return vcenter
 
     def get_adapter(self, target, token):
         url = "https://" + target + "/suite-api/api/adapters"

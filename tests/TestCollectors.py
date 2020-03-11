@@ -16,6 +16,7 @@ from InventoryBuilder import InventoryBuilder
 from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
+from collectors.DatastoreStatsCollector import DatastoreStatsCollector
 from prometheus_client.core import REGISTRY
 
 
@@ -53,9 +54,12 @@ class TestCollectors(unittest.TestCase):
                                                               {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
                                                                     {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
+            Resources.get_datastores = MagicMock(return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
+                                                            {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3328-93a1-56e8463404'},
                                                               {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
+            Resources.get_property = MagicMock(return_value="connected")
 
             if 'Stats' in collector:
                 # mocking all values from yaml
