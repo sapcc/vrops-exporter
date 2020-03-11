@@ -28,7 +28,16 @@ HostSystemStatsCollector:
     - label: "network_packets_dropped_percentage"
       statkey: "net|droppedPct"
 
-ClusterComputeStatsCollector:
-  - label:
-    statkey:
+DatastoreStatsCollector:
+  - label: "capacity_total_capacity_gigabytes"
+    statkey: "capacity|total_capacity"
+  - label: "capacity_available_space_gigabytes"
+    statkey: "capacity|available_space"
+  - label: "diskspace|total_usage"
+    statkey: "diskspace|total_usage"
+  - label: "virtual_machine_used_diskspace_gigabytes"
+    statkey: "diskspace|diskused"
+  - label: "capacity_used_space_percentage"
+    statkey: "capacity|usedSpacePct"
+
 

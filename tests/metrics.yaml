@@ -46,6 +46,9 @@ HostSystemPropertiesCollector:
       - 'vrops_hostsystem_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_version: EXM4.4.0.2a"}'
       - 'vrops_hostsystem_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="sys_build): EXM4.4.0.2a"}'
 
+DatastoreStatsCollector:
+      -
+
 SampleCollector:
    metrics:
       - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'

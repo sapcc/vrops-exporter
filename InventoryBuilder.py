@@ -96,6 +96,7 @@ class InventoryBuilder:
             self.get_datacenters()
             self.get_clusters()
             self.get_hosts()
+            self.get_datastores()
             self.get_vms()
             self.iteration += 1
             time.sleep(180)
@@ -113,6 +114,8 @@ class InventoryBuilder:
 
     def create_resource_objects(self, vrops, token):
         for adapter in self.get_adapter(target=vrops, token=token):
+            if os.environ['DEBUG'] >= '2':
+                print("Collecting vcenter: " + adapter['name'])
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
@@ -130,11 +133,11 @@ class InventoryBuilder:
                         for ds_object in hs_object.datastores:
                             if os.environ['DEBUG'] >= '2':
                                 print("Collecting Datastore: " + ds_object.name)
-                        hs_object.add_vm()
+                        """hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] >= '2':
-                                print("Collecting VM: " + vm_object.name)
-            return vcenter
+                                print("Collecting VM: " + vm_object.name)"""
+                return vcenter
 
     def get_adapter(self, target, token):
         url = "https://" + target + "/suite-api/api/adapters"

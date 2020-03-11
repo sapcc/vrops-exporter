@@ -16,30 +16,40 @@ class DatastoreStatsCollector(BaseCollector):
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
     def collect(self):
-        if os.environ['DEBUG'] >= '1':
-            print('DatastoreStatsCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
+        if len(self.get_datastores()) >= 1:
+            print('DatastoreStatsCollector starts with collecting the metrics')
+        else:
+            print("There are no Datastores in the inventory")
+            return False
+
+        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem',
+                                                                            'datastore', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
-        for target in self.get_hosts_by_target():
+        for target in self.get_datastores_by_target():
             token = self.get_target_tokens()
             token = token[target]
             if not token:
-                print("skipping " + target + " in HostSystemStatsCollector, no token")
+                print("skipping " + target + " in " + self.__class__.__name__ + " , no token")
 
-            uuids = self.target_hosts[target]
-            for statkey_pair in self.statkey_yaml["HostSystemStatsCollector"]:
+            uuids = self.target_datastores[target]
+            print(uuids)
+            for statkey_pair in self.statkey_yaml[self.__class__.__name__]:
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
+                print(statkey)
                 values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
                 if not values:
-                    print("skipping statkey " + str(statkey) + " in HostSystemStatsCollector, no return")
+                    print("skipping statkey " + str(statkey) + self.__class__.__name__ + " , no return")
                     continue
                 for value_entry in values:
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
-                    host_id = value_entry['resourceId']
-                    g.add_metric(labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
-                                     self.hosts[host_id]['name'], statkey_label], value=metric_value)
+                    datastore_id = value_entry['resourceId']
+                    g.add_metric(labels=[self.datastores[datastore_id]['datacenter'],
+                                         self.datastores[datastore_id]['cluster'],
+                                         self.datastores[datastore_id]['parent_host_name'],
+                                         self.datastores[datastore_id]['name'],
+                                         statkey_label], value=metric_value)
         yield g

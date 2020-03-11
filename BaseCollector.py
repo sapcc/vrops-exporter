@@ -63,3 +63,13 @@ class BaseCollector(ABC):
             self.target_hosts[host['target']].append(uuid)
         return self.target_hosts
 
+    def get_datastores_by_target(self):
+        self.target_datastores = dict()
+        datastore_dict = self.get_hosts()
+        for uuid in datastore_dict:
+            host = datastore_dict[uuid]
+            if host['target'] not in self.target_datastores.keys():
+                self.target_datastores[host['target']] = list()
+            self.target_datastores[host['target']].append(uuid)
+        return self.target_datastores
+

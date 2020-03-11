@@ -16,8 +16,8 @@ class Host:
 
     def add_datastore(self):
         r = Resources()
-        for vm in r.get_datastores(target=self.target, token=self.token, parentid=self.uuid):
-            self.vms.append(Datastore(target=self.target, token=self.token, name=vm['name'], uuid=vm['uuid']))
+        for ds in r.get_datastores(target=self.target, token=self.token, parentid=self.uuid):
+            self.datastores.append(Datastore(target=self.target, token=self.token, name=ds['name'], uuid=ds['uuid']))
 
     def add_vm(self):
         r = Resources()
