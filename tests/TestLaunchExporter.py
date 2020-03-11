@@ -5,7 +5,7 @@ import unittest
 sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
-
+from pathlib import Path
 
 class TestLaunchExporter(TestCase):
 
@@ -52,6 +52,12 @@ class TestLaunchExporter(TestCase):
         with self.assertRaises(SystemExit) as se:
             parse_params()
         self.assertEqual(se.exception.code, 0, 'PORT, USER or PASSWORD are not set in ENV or command line!')
+
+    def test_for_atlas_configfile(self):
+        os.environ.clear()
+        netbox_json = Path("./atlas/")
+        self.assertTrue(netbox_json.is_file(), msg="configfile does not exist")
+
 
 if __name__ == '__main__':
     unittest.main()
