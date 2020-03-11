@@ -58,6 +58,9 @@ class Resources:
     def get_hosts(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="HostSystem")
 
+    def get_datastores(self, target, token, parentid):
+        return self.get_resources(target, token, parentid=parentid, resourcekind="Datastore")
+
     def get_virtualmachines(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="VirtualMachine")
 
