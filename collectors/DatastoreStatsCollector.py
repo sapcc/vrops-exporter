@@ -23,7 +23,7 @@ class DatastoreStatsCollector(BaseCollector):
             print("There are no Datastores in the inventory")
             return False
 
-        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem',
+        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem',
                                                                             'datastore', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
