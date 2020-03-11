@@ -16,12 +16,8 @@ class DatastoreStatsCollector(BaseCollector):
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
     def collect(self):
-
-        if len(self.get_datastores()) >= 1:
-            print('DatastoreStatsCollector starts with collecting the metrics')
-        else:
-            print("There are no Datastores in the inventory")
-            return False
+        if os.environ['DEBUG'] >= '1':
+            print(self.__class__.__name__ + " starts with collecting the metrics")
 
         g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem',
                                                                             'datastore', 'statkey'])
