@@ -29,14 +29,10 @@ HostSystemStatsCollector:
       statkey: "net|droppedPct"
 
 DatastoreStatsCollector:
-  - label: "diskspace_disktotal_gigabytes"
+  - label: "diskspace_total_used_gigabytes"
     statkey: "diskspace|disktotal"
-  - label: "diskspace_available_space_gigabytes"
+  - label: "diskspace_freespace_gigabytes"
     statkey: "diskspace|freespace"
-  - label: "diskspace_total_usage_gigabytes"
-    statkey: "diskspace|used"
-  - label: "virtualmachine_usage_gigabytes"
-    statkey: "diskspace|diskused"
   - label: "diskspace_capacity_gigabytes"
     statkey: "diskspace|capacity"
 
