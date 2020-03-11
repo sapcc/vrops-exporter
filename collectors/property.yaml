@@ -1,0 +1,29 @@
+HostSystemPropertiesCollector:
+    enum_metrics:
+      - label: "runtime_powerState"
+        expected: "Powered On"
+        property: "runtime|powerState"
+      - label: "runtime_connectionState"
+        expected: "connected"
+        property: "runtime|connectionState"
+      - label: "runtime_maintenanceState"
+        expected: "notInMaintenance"
+        property: "runtime|maintenanceState"
+
+    info_metrics:
+      - label: "summary_version"
+        property: "summary|version"
+      - label: "sys_build)"
+        property: "sys|build)"
+
+    number_metrics:
+      - label: "config_diskSpace_bytes"
+        property: "config|diskSpace"
+      - label: "runtime_memory_capacity_kilobytes"
+        property: "runtime|memoryCap"
+
+
+
+
+
+

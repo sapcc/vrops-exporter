@@ -14,7 +14,8 @@ from tools.YamlRead import YamlRead
 from tools.Resources import Resources
 from InventoryBuilder import InventoryBuilder
 from collectors.SampleCollector import SampleCollector
-from collectors.HostSystemCollector import HostSystemCollector
+from collectors.HostSystemStatsCollector import HostSystemStatsCollector
+from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from prometheus_client.core import REGISTRY
 
 
@@ -41,33 +42,74 @@ class TestCollectors(unittest.TestCase):
 
             # test tool get_resources to create resource objects
 
-            Resources.get_datacenter = MagicMock(return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
-                                                 {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_datacenter = MagicMock(
+                return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
+                              {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
-                                              {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                            {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                            {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                          {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                              {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
-                                                      {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                                    {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3628-93a1-56e8463404'},
-                                                {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                              {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
 
-            #mocking all values from yaml
-            statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-            multiple_metrics_generated = list()
-            for statkey_pair in statkey_yaml["HostSystemCollector"]:
-                multiple_metrics_generated.append({ "resourceId": "3628-93a1-56e84634050814", "stat-list": { "stat": [{ "timestamps": [ 1582797716394 ], "statKey": { "key": statkey_pair['statkey'] }, "data": [ 88.0 ] }] } })
-                multiple_metrics_generated.append({ "resourceId": "5628-9ba1-55e847050814"  , "stat-list": { "stat": [{ "timestamps": [ 1582797716394 ], "statKey": { "key": statkey_pair['statkey'] }, "data": [ 44.0 ] }] } })
-            Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
+            if 'Stats' in collector:
+                # mocking all values from yaml
+                statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+                multiple_metrics_generated = list()
+                for statkey_pair in statkey_yaml[collector]:
+                    multiple_metrics_generated.append({"resourceId": "3628-93a1-56e84634050814", "stat-list": {"stat": [
+                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [88.0]}]}})
+                    multiple_metrics_generated.append({"resourceId": "5628-9ba1-55e847050814", "stat-list": {"stat": [
+                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [44.0]}]}})
+                Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
+
+            if "Properties" in collector:
+                propkey_yaml = YamlRead('collectors/property.yaml').run()
+                multiple_enum_properties_generated = list()
+                for propkey_pair in propkey_yaml[collector]['enum_metrics']:
+                    multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 0,
+                                                               'latest_state': 'Powered On'})
+                    multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 0,
+                                                               'latest_state': 'connected'})
+                Resources.get_latest_enum_properties_multiple = MagicMock(
+                    return_value=multiple_enum_properties_generated)
+
+                multiple_number_properties_generated = list()
+                for propkey_pair in propkey_yaml[collector]['number_metrics']:
+                    multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                 'propkey': propkey_pair['property'],
+                                                                 'data': 19.54})
+                    multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                 'propkey': propkey_pair['property'],
+                                                                 'data': '6.5'})
+                Resources.get_latest_number_properties_multiple = MagicMock(
+                    return_value=multiple_number_properties_generated)
+
+                multiple_info_properties_generated = list()
+                for propkey_pair in propkey_yaml[collector]['info_metrics']:
+                    multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': '6.6a-92b1'})
+                    multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 'EXM4.4.0.2a'})
+                Resources.get_latest_info_properties_multiple = MagicMock(
+                    return_value=multiple_info_properties_generated)
 
             thread_list = list()
 
             # start prometheus server to provide metrics later on
             collector_instance = globals()[collector]()
-            thread1 = Thread(target=run_prometheus_server, args=(random_prometheus_port,[collector_instance]))
+            thread1 = Thread(target=run_prometheus_server, args=(random_prometheus_port, [collector_instance]))
             thread1.daemon = True
             thread1.start()
             thread_list.append(thread1)
@@ -94,10 +136,10 @@ class TestCollectors(unittest.TestCase):
                     continue
                 if entry.startswith('python_info'):
                     continue
-                split_entry = entry.split()
+                split_entry = entry.split("}")
                 if len(split_entry) != 2:
                     continue
-                metrics.append(split_entry[0])
+                metrics.append(split_entry[0] + "}")
 
             metrics_yaml_list = metrics_yaml[collector]['metrics']
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
@@ -112,7 +154,6 @@ class TestCollectors(unittest.TestCase):
             self.assertTrue(set(metrics).issubset(metrics_yaml_list),
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
-
             for t in thread_list:
                 t.join(timeout=5)
 

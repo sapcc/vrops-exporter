@@ -12,7 +12,8 @@ from threading import Thread
 # from VropsCollector import VropsCollector
 from InventoryBuilder import InventoryBuilder
 from collectors.SampleCollector import SampleCollector
-from collectors.HostSystemCollector import HostSystemCollector
+from collectors.HostSystemStatsCollector import HostSystemStatsCollector
+from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 
 def parse_params():
     parser = OptionParser()
@@ -58,14 +59,14 @@ def run_prometheus_server(port, collectors, *args):
     while True:
         time.sleep(1)
 
-
 if __name__ == '__main__':
     options = parse_params()
     print(options.atlas)
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-                HostSystemCollector(),
-                SampleCollector()
+                HostSystemStatsCollector(),
+                SampleCollector(),
+                HostSystemPropertiesCollector()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
