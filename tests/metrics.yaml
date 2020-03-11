@@ -48,15 +48,12 @@ HostSystemPropertiesCollector:
 
 DatastoreStatsCollector:
    metrics:
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="virtualmachine_usage_gigabytes"}'
+
       - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_capacity_gigabytes"}'
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_available_space_gigabytes"}'
       - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_total_usage_gigabytes"}'
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_disktotal_gigabytes"}'
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_disktotal_gigabytes"}'
       - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_capacity_gigabytes"}'
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="virtualmachine_usage_gigabytes"}'
-      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_available_space_gigabytes"}'
+      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_freespace_gigabytes"}'
+      - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_freespace_gigabytes"}'
       - 'vrops_hostsystem_stats{cluster="cluster2",datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_total_usage_gigabytes"}'
 
 SampleCollector:
