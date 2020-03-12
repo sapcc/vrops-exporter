@@ -36,3 +36,12 @@ DatastoreStatsCollector:
   - label: "diskspace_capacity_gigabytes"
     statkey: "diskspace|capacity"
 
+ShadowVMCollector:
+  - label: "connection_state_vm_info"
+    statkey: "summary|runtime|connectionState"
+  - label: "number_of_vcpus_number"
+    statkey: "config|hardware|num_Cpu"
+  - label: "vm_memory_in_kb_number"
+    statkey: "config|hardware|memoryKB"
+  - label: "number_of_ethernet_cards_number"
+    statkey: "summary|config|numEthernetCards"
