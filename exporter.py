@@ -15,6 +15,7 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.ShadowVMCollector import ShadowVMCollector
 
 def parse_params():
     parser = OptionParser()
@@ -69,6 +70,7 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 SampleCollector(),
                 HostSystemPropertiesCollector(),
-                DatastoreStatsCollector()
+                DatastoreStatsCollector(),
+                ShadowVMCollector()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
