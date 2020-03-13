@@ -36,7 +36,7 @@ DatastoreStatsCollector:
   - label: "diskspace_capacity_gigabytes"
     statkey: "diskspace|capacity"
 
-ShadowVMCollector:
+VMstatCollector:
   - label: "connection_state_vm_info"
     statkey: "summary|runtime|connectionState"
   - label: "number_of_vcpus_number"
