@@ -187,7 +187,7 @@ class InventoryBuilder:
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            print("problem getting token " + str(target))
+            print("problem getting token " + str(target) + ": " + json.dumps(response.json(), indent=3))
             return False
 
     def get_vcenters(self):
