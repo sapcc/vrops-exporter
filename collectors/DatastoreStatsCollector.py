@@ -19,7 +19,7 @@ class DatastoreStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print(self.__class__.__name__ + " starts with collecting the metrics")
 
-        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem',
+        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem',
                                                                             'datastore', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
