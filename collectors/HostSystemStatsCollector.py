@@ -19,7 +19,7 @@ class HostSystemStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('HostSystemStatsCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'cluster', 'hostsystem', 'statkey'])
+        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
         for target in self.get_hosts_by_target():

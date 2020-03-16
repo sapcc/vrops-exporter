@@ -20,7 +20,7 @@ class HostSystemPropertiesCollector(BaseCollector):
             print('HostSystemPropertiesCollector starts with collecting the metrics')
 
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
-                              labels=['datacenter', 'cluster', 'hostsystem', 'propkey'])
+                              labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
 
         for target in self.get_hosts_by_target():
             token = self.get_target_tokens()
