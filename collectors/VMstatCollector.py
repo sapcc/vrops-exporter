@@ -22,7 +22,7 @@ class VMstatCollector(BaseCollector):
         g = GaugeMetricFamily('vrops_VMs_stats', 'testtext', labels=['datacenter', 'cluster', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
-        for target in self.get_vms_by_target():
+        for target in self.get_vms():
             token = self.get_target_tokens()
             token = token[target]
             if not token:

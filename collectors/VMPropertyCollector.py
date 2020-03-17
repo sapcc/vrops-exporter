@@ -22,7 +22,7 @@ class VMPropertyCollector(BaseCollector):
         g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
                               labels=['datacenter', 'cluster', 'hostsystem', 'propkey'])
 
-        for target in self.get_hosts_by_target():
+        for target in self.get_vms():
             token = self.get_target_tokens()
             token = token[target]
 
