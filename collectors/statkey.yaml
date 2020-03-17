@@ -37,13 +37,13 @@ DatastoreStatsCollector:
     statkey: "diskspace|capacity"
 
 VMstatCollector:
-  - label: "number_of_vcpus_number"
+  - label: "number_of_vcpus_total"
     statkey: "config|hardware|num_Cpu"
   - label: "vm_memory_in_kilobytes"
     statkey: "mem|guest_provisioned"
-  - label: "active_guest_memory_GB"
+  - label: "active_guest_memory_gigabytes"
     statkey: "mem|guest_activePct"
-  - label: "vm_power_state"
+  - label: "vm_power_info"
     statkey: "sys|poweredOn"
-  - label: "vm_disk_space_gb"
+  - label: "vm_disk_space_gigabytes"
     statkey: "config|hardware|disk_Space"

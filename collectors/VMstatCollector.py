@@ -19,7 +19,7 @@ class VMstatCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('VMstatCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['vms', 'statkey'])
+        g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['virtualmachine', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
         for target in self.get_vms_by_target():
@@ -40,7 +40,6 @@ class VMstatCollector(BaseCollector):
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     vm_id = value_entry['resourceId']
-                    g.add_metric(labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
-                                     self.vms[vm_id]['datacenter'], statkey_label], value=metric_value)
+                    g.add_metric(labels=[self.vms[vm_id]['name'], statkey_label], value=metric_value)
         yield g
 
