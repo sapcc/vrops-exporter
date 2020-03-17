@@ -19,16 +19,16 @@ class VMstatCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('VMstatCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_VMs_stats', 'testtext', labels=['datacenter', 'cluster', 'statkey'])
+        g = GaugeMetricFamily('vrops_VMs_stats', 'testtext', labels=['vms', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
-        for target in self.get_vms():
+        for target in self.get_vms_by_target():
             token = self.get_target_tokens()
             token = token[target]
             if not token:
                 print("skipping " + target + " in VMstatCollector, no token")
 
-            uuids = self.target_hosts[target]
+            uuids = self.target_vms[target]
             for statkey_pair in self.statkey_yaml["VMstatCollector"]:
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']

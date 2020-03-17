@@ -73,3 +73,12 @@ class BaseCollector(ABC):
             self.target_datastores[host['target']].append(uuid)
         return self.target_datastores
 
+    def get_vms_by_target(self):
+        self.target_vms = dict()
+        vms_dict = self.get_vms()
+        for uuid in vms_dict:
+            vm = vms_dict[uuid]
+            if vm['target'] not in self.target_vms.keys():
+                self.target_vms[vm['target']] = list()
+            self.target_vms[vm['target']].append(uuid)
+        return self.target_vms

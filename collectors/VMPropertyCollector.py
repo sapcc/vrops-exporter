@@ -22,14 +22,14 @@ class VMPropertyCollector(BaseCollector):
         g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
                               labels=['datacenter', 'cluster', 'hostsystem', 'propkey'])
 
-        for target in self.get_vms():
+        for target in self.get_vms_by_target():
             token = self.get_target_tokens()
             token = token[target]
 
             if not token:
                 print("skipping " + target + " in VMPropertyCollector, no token")
 
-            uuids = self.target_hosts[target]
+            uuids = self.target_vms[target]
             for property_pair in self.property_yaml['VMPropertyCollector']['number_metrics']:
                 property_label = property_pair['label']
                 propkey = property_pair['property']
@@ -38,7 +38,7 @@ class VMPropertyCollector(BaseCollector):
                     continue
                 for value_entry in values:
                     data = value_entry['data']
-                    host_id = value_entry['resourceId']
+                    vm_id = value_entry['resourceId']
                     g.add_metric(
                         labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
                                 self.vms[vm_id]['datacenter'], property_label],
@@ -53,7 +53,7 @@ class VMPropertyCollector(BaseCollector):
                     continue
                 for value_entry in values:
                     data = value_entry['data']
-                    host_id = value_entry['resourceId']
+                    vm_id = value_entry['resourceId']
                     latest_state = value_entry['latest_state']
                     g.add_metric(
                         labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
@@ -67,7 +67,7 @@ class VMPropertyCollector(BaseCollector):
                 if not values:
                     continue
                 for value_entry in values:
-                    host_id = value_entry['resourceId']
+                    vm_id = value_entry['resourceId']
                     try:
                         info_value = float(value_entry['data'])
                         g.add_metric(
