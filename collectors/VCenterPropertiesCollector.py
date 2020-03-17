@@ -47,7 +47,8 @@ class VcenterPropertiesCollector(BaseCollector):
                     except (ValueError, TypeError):
                         info = vc_values
                         info_value = 0
-                        g.add_metric(labels=[self.vcenters[vc]['name'], property_label], value=info_value)
+                        g.add_metric(labels=[self.vcenters[vc]['name'],
+                                     property_label + ": " + info], value=info_value)
 
 
             yield g
