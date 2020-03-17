@@ -19,7 +19,7 @@ class VMstatCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('VMstatCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_VMs_stats', 'testtext', labels=['vms', 'statkey'])
+        g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['vms', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
         for target in self.get_vms_by_target():

@@ -72,7 +72,7 @@ if __name__ == '__main__':
 #                SampleCollector(),
 #                HostSystemPropertiesCollector(),
 #                DatastoreStatsCollector(),
-#                VMstatCollector(),
+                VMstatCollector(),
                 VMPropertyCollector()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
