@@ -40,8 +40,8 @@ class VMPropertyCollector(BaseCollector):
                     data = value_entry['data']
                     host_id = value_entry['resourceId']
                     g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
-                                self.hosts[host_id]['name'], property_label],
+                        labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
+                                self.vms[vm_id]['datacenter'], property_label],
                         value=data)
 
             for property_pair in self.property_yaml["VMPropertyCollector"]['enum_metrics']:
@@ -56,8 +56,8 @@ class VMPropertyCollector(BaseCollector):
                     host_id = value_entry['resourceId']
                     latest_state = value_entry['latest_state']
                     g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
-                                self.hosts[host_id]['name'], property_label + ": " + latest_state],
+                        labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
+                                self.vms[vm_id]['datacenter'], property_label + ": " + latest_state],
                         value=data)
 
             for property_pair in self.property_yaml["VMPropertyCollector"]['info_metrics']:
@@ -71,15 +71,15 @@ class VMPropertyCollector(BaseCollector):
                     try:
                         info_value = float(value_entry['data'])
                         g.add_metric(
-                            labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
-                                    self.hosts[host_id]['name'], property_label],
+                        labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
+                                self.vms[vm_id]['datacenter'], property_label],
                             value=info_value)
                     except ValueError:
                         info = value_entry['data']
                         info_value = 0
                         g.add_metric(
-                            labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
-                                    self.hosts[host_id]['name'], property_label + ": " + info],
+                        labels=[self.vms[vm_id]['name'], self.vms[vm_id]['cluster'],
+                                self.vms[vm_id]['datacenter'], property_label + ": " + info],
                             value=info_value)
 
             yield g
