@@ -27,16 +27,16 @@ VMPropertyCollector:
       - label: "runtime_powerState_info"
         expected: "Powered On"
         property: "summary|runtime|powerState"
-      - label: "runtime_connectionState_info"
+      - label: "runtime_connectionstate_info"
         expected: "connected"
         property: "summary|runtime|connectionState"
 
     info_metrics:
-      - label: "summary_ethernetcards_total"
+      - label: "summary_ethernetcards"
         property: "summary|config|numEthernetCards"
 
     number_metrics:
-      - label: "config_diskSpace_bytes"
+      - label: "config_diskspace_bytes"
         property: "config|hardware|diskSpace"
       - label: "runtime_memory_capacity_kilobytes"
         property: "config|hardware|memoryKB"

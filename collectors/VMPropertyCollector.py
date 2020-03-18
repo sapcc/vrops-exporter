@@ -4,7 +4,7 @@ from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 
-
+#Creating class for for VMproperty Collector
 class VMPropertyCollector(BaseCollector):
     def __init__(self):
         self.iteration = 0

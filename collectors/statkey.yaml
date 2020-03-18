@@ -41,7 +41,7 @@ VMstatCollector:
     statkey: "config|hardware|num_Cpu"
   - label: "vm_memory_in_kilobytes"
     statkey: "mem|guest_provisioned"
-  - label: "active_guest_memory_gigabytes"
+  - label: "active_memory_gigabytes"
     statkey: "mem|guest_activePct"
   - label: "vm_power_info"
     statkey: "sys|poweredOn"

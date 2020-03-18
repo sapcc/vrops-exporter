@@ -21,7 +21,7 @@ class VMstatCollector(BaseCollector):
 
         g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['virtualmachine', 'statkey'])
 
-        #make one big request per stat id with all resource id's in its belly
+       # #make one big request per stat id with all resource id's in its belly
         for target in self.get_vms_by_target():
             token = self.get_target_tokens()
             token = token[target]
