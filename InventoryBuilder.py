@@ -127,14 +127,14 @@ class InventoryBuilder:
                         print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        if hs_object.name != "node004-bb052.cc.ap-cn-1.cloud.sap":
-                            continue 
+#                        if hs_object.name != "node004-bb052.cc.ap-cn-1.cloud.sap":
+#                            continue 
                         if os.environ['DEBUG'] >= '2':
                             print("Collecting Host: " + hs_object.name)
-#                        hs_object.add_datastore()
-#                        for ds_object in hs_object.datastores:
-#                            if os.environ['DEBUG'] >= '2':
-#                                print("Collecting Datastore: " + ds_object.name)
+                        hs_object.add_datastore()
+                        for ds_object in hs_object.datastores:
+                            if os.environ['DEBUG'] >= '2':
+                                print("Collecting Datastore: " + ds_object.name)
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] >= '2':
