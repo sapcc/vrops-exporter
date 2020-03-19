@@ -12,6 +12,9 @@ class SampleCollector(BaseCollector):
             print("waiting for initial iteration")
         print("done: initial query")
 
+    def desc_func(self):
+        return 'vrops_inventory_collection_iteration'
+
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print('SampleCollector is collecting...')

@@ -15,6 +15,9 @@ class DatastoreStatsCollector(BaseCollector):
         print("done: initial query")
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
+    def desc_func(self):
+        return 'vrops_datastore_stats'
+
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print(self.__class__.__name__ + " starts with collecting the metrics")

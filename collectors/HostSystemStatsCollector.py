@@ -15,6 +15,9 @@ class HostSystemStatsCollector(BaseCollector):
         print("done: initial query")
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
 
+    def desc_func(self):
+        return 'vrops_hostsystem_stats'
+
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print('HostSystemStatsCollector starts with collecting the metrics')

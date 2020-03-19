@@ -15,6 +15,9 @@ class HostSystemPropertiesCollector(BaseCollector):
         print("done: initial query")
         self.property_yaml = YamlRead('collectors/property.yaml').run()
 
+    def desc_func(self):
+        return 'vrops_hostsystem_properties'
+
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print('HostSystemPropertiesCollector starts with collecting the metrics')

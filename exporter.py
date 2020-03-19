@@ -3,7 +3,6 @@
 import sys
 import time
 import os
-import http.client
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY #GaugeMetricFamily, REGISTRY, CounterMetricFamily
 from optparse import OptionParser
@@ -15,7 +14,8 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
-from collectors.CollectorUp import CollectorUp
+from collectors.CollectorUp import CollectorUp, get_collector_up_information
+
 
 def parse_params():
     parser = OptionParser()
@@ -53,42 +53,17 @@ def parse_params():
 
     return options
 
-def run_prometheus_server(port, collectors, *args):
+
+def run_prometheus_server(port, collectors, collector_up=True, *args):
     start_http_server(int(port))
-    collector_list = list()
     for c in collectors:
         REGISTRY.register(c)
-        collector_list.append(REGISTRY._get_names(c))
-
-    metrics = get_collector_up_information(port)
-    REGISTRY.register(CollectorUp(collector_list, metrics))
+    if collector_up:
+        metrics = get_collector_up_information(port)
+        REGISTRY.register(CollectorUp(collectors, metrics))
 
     while True:
         time.sleep(1)
-
-def get_collector_up_information(port):
-    c = http.client.HTTPConnection("localhost:" + str(port))
-    c.request("GET", "/")
-    r = c.getresponse()
-    if r.status != 200:
-        return False
-    data = r.read().decode()
-    data_array = data.split('\n')
-    metrics = set()
-    for entry in data_array:
-        if entry.startswith('#'):
-            continue
-        if entry.startswith('python_gc'):
-            continue
-        if entry.startswith('process_'):
-            continue
-        if entry.startswith('python_info'):
-            continue
-        split_entry = entry.split("{")
-        if len(split_entry) != 2:
-            continue
-        metrics.add(split_entry[0])
-    return list(metrics)
 
 if __name__ == '__main__':
     options = parse_params()
@@ -99,6 +74,6 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 SampleCollector(),
                 HostSystemPropertiesCollector(),
-                DatastoreStatsCollector()
+                DatastoreStatsCollector(),
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
