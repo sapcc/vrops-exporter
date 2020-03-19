@@ -28,3 +28,11 @@ HostSystemStatsCollector:
     - label: "network_packets_dropped_percentage"
       statkey: "net|droppedPct"
 
+DatastoreStatsCollector:
+  - label: "diskspace_total_usage_gigabytes"
+    statkey: "diskspace|disktotal"
+  - label: "diskspace_freespace_gigabytes"
+    statkey: "diskspace|freespace"
+  - label: "diskspace_capacity_gigabytes"
+    statkey: "diskspace|capacity"
+

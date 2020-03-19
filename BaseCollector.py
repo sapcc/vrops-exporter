@@ -28,6 +28,11 @@ class BaseCollector(ABC):
         self.hosts = request.json()
         return self.hosts
 
+    def get_datastores(self):
+        request = requests.get(url = "http://localhost:8000/datastores")
+        self.datastores = request.json()
+        return self.datastores
+
     def get_vms(self):
         request = requests.get(url = "http://localhost:8000/vms")
         self.vms = request.json()
@@ -57,4 +62,14 @@ class BaseCollector(ABC):
                 self.target_hosts[host['target']] = list()
             self.target_hosts[host['target']].append(uuid)
         return self.target_hosts
+
+    def get_datastores_by_target(self):
+        self.target_datastores = dict()
+        datastore_dict = self.get_datastores()
+        for uuid in datastore_dict:
+            host = datastore_dict[uuid]
+            if host['target'] not in self.target_datastores.keys():
+                self.target_datastores[host['target']] = list()
+            self.target_datastores[host['target']].append(uuid)
+        return self.target_datastores
 

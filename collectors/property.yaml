@@ -13,8 +13,8 @@ HostSystemPropertiesCollector:
     info_metrics:
       - label: "summary_version"
         property: "summary|version"
-      - label: "sys_build)"
-        property: "sys|build)"
+      - label: "sys_build"
+        property: "sys|build"
 
     number_metrics:
       - label: "config_diskSpace_bytes"
