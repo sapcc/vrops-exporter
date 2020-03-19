@@ -1,11 +1,13 @@
 import sys
 import os
 import unittest
+import json
 
 sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
 from pathlib import Path
+
 
 class TestLaunchExporter(TestCase):
 
@@ -41,7 +43,7 @@ class TestLaunchExporter(TestCase):
 
     def test_with_bogus_options(self):
         os.environ.clear()
-        sys.argv = ['prog', '-z', 'foo', '-a', 'bar', '-w', 'bar']
+        sys.argv = ['prog', '-z', 'foo', '-v', 'bar', '-w', 'bar']
         with self.assertRaises(SystemExit) as se:
             parse_params()
         self.assertEqual(se.exception.code, 2, 'PORT, USER or PASSWORD are not set properly in ENV or command line!')
@@ -55,8 +57,21 @@ class TestLaunchExporter(TestCase):
 
     def test_for_atlas_configfile(self):
         os.environ.clear()
-        netbox_json = Path("./atlas/")
-        self.assertTrue(netbox_json.is_file(), msg="configfile does not exist")
+        netbox_json_file = Path("./atlas/netbox.json")
+        self.assertTrue(netbox_json_file.is_file(), msg="configfile does not exist")
+        try:
+            with open('./atlas/netbox.json') as json_file:
+                netbox_json = json.load(json_file)
+        except (ValueError, json.decoder.JSONDecodeError):
+            raise AssertionError("No valid JSON file provided")
+
+        for target in netbox_json:
+            self.assertTrue("job" in target['labels'],
+                            msg="Key 'job' needed in InventoryBuilder are missing")
+            self.assertTrue("server_name" in target['labels'],
+                            msg="Key 'server_name' needed in InventoryBuilder are missing")
+            self.assertTrue("vrops" in target['labels']['job'],
+                            msg="There is no target 'vrops' in atlas configfile")
 
 
 if __name__ == '__main__':
