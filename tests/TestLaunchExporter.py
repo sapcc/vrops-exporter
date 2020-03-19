@@ -64,14 +64,15 @@ class TestLaunchExporter(TestCase):
                 netbox_json = json.load(json_file)
         except (ValueError, json.decoder.JSONDecodeError):
             raise AssertionError("No valid JSON file provided")
-
-        for target in netbox_json:
-            self.assertTrue("job" in target['labels'],
-                            msg="Key 'job' needed in InventoryBuilder are missing")
-            self.assertTrue("server_name" in target['labels'],
-                            msg="Key 'server_name' needed in InventoryBuilder are missing")
-            self.assertTrue("vrops" in target['labels']['job'],
-                            msg="There is no target 'vrops' in atlas configfile")
+        
+        if netbox_json:
+            for target in netbox_json:
+                self.assertTrue("job" in target['labels'],
+                                msg="Key 'job' needed in InventoryBuilder are missing")
+                self.assertTrue("server_name" in target['labels'],
+                                msg="Key 'server_name' needed in InventoryBuilder are missing")
+                self.assertTrue("vrops" in target['labels']['job'],
+                                msg="There is no target 'vrops' in atlas configfile")
 
 
 if __name__ == '__main__':
