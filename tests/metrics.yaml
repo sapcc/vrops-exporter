@@ -46,6 +46,11 @@ HostSystemPropertiesCollector:
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_version: EXM4.4.0.2a",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="sys_build: EXM4.4.0.2a",vccluster="cluster2"}'
 
+VCenterPropertiesCollector:
+   metrics:
+      - 'vrops_vcenter_properties{datacenter="datacenter1",vcenter="vcenter1",propkey="summary_version: 6.5.0-11347054"}'
+      - 'vrops_vcenter_properties{datacenter="datacenter1",vcenter="vcenter1",propkey="vc_fullname: VMware vCenter Server 6.5.0 build-11347054"}'
+
 DatastoreStatsCollector:
    metrics:
       - 'vrops_datastore_stats{datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_capacity_gigabytes",vccluster="cluster2"}'

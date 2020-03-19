@@ -47,7 +47,7 @@ class VcenterPropertiesCollector(BaseCollector):
                     info = vc_values
                     info_value = 0
                     g.add_metric(labels=[dc_name, self.vcenters[vc]['name'],
-                                         property_label + ":" + info], value=info_value)
+                                         property_label + ": " + info], value=info_value)
 
 
             yield g

@@ -17,6 +17,7 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.VCenterPropertiesCollector import VcenterPropertiesCollector
 from prometheus_client.core import REGISTRY
 
 
