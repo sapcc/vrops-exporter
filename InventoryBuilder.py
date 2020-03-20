@@ -6,6 +6,7 @@ import traceback
 import requests
 from threading import Thread
 from resources.Vcenter import Vcenter
+from tools.Resources import Resources
 from urllib.parse import urlparse, parse_qs
 from urllib3 import disable_warnings, exceptions
 from urllib3.exceptions import HTTPError
@@ -104,7 +105,7 @@ class InventoryBuilder:
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
             print("querying " + vrops)
-        token = self.get_token(target=vrops)
+        token = Resources.get_token(target=vrops)
         if not token:
             return False
         self.target_tokens[vrops] = token
@@ -113,7 +114,7 @@ class InventoryBuilder:
         return True
 
     def create_resource_objects(self, vrops, token):
-        for adapter in self.get_adapter(target=vrops, token=token):
+        for adapter in Resources.get_adapter(target=vrops, token=token):
             if os.environ['DEBUG'] >= '2':
                 print("Collecting vcenter: " + adapter['name'])
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
@@ -133,73 +134,11 @@ class InventoryBuilder:
                         for ds_object in hs_object.datastores:
                             if os.environ['DEBUG'] >= '2':
                                 print("Collecting Datastore: " + ds_object.name)
-                        hs_object.add_vm()
+                        """hs_object.add_vm()
                         for vm_object in hs_object.vms:
                             if os.environ['DEBUG'] >= '2':
-                                print("Collecting VM: " + vm_object.name)
+                                print("Collecting VM: " + vm_object.name)"""
             return vcenter
-
-    def get_adapter(self, target, token):
-        url = "https://" + target + "/suite-api/api/adapters"
-        querystring = {
-            "adapterKindKey": "VMWARE"
-        }
-        headers = {
-            'Content-Type': "application/json",
-            'Accept': "application/json",
-            'Authorization': "vRealizeOpsToken " + token
-        }
-        adapters = list()
-        disable_warnings(exceptions.InsecureRequestWarning)
-        try:
-            response = requests.get(url,
-                                    params=querystring,
-                                    verify=False,
-                                    headers=headers)
-        except Exception as e:
-            print("Problem connecting to " + target + ' Error: ' + str(e))
-            return False
-
-        if response.status_code == 200:
-            for resource in response.json()["adapterInstancesInfoDto"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["id"]
-                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                adapters.append(res)
-        else:
-            print("problem getting adapter " + str(target))
-            return False
-
-        return adapters
-
-    def get_token(self, target):
-        url = "https://" + target + "/suite-api/api/auth/token/acquire"
-        headers = {
-            'Content-Type': "application/json",
-            'Accept': "application/json"
-        }
-        payload = {
-            "username": os.environ['USER'],
-            "authSource": "Local",
-            "password": os.environ['PASSWORD']
-        }
-        disable_warnings(exceptions.InsecureRequestWarning)
-        try:
-            response = requests.post(url,
-                                     data=json.dumps(payload),
-                                     verify=False,
-                                     headers=headers,
-                                     timeout=10)
-        except Exception as e:
-            print("Problem connecting to " + target + ' Error: ' + str(e))
-            return False
-
-        if response.status_code == 200:
-            return response.json()["token"]
-        else:
-            print("problem getting token " + str(target) + ": " + json.dumps(response.json(), indent=3))
-            return False
 
     def get_vcenters(self):
         tree = dict()

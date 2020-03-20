@@ -1,10 +1,70 @@
-import requests, json
-
+import requests, json, os
 from urllib3 import disable_warnings, exceptions
-from urllib3.exceptions import HTTPError
 
 
 class Resources:
+    
+    def get_token(target):
+        url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json"
+        }
+        payload = {
+            "username": os.environ['USER'],
+            "authSource": "Local",
+            "password": os.environ['PASSWORD']
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers,
+                                     timeout=10)
+        except Exception as e:
+            print("Problem connecting to " + target + ' Error: ' + str(e))
+            return False
+
+        if response.status_code == 200:
+            return response.json()["token"]
+        else:
+            print("problem getting token " + str(target) + ": " + json.dumps(response.json(), indent=3))
+            return False
+
+    def get_adapter(target, token):
+        url = "https://" + target + "/suite-api/api/adapters"
+        querystring = {
+            "adapterKindKey": "VMWARE"
+        }
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        adapters = list()
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.get(url,
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+        except Exception as e:
+            print("Problem connecting to " + target + ' Error: ' + str(e))
+            return False
+
+        if response.status_code == 200:
+            for resource in response.json()["adapterInstancesInfoDto"]:
+                res = dict()
+                res['name'] = resource["resourceKey"]["name"]
+                res['uuid'] = resource["id"]
+                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
+                adapters.append(res)
+        else:
+            print("problem getting adapter " + str(target))
+            return False
+
+        return adapters
 
     def get_resources(self, target, token, resourcekind, parentid):
         url = "https://" + target + "/suite-api/api/resources"
@@ -26,17 +86,18 @@ class Resources:
                                     params=querystring,
                                     verify=False,
                                     headers=headers)
-            if response.status_code == 200:
-                for resource in response.json()["resourceList"]:
-                    res = dict()
-                    res['name'] = resource["resourceKey"]["name"]
-                    res['uuid'] = resource["identifier"]
-                    resources.append(res)
-            else:
-                raise AttributeError("There is no attribute resourceList \nerror message: " + str(response.json()))
-        except HTTPError as e:
-            raise HTTPError("Request failed for resourceList: " + target + "\nerror message: " + str(e))
+        except Exception as e:
+            print("Problem connecting to " + target + "Error: " + str(e))
+            return False
 
+        if response.status_code == 200:
+            for resource in response.json()["resourceList"]:
+                res = dict()
+                res['name'] = resource["resourceKey"]["name"]
+                res['uuid'] = resource["identifier"]
+                resources.append(res)
+        else:
+            print("problem getting resource " + str(response.json()))
         return resources
 
     def get_project_id(self, target, token):
@@ -94,6 +155,10 @@ class Resources:
 
     def get_latest_stat_multiple(target, token, uuids, key):
 
+        if not isinstance(uuids, list):
+            print("uuids must be a list with multiple entries")
+            return False
+
         url = "https://" + target + "/suite-api/api/resources/stats/latest/query"
         headers = {
             'Content-Type': "application/json",
@@ -120,7 +185,7 @@ class Resources:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
-    # this is for a single query of a property
+    # this is for a single query of a property and returns only the value
     def get_property(target, token, uuid, key):
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
@@ -147,6 +212,10 @@ class Resources:
 
     # if we expect a number without special characters
     def get_latest_number_properties_multiple(target, token, uuids, propkey):
+
+        if not isinstance(uuids, list):
+            print("uuids must be a list with multiple entries")
+            return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -191,6 +260,10 @@ class Resources:
     # if the property describes a status that has several states
     # the expected status returns a 0, all others become 1
     def get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state):
+
+        if not isinstance(uuids, list):
+            print("uuids must be a list with multiple entries")
+            return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -239,6 +312,10 @@ class Resources:
 
     # for all other properties that return a string or numbers with special characters
     def get_latest_info_properties_multiple(target, token, uuids, propkey):
+
+        if not isinstance(uuids, list):
+            print("uuids must be a list with multiple entries")
+            return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
