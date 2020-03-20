@@ -5,21 +5,19 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
     def __init__(self):
-        self.iteration = 0
-        while not self.iteration:
-            time.sleep(5)
-            self.get_iteration()
-            print("waiting for initial iteration")
-        print("done: initial query")
+        self.wait_for_inventory_data()
+        self.g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
+                              labels=['vcenter'])
+
+    def describe(self):
+        yield self.g
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print('SampleCollector is collecting...')
 
-        g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
-                              labels=['vcenter'])
         for vc in self.get_vcenters():
             self.get_iteration()
 
-            g.add_metric(labels=[self.vcenters[vc]['name']], value=int(self.iteration))
-        yield g
+            self.g.add_metric(labels=[self.vcenters[vc]['name']], value=int(self.iteration))
+        yield self.g

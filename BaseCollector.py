@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import requests, json
 import time
+import os
 
 class BaseCollector(ABC):
 
@@ -72,4 +73,14 @@ class BaseCollector(ABC):
                 self.target_datastores[host['target']] = list()
             self.target_datastores[host['target']].append(uuid)
         return self.target_datastores
+
+    def wait_for_inventory_data(self):
+        iteration = 0
+        while not iteration:
+            time.sleep(5)
+            iteration = self.get_iteration()
+            if os.environ['DEBUG'] >= '1':
+                print("waiting for initial iteration: " + type(self).__name__)
+        print("done: initial query " + type(self).__name__)
+        return
 
