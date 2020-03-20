@@ -5,7 +5,7 @@ from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 
 
-class VMstatCollector(BaseCollector):
+class VMStatsCollector(BaseCollector):
     def __init__(self):
         self.iteration = 0
         while not self.iteration:
@@ -17,29 +17,29 @@ class VMstatCollector(BaseCollector):
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
-            print('VMstatCollector starts with collecting the metrics')
+            print('VMStatsCollector starts with collecting the metrics')
 
-        g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['virtualmachine', 'statkey'])
+        g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['cluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
 
        # #make one big request per stat id with all resource id's in its belly
         for target in self.get_vms_by_target():
             token = self.get_target_tokens()
             token = token[target]
             if not token:
-                print("skipping " + target + " in VMstatCollector, no token")
+                print("skipping " + target + " in VMStatsCollector, no token")
 
             uuids = self.target_vms[target]
-            for statkey_pair in self.statkey_yaml["VMstatCollector"]:
+            for statkey_pair in self.statkey_yaml["VMStatsCollector"]:
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
                 values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
                 if not values:
-                    print("skipping statkey " + str(statkey) + " in VMstatCollector, no return")
+                    print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                     continue
                 for value_entry in values:
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     vm_id = value_entry['resourceId']
-                    g.add_metric(labels=[self.vms[vm_id]['name'], statkey_label], value=metric_value)
+                    g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
+                                self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label], value=metric_value)
         yield g
-

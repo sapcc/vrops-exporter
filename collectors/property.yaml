@@ -22,21 +22,24 @@ HostSystemPropertiesCollector:
       - label: "runtime_memory_capacity_kilobytes"
         property: "runtime|memoryCap"
 
-VMPropertyCollector:
+VMPropertiesCollector:
     enum_metrics:
-      - label: "runtime_powerState_info"
+      - label: "runtime_powerState"
         expected: "Powered On"
         property: "summary|runtime|powerState"
-      - label: "runtime_connectionstate_info"
+      - label: "runtime_connectionState"
         expected: "connected"
         property: "summary|runtime|connectionState"
-
-    info_metrics:
-      - label: "summary_ethernetcards"
+      - label: "summary_numEthernetCards"
+        expected: "1"
         property: "summary|config|numEthernetCards"
 
+    info_metrics:
+      - label: "summary_parentVcenter"
+        property: "summary|parentVcenter"
+
     number_metrics:
-      - label: "config_diskspace_bytes"
+      - label: "config_diskSpace"
         property: "config|hardware|diskSpace"
-      - label: "runtime_memory_capacity_kilobytes"
+      - label: "runtime_memory_capacity"
         property: "config|hardware|memoryKB"

@@ -58,3 +58,29 @@ DatastoreStatsCollector:
 SampleCollector:
    metrics:
       - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
+
+VMStatsCollector:
+   metrics:
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="number_of_vcpus_total",virtualmachine="vm2"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="number_of_vcpus_total",virtualmachine="vm1"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_memory_in_kilobytes",virtualmachine="vm2"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_memory_in_kilobytes",virtualmachine="vm1"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_power_info",virtualmachine="vm2"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_power_info",virtualmachine="vm1"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_disk_space_gigabytes",virtualmachine="vm2"}'
+      - 'vrops_vms_stats{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",statkey="vm_disk_space_gigabytes",virtualmachine="vm1"}'
+
+VMPropertiesCollector:
+   metrics:
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_powerState: connected",virtualmachine="vm2"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_powerState: Powered On",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_connectionState: connected",virtualmachine="vm2"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_connectionState: Powered On",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_numEthernetCards: connected",virtualmachine="vm2"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_numEthernetCards: Powered On",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="config_diskSpace",virtualmachine="vm2"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="config_diskSpace",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_memory_capacity",virtualmachine="vm2"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_memory_capacity",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_parentVcenter: 6.6a-92b1",virtualmachine="vm1"}'
+      - 'vrops_vm_properties{cluster="cluster2",datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_parentVcenter: EXM4.4.0.2a",virtualmachine="vm2"}'

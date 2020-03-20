@@ -15,8 +15,8 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
-from collectors.VMstatCollector import VMstatCollector
-from collectors.VMPropertyCollector import VMPropertyCollector
+from collectors.VMStatsCollector import VMStatsCollector
+from collectors.VMPropertiesCollector import VMPropertiesCollector
 
 def parse_params():
     parser = OptionParser()
@@ -68,11 +68,11 @@ if __name__ == '__main__':
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-#                HostSystemStatsCollector(),
-#                SampleCollector(),
-#                HostSystemPropertiesCollector(),
-#                DatastoreStatsCollector(),
-                VMstatCollector(),
-                VMPropertyCollector()
+                HostSystemStatsCollector(),
+                SampleCollector(),
+                HostSystemPropertiesCollector(),
+                DatastoreStatsCollector(),
+                VMStatsCollector(),
+                VMPropertiesCollector()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)

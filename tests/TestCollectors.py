@@ -17,6 +17,8 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.VMStatsCollector import VMStatsCollector
+from collectors.VMPropertiesCollector import VMPropertiesCollector
 from prometheus_client.core import REGISTRY
 
 
@@ -52,7 +54,7 @@ class TestCollectors(unittest.TestCase):
                                                           {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
                                                               {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
+            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
                                                                     {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_datastores = MagicMock(return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
                                                             {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
@@ -145,6 +147,8 @@ class TestCollectors(unittest.TestCase):
                     continue
                 metrics.append(split_entry[0] + "}")
 
+#            for m in metrics:
+#                print (m)
             metrics_yaml_list = metrics_yaml[collector]['metrics']
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
