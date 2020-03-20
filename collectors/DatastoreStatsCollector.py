@@ -7,12 +7,7 @@ from tools.YamlRead import YamlRead
 
 class DatastoreStatsCollector(BaseCollector):
     def __init__(self):
-        self.iteration = 0
-        while not self.iteration:
-            time.sleep(5)
-            self.get_iteration()
-            print("waiting for initial iteration")
-        print("done: initial query")
+        self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
         self.g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'datastore', 'statkey'])
 
