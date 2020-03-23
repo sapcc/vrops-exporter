@@ -76,39 +76,42 @@ class TestCollectors(unittest.TestCase):
             if "Properties" in collector:
                 propkey_yaml = YamlRead('collectors/property.yaml').run()
                 multiple_enum_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['enum_metrics']:
-                    multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 0,
-                                                               'latest_state': 'Powered On'})
-                    multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 0,
-                                                               'latest_state': 'connected'})
-                Resources.get_latest_enum_properties_multiple = MagicMock(
-                    return_value=multiple_enum_properties_generated)
+                if 'enum_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['enum_metrics']:
+                        multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 0,
+                                                                   'latest_state': 'Powered On'})
+                        multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 0,
+                                                                   'latest_state': 'connected'})
+                    Resources.get_latest_enum_properties_multiple = MagicMock(
+                        return_value=multiple_enum_properties_generated)
 
-                multiple_number_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['number_metrics']:
-                    multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                                 'propkey': propkey_pair['property'],
-                                                                 'data': 19.54})
-                    multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                                 'propkey': propkey_pair['property'],
-                                                                 'data': '6.5'})
-                Resources.get_latest_number_properties_multiple = MagicMock(
-                    return_value=multiple_number_properties_generated)
+                    multiple_number_properties_generated = list()
+                if 'number_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['number_metrics']:
+                        multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                     'propkey': propkey_pair['property'],
+                                                                     'data': 19.54})
+                        multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                     'propkey': propkey_pair['property'],
+                                                                     'data': '6.5'})
+                    Resources.get_latest_number_properties_multiple = MagicMock(
+                        return_value=multiple_number_properties_generated)
 
-                multiple_info_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['info_metrics']:
-                    multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': '6.6a-92b1'})
-                    multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 'EXM4.4.0.2a'})
-                Resources.get_latest_info_properties_multiple = MagicMock(
-                    return_value=multiple_info_properties_generated)
+                    multiple_info_properties_generated = list()
+                if 'info_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['info_metrics']:
+                        multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': '6.6a-92b1'})
+                        multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 'EXM4.4.0.2a'})
+                    Resources.get_latest_info_properties_multiple = MagicMock(
+                        return_value=multiple_info_properties_generated)
 
             thread_list = list()
 
