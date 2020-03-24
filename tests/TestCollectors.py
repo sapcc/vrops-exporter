@@ -53,11 +53,12 @@ class TestCollectors(unittest.TestCase):
                                                           {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
                                                               {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
+            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
                                                                     {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_datastores = MagicMock(return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                                                            {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3328-93a1-56e8463404'},
+            Resources.get_datastores = MagicMock(
+                return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
+                              {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
                                                               {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
             Resources.get_property = MagicMock(return_value="test_property")
@@ -112,7 +113,7 @@ class TestCollectors(unittest.TestCase):
                                                                    'data': 'test_info_property'})
                     Resources.get_latest_info_properties_multiple = MagicMock(
                         return_value=multiple_info_properties_generated)
-
+                    
             thread_list = list()
 
             # start prometheus server to provide metrics later on

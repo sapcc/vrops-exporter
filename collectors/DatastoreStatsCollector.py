@@ -7,20 +7,16 @@ from tools.YamlRead import YamlRead
 
 class DatastoreStatsCollector(BaseCollector):
     def __init__(self):
-        self.iteration = 0
-        while not self.iteration:
-            time.sleep(5)
-            self.get_iteration()
-            print("waiting for initial iteration")
-        print("done: initial query")
+        self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+        self.g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'datastore', 'statkey'])
+
+    def describe(self):
+        yield self.g
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
             print(self.__class__.__name__ + " starts with collecting the metrics")
-
-        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem',
-                                                                            'datastore', 'statkey'])
 
         #make one big request per stat id with all resource id's in its belly
         for target in self.get_datastores_by_target():
@@ -41,9 +37,9 @@ class DatastoreStatsCollector(BaseCollector):
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     datastore_id = value_entry['resourceId']
-                    g.add_metric(labels=[self.datastores[datastore_id]['datacenter'],
+                    self.g.add_metric(labels=[self.datastores[datastore_id]['datacenter'],
                                          self.datastores[datastore_id]['cluster'],
                                          self.datastores[datastore_id]['parent_host_name'],
                                          self.datastores[datastore_id]['name'],
                                          statkey_label], value=metric_value)
-        yield g
+        yield self.g
