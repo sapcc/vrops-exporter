@@ -39,7 +39,6 @@ class TestCollectors(unittest.TestCase):
         thread.daemon = True
         thread.start()
 
-        first = True
         for collector in metrics_yaml.keys():
             print("\nTesting " + collector)
 
