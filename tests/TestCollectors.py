@@ -52,14 +52,15 @@ class TestCollectors(unittest.TestCase):
                                                           {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
                                                               {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e8463404'},
+            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
                                                                     {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_datastores = MagicMock(return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                                                            {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3328-93a1-56e8463404'},
+            Resources.get_datastores = MagicMock(
+                return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
+                              {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
+            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
                                                               {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
-            Resources.get_property = MagicMock(return_value="connected")
+            Resources.get_property = MagicMock(return_value="test property")
 
             if 'Stats' in collector:
                 # mocking all values from yaml
@@ -79,11 +80,11 @@ class TestCollectors(unittest.TestCase):
                     multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                'propkey': propkey_pair['property'],
                                                                'data': 0,
-                                                               'latest_state': 'Powered On'})
+                                                               'latest_state': 'test enum property'})
                     multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                'propkey': propkey_pair['property'],
                                                                'data': 0,
-                                                               'latest_state': 'connected'})
+                                                               'latest_state': 'test enum property'})
                 Resources.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
@@ -102,10 +103,10 @@ class TestCollectors(unittest.TestCase):
                 for propkey_pair in propkey_yaml[collector]['info_metrics']:
                     multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                'propkey': propkey_pair['property'],
-                                                               'data': '6.6a-92b1'})
+                                                               'data': 'test info property'})
                     multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                'propkey': propkey_pair['property'],
-                                                               'data': 'EXM4.4.0.2a'})
+                                                               'data': 'test info property'})
                 Resources.get_latest_info_properties_multiple = MagicMock(
                     return_value=multiple_info_properties_generated)
 
