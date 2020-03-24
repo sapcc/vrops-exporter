@@ -81,11 +81,11 @@ class TestCollectors(unittest.TestCase):
                         multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 0,
-                                                                   'latest_state': 'Powered On'})
+                                                                   'latest_state': 'test_enum_property'})
                         multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 0,
-                                                                   'latest_state': 'connected'})
+                                                                   'latest_state': 'test_enum_property'})
                     Resources.get_latest_enum_properties_multiple = MagicMock(
                         return_value=multiple_enum_properties_generated)
 
@@ -106,10 +106,10 @@ class TestCollectors(unittest.TestCase):
                     for propkey_pair in propkey_yaml[collector]['info_metrics']:
                         multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                    'propkey': propkey_pair['property'],
-                                                                   'data': '6.6a-92b1'})
+                                                                   'data': 'test_info_property'})
                         multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                    'propkey': propkey_pair['property'],
-                                                                   'data': 'EXM4.4.0.2a'})
+                                                                   'data': 'test_info_property'})
                     Resources.get_latest_info_properties_multiple = MagicMock(
                         return_value=multiple_info_properties_generated)
 
