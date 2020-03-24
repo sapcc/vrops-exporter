@@ -60,7 +60,7 @@ class TestCollectors(unittest.TestCase):
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
                                                               {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
-            Resources.get_property = MagicMock(return_value="test property")
+            Resources.get_property = MagicMock(return_value="test_property")
 
             if 'Stats' in collector:
                 # mocking all values from yaml
@@ -80,11 +80,11 @@ class TestCollectors(unittest.TestCase):
                     multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                'propkey': propkey_pair['property'],
                                                                'data': 0,
-                                                               'latest_state': 'test enum property'})
+                                                               'latest_state': 'test_enum_property'})
                     multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                'propkey': propkey_pair['property'],
                                                                'data': 0,
-                                                               'latest_state': 'test enum property'})
+                                                               'latest_state': 'test_enum_property'})
                 Resources.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
@@ -103,10 +103,10 @@ class TestCollectors(unittest.TestCase):
                 for propkey_pair in propkey_yaml[collector]['info_metrics']:
                     multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                'propkey': propkey_pair['property'],
-                                                               'data': 'test info property'})
+                                                               'data': 'test_info_property'})
                     multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
                                                                'propkey': propkey_pair['property'],
-                                                               'data': 'test info property'})
+                                                               'data': 'test_info_property'})
                 Resources.get_latest_info_properties_multiple = MagicMock(
                     return_value=multiple_info_properties_generated)
 
