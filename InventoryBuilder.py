@@ -127,6 +127,8 @@ class InventoryBuilder:
                         print("Collecting Cluster: " + cl_object.name)
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
+                        if hs_object.name != "node004-bb052.cc.ap-cn-1.cloud.sap":
+                            continue 
                         if os.environ['DEBUG'] >= '2':
                             print("Collecting Host: " + hs_object.name)
                         hs_object.add_datastore()
@@ -198,7 +200,7 @@ class InventoryBuilder:
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            print("problem getting token " + str(target))
+            print("problem getting token " + str(target) + ": " + json.dumps(response.json(), indent=3))
             return False
 
     def get_vcenters(self):

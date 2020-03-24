@@ -30,9 +30,9 @@ VMPropertiesCollector:
       - label: "runtime_connectionState"
         expected: "connected"
         property: "summary|runtime|connectionState"
-      - label: "summary_numEthernetCards"
-        expected: "1"
-        property: "summary|config|numEthernetCards"
+#      - label: "summary_numEthernetCards"
+#        expected: "1"
+#        property: "summary|config|numEthernetCards"
 
     info_metrics:
       - label: "summary_parentVcenter"
@@ -43,3 +43,5 @@ VMPropertiesCollector:
         property: "config|hardware|diskSpace"
       - label: "runtime_memory_capacity"
         property: "config|hardware|memoryKB"
+      - label: "summary_numEthernetCards"
+        property: "summary|config|numEthernetCards"

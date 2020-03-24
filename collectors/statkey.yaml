@@ -41,7 +41,5 @@ VMStatsCollector:
     statkey: "config|hardware|num_Cpu"
   - label: "vm_memory_in_kilobytes"
     statkey: "mem|guest_provisioned"
-  - label: "vm_power_info"
-    statkey: "sys|poweredOn"
   - label: "vm_disk_space_gigabytes"
     statkey: "config|hardware|disk_Space"
