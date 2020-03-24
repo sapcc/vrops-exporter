@@ -21,7 +21,7 @@ HostSystemPropertiesCollector:
         property: "config|diskSpace"
       - label: "runtime_memory_capacity_kilobytes"
         property: "runtime|memoryCap"
-VCenterPropertiesCollector:
+VcenterPropertiesCollector:
     info_metrics:
       - label: "summary_version"
         property: "summary|version"

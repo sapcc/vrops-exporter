@@ -31,7 +31,7 @@ class VcenterPropertiesCollector(BaseCollector):
                 if self.clusters[cl]['vcenter'] == target_vc:
                     dc_name = self.clusters[cl]['parent_dc_name']
 
-            for property_pair in self.property_yaml["VCenterPropertiesCollector"]['info_metrics']:
+            for property_pair in self.property_yaml["VcenterPropertiesCollector"]['info_metrics']:
                 property_label = property_pair['label']
                 propkey = property_pair['property']
 
@@ -41,12 +41,12 @@ class VcenterPropertiesCollector(BaseCollector):
                     continue
                 try:
                     info_value = int(vc_values)
-                    g.add_metric(labels=[dc_name, self.vcenters[vc]['name'],
+                    g.add_metric(labels=[dc_name, target_vc,
                                          property_label], value=info_value)
                 except (ValueError, TypeError):
                     info = vc_values
                     info_value = 0
-                    g.add_metric(labels=[dc_name, self.vcenters[vc]['name'],
+                    g.add_metric(labels=[dc_name, target_vc,
                                          property_label + ": " + info], value=info_value)
 
 
