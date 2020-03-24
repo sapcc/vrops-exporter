@@ -60,7 +60,7 @@ class TestCollectors(unittest.TestCase):
             Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '3328-93a1-56e8463404'},
                                                               {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
             Resources.get_latest_stat = MagicMock(return_value=1)
-            Resources.get_property = MagicMock(return_value="connected")
+            Resources.get_property = MagicMock(return_value="test_property")
 
             if 'Stats' in collector:
                 # mocking all values from yaml
