@@ -8,12 +8,10 @@ class SampleCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
                               labels=['vcenter'])
+        self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
         yield self.g
-
-    def desc_func(self):
-        return 'vrops_inventory_collection_iteration'
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
@@ -23,4 +21,5 @@ class SampleCollector(BaseCollector):
             self.get_iteration()
 
             self.g.add_metric(labels=[self.vcenters[vc]['name']], value=int(self.iteration))
+        self.post_metrics(self.g.name)
         yield self.g

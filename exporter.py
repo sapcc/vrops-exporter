@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-
 import sys
 import time
 import os
@@ -14,7 +13,7 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
-from collectors.CollectorUp import CollectorUp, get_collector_up_information
+from collectors.CollectorUp import CollectorUp
 
 
 def parse_params():
@@ -54,14 +53,10 @@ def parse_params():
     return options
 
 
-def run_prometheus_server(port, collectors, collector_up=True, *args):
+def run_prometheus_server(port, collectors,  *args):
     start_http_server(int(port))
     for c in collectors:
         REGISTRY.register(c)
-    if collector_up:
-        metrics = get_collector_up_information(port)
-        REGISTRY.register(CollectorUp(collectors, metrics))
-
     while True:
         time.sleep(1)
 
@@ -71,9 +66,10 @@ if __name__ == '__main__':
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-                HostSystemStatsCollector(),
                 SampleCollector(),
+                HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
+                CollectorUp()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
