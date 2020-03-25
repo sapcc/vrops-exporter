@@ -48,8 +48,8 @@ HostSystemPropertiesCollector:
 
 VcenterPropertiesCollector:
    metrics:
-      - 'vrops_vcenter_properties{datacenter="datacenter2",propkey="vc_fullname: test_info_property",vcenter="vcenter1"}'
-      - 'vrops_vcenter_properties{datacenter="datacenter2",propkey="summary_version: test_info_property",vcenter="vcenter1"}'
+      - 'vrops_vcenter_properties{datacenter="datacenter2",propkey="vc_fullname: test_property",vcenter="vcenter1"}'
+      - 'vrops_vcenter_properties{datacenter="datacenter2",propkey="summary_version: test_property",vcenter="vcenter1"}'
 
 DatastoreStatsCollector:
    metrics:
