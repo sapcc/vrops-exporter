@@ -17,9 +17,10 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.CollectorUp import CollectorUp
+from prometheus_client.core import REGISTRY
 from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
-from prometheus_client.core import REGISTRY
 
 
 class TestCollectors(unittest.TestCase):
@@ -34,8 +35,8 @@ class TestCollectors(unittest.TestCase):
         random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(random_prometheus_port))
 
-        InventoryBuilder.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
-        InventoryBuilder.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
+        Resources.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
+        Resources.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
         thread.daemon = True
         thread.start()
@@ -122,7 +123,7 @@ class TestCollectors(unittest.TestCase):
             thread_list.append(thread1)
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
             time.sleep(10)
-
+            
             print("prometheus query port " + str(random_prometheus_port))
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")

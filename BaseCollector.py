@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import requests, json
+import requests
 import time
 import os
 
@@ -53,6 +53,38 @@ class BaseCollector(ABC):
         request = requests.get(url="http://localhost:8000/target_tokens")
         self.target_tokens = request.json()
         return self.target_tokens
+
+    def post_registered_collector(self, collector, *metric_names):
+        payload = {
+            'collector': collector,
+            'metric_names': list(metric_names)
+        }
+        request = requests.post(json=payload, url="http://localhost:8000/register")
+        if request.status_code != 200:
+            print("request failed with status: {}".format(request.status_code))
+
+    def get_registered_collectors(self):
+        request = requests.get(url="http://localhost:8000/register")
+        self.collectors_up = request.json()
+        return self.collectors_up
+
+    def post_metrics(self, metric):
+        payload = {
+            'metric_name': metric
+        }
+        r = requests.post(json=payload, url="http://localhost:8000/metrics")
+        if r.status_code != 200:
+            print("request failed with status: {}".format(r.status_code))
+
+    def get_metrics(self):
+        request = requests.get(url="http://localhost:8000/metrics")
+        self.metrics = request.json()
+        return self.metrics
+
+    def delete_metrics(self):
+        request = requests.delete(url="http://localhost:8000/metrics")
+        if request.status_code != 200:
+            print("request failed with status: {}".format(request.status_code))
 
     def get_hosts_by_target(self):
         self.target_hosts = dict()
