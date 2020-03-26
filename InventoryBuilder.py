@@ -1,5 +1,5 @@
 import json, os
-from flask import Flask
+from flask import Flask, request, abort, jsonify
 from gevent.pywsgi import WSGIServer
 import re, yaml, sys, time
 import traceback
@@ -27,6 +27,9 @@ class InventoryBuilder:
         self.query_inventory_permanent()
 
     def run_rest_server(self):
+        collectors = []
+        metrics = []
+
         app = Flask(__name__)
         print('serving /vrops_list on 8000')
 
@@ -63,6 +66,41 @@ class InventoryBuilder:
         @app.route('/iteration', methods=['GET'])
         def iteration():
             return str(self.iteration)
+
+        @app.route('/register', methods=['POST'])
+        def post_registered_collectors():
+            if not request.json:
+                abort(400)
+            collector = {
+                'collector': request.json["collector"],
+                'metrics': request.json["metric_names"]
+            }
+            collectors.append(collector)
+            return jsonify({"collectors registered": collectors})
+
+        @app.route('/register', methods=['GET'])
+        def get_registered_collectors():
+            return jsonify({"collectors registered": collectors})
+
+        @app.route('/metrics', methods=['POST'])
+        def collect_metric_names():
+            if not request.json:
+                abort(400)
+            metric = {
+                'metric_name': request.json['metric_name']
+            }
+            metrics.append(metric)
+            return jsonify({"collector metrics names ": metrics})
+
+        @app.route('/metrics', methods=['GET'])
+        def get_metric_names():
+            return jsonify({"metrics": metrics})
+
+        @app.route('/metrics', methods=['DELETE'])
+        def delete_metric_names():
+            metrics.clear()
+            return jsonify({"metrics": metrics})
+
 
         #FIXME: this could basically be the always active token list. no active token? refresh!
         @app.route('/target_tokens', methods=['GET'])

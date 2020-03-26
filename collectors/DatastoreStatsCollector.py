@@ -10,6 +10,7 @@ class DatastoreStatsCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
         self.g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'datastore', 'statkey'])
+        self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
         yield self.g
@@ -42,4 +43,5 @@ class DatastoreStatsCollector(BaseCollector):
                                          self.datastores[datastore_id]['parent_host_name'],
                                          self.datastores[datastore_id]['name'],
                                          statkey_label], value=metric_value)
+        self.post_metrics(self.g.name)
         yield self.g

@@ -58,3 +58,11 @@ DatastoreStatsCollector:
 SampleCollector:
    metrics:
       - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
+
+CollectorUp:
+   metrics:
+      - 'vrops_collector_up{collector="SampleCollector",metric="vrops_inventory_collection_iteration"}'
+      - 'vrops_collector_up{collector="HostSystemStatsCollector",metric="vrops_hostsystem_stats"}'
+      - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metric="vrops_hostsystem_properties"}'
+      - 'vrops_collector_up{collector="DatastoreStatsCollector",metric="vrops_datastore_stats"}'
+      - 'vrops_collector_up{collector="CollectorUp",metric="vrops_collector_up"}'

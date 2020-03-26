@@ -11,6 +11,7 @@ class HostSystemPropertiesCollector(BaseCollector):
         self.property_yaml = YamlRead('collectors/property.yaml').run()
         self.g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
                               labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
+        self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
         yield self.g
@@ -78,7 +79,7 @@ class HostSystemPropertiesCollector(BaseCollector):
                             labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                     self.hosts[host_id]['name'], property_label + ": " + info],
                             value=info_value)
-
+            self.post_metrics(self.g.name)
             yield self.g
 
 

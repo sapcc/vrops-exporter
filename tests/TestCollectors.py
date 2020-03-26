@@ -17,6 +17,7 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.CollectorUp import CollectorUp
 from prometheus_client.core import REGISTRY
 
 
@@ -120,7 +121,7 @@ class TestCollectors(unittest.TestCase):
             thread_list.append(thread1)
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
             time.sleep(10)
-
+            
             print("prometheus query port " + str(random_prometheus_port))
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")
