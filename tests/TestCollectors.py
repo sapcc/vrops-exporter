@@ -114,14 +114,13 @@ class TestCollectors(unittest.TestCase):
 
             # start prometheus server to provide metrics later on
             collector_instance = globals()[collector]()
-            collector_up = False
-            thread1 = Thread(target=run_prometheus_server, args=(random_prometheus_port, [collector_instance],
-                                                                 collector_up))
+            thread1 = Thread(target=run_prometheus_server, args=(random_prometheus_port, [collector_instance]))
             thread1.daemon = True
             thread1.start()
             thread_list.append(thread1)
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
             time.sleep(10)
+            
             print("prometheus query port " + str(random_prometheus_port))
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")
