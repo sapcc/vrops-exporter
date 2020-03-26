@@ -68,10 +68,10 @@ if __name__ == '__main__':
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-                #HostSystemStatsCollector(),
-                #SampleCollector(),
-                #HostSystemPropertiesCollector(),
-                #DatastoreStatsCollector(),
+                HostSystemStatsCollector(),
+                SampleCollector(),
+                HostSystemPropertiesCollector(),
+                DatastoreStatsCollector(),
                 VMStatsCollector(),
                 VMPropertiesCollector()
             ]
