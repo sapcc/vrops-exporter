@@ -70,6 +70,7 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
+                # add new collectors above this line
                 CollectorUp()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)

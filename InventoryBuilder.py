@@ -67,12 +67,14 @@ class InventoryBuilder:
             return str(self.iteration)
 
         @app.route('/register', methods=['POST'])
-        def collect_registered_collectors():
+        def post_registered_collectors():
             if not request.json:
                 abort(400)
+            metrics = []
+            metrics.append(request.json["metric_name"])
             collector = {
-                'collector' : request.json["collector"],
-                'metric_name': request.json["metric_name"]
+                'collector': request.json["collector"],
+                'metrics': metrics
             }
             collectors.append(collector)
             return jsonify({"collectors registered": collectors})
