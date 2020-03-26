@@ -156,7 +156,7 @@ class Resources:
     def get_latest_stat_multiple(target, token, uuids, key):
 
         if not isinstance(uuids, list):
-            print("uuids must be a list with multiple entries")
+            print("Error in get multiple: uuids must be a list with multiple entries")
             return False
 
         url = "https://" + target + "/suite-api/api/resources/stats/latest/query"
@@ -185,7 +185,7 @@ class Resources:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
-    # this is for a single query of a property and returns only the value
+    # this is for a single query of a property and returns the value only
     def get_property(target, token, uuid, key):
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
@@ -214,7 +214,7 @@ class Resources:
     def get_latest_number_properties_multiple(target, token, uuids, propkey):
 
         if not isinstance(uuids, list):
-            print("uuids must be a list with multiple entries")
+            print("Error in get multiple: uuids must be a list with multiple entries")
             return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
@@ -262,7 +262,7 @@ class Resources:
     def get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state):
 
         if not isinstance(uuids, list):
-            print("uuids must be a list with multiple entries")
+            print("Error in get multiple: uuids must be a list with multiple entries")
             return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
@@ -314,7 +314,7 @@ class Resources:
     def get_latest_info_properties_multiple(target, token, uuids, propkey):
 
         if not isinstance(uuids, list):
-            print("uuids must be a list with multiple entries")
+            print("Error in get multiple: uuids must be a list with multiple entries")
             return False
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
