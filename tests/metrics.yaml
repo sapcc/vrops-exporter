@@ -61,8 +61,8 @@ SampleCollector:
 
 CollectorUp:
    metrics:
-      - 'vrops_collector_up{collector="vrops_inventory_collection_iteration"}'
-      - 'vrops_collector_up{collector="vrops_hostsystem_stats"}'
-      - 'vrops_collector_up{collector="vrops_hostsystem_properties"}'
-      - 'vrops_collector_up{collector="vrops_datastore_stats"}'
-      - 'vrops_collector_up{collector="vrops_collector_up"}'
+      - 'vrops_collector_up{collector="SampleCollector",metrics="vrops_inventory_collection_iteration"}'
+      - 'vrops_collector_up{collector="HostSystemStatsCollector",metrics="vrops_hostsystem_stats"}'
+      - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metrics="vrops_hostsystem_properties"}'
+      - 'vrops_collector_up{collector="DatastoreStatsCollector",metrics="vrops_datastore_stats"}'
+      - 'vrops_collector_up{collector="CollectorUp",metrics="vrops_collector_up"}'
