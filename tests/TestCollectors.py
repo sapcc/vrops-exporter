@@ -148,8 +148,6 @@ class TestCollectors(unittest.TestCase):
                     continue
                 metrics.append(split_entry[0] + "}")
 
-#            for m in metrics:
-#                print (m)
             metrics_yaml_list = metrics_yaml[collector]['metrics']
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
