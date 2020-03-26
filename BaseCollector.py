@@ -54,10 +54,10 @@ class BaseCollector(ABC):
         self.target_tokens = request.json()
         return self.target_tokens
 
-    def post_registered_collector(self, collector, metric_name):
+    def post_registered_collector(self, collector, *metric_names):
         payload = {
             'collector': collector,
-            'metric_name': metric_name
+            'metric_names': list(metric_names)
         }
         request = requests.post(json=payload, url="http://localhost:8000/register")
         if request.status_code != 200:

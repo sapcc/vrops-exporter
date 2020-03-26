@@ -70,11 +70,9 @@ class InventoryBuilder:
         def post_registered_collectors():
             if not request.json:
                 abort(400)
-            metrics = []
-            metrics.append(request.json["metric_name"])
             collector = {
                 'collector': request.json["collector"],
-                'metrics': metrics
+                'metrics': request.json["metric_names"]
             }
             collectors.append(collector)
             return jsonify({"collectors registered": collectors})
