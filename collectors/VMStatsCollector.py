@@ -1,6 +1,5 @@
 from BaseCollector import BaseCollector
 import os
-import requests
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
