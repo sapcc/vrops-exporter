@@ -1,6 +1,5 @@
-
 from BaseCollector import BaseCollector
-import os, time
+import os
 import requests
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
@@ -11,7 +10,7 @@ class VMStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-        self.g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['cluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
+        self.g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
         self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
@@ -42,6 +41,5 @@ class VMStatsCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     self.g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
                                 self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label], value=metric_value)
-        self.post_metrics(self.g.name)                        
+        self.post_metrics(self.g.name)
         yield self.g
-

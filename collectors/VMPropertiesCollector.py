@@ -10,7 +10,7 @@ class VMPropertiesCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.property_yaml = YamlRead('collectors/property.yaml').run()
         self.g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
-                labels=['cluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
+                labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
         self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
@@ -81,4 +81,3 @@ class VMPropertiesCollector(BaseCollector):
                             value=info_value)
             self.post_metrics(self.g.name)
             yield self.g
-

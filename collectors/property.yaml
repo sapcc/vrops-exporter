@@ -31,12 +31,11 @@ VMPropertiesCollector:
         expected: "connected"
         property: "summary|runtime|connectionState"
 
-
     info_metrics:
-#      - label: "virtualdisk_datastore"
-#        property: "virtualDisk|Datastore"
-      - label: "summary_datastore"
-        property: "summary|dataStore"
+      - label: "virtualdisk_scsi0_0_datastore"
+        property: "virtualDisk:scsi0:0|datastore"
+      - label: "virtualdisk_scsi0_1_datastore"
+        property: "virtualDisk:scsi0:1|datastore"
 
     number_metrics:
       - label: "summary_ethernetCards"
