@@ -17,6 +17,7 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
 from collectors.CollectorUp import CollectorUp
 from prometheus_client.core import REGISTRY
 
@@ -77,37 +78,40 @@ class TestCollectors(unittest.TestCase):
             if "Properties" in collector:
                 propkey_yaml = YamlRead('collectors/property.yaml').run()
                 multiple_enum_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['enum_metrics']:
-                    multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 0,
-                                                               'latest_state': 'test_enum_property'})
-                    multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 0,
-                                                               'latest_state': 'test_enum_property'})
+                if 'enum_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['enum_metrics']:
+                        multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 0,
+                                                                   'latest_state': 'test_enum_property'})
+                        multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 0,
+                                                                   'latest_state': 'test_enum_property'})
                 Resources.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
                 multiple_number_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['number_metrics']:
-                    multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                                 'propkey': propkey_pair['property'],
-                                                                 'data': 19.54})
-                    multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                                 'propkey': propkey_pair['property'],
-                                                                 'data': '6.5'})
+                if 'number_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['number_metrics']:
+                        multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                     'propkey': propkey_pair['property'],
+                                                                     'data': 19.54})
+                        multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                     'propkey': propkey_pair['property'],
+                                                                     'data': '6.5'})
                 Resources.get_latest_number_properties_multiple = MagicMock(
                     return_value=multiple_number_properties_generated)
 
                 multiple_info_properties_generated = list()
-                for propkey_pair in propkey_yaml[collector]['info_metrics']:
-                    multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 'test_info_property'})
-                    multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
-                                                               'propkey': propkey_pair['property'],
-                                                               'data': 'test_info_property'})
+                if 'info_metrics' in propkey_yaml[collector]:
+                    for propkey_pair in propkey_yaml[collector]['info_metrics']:
+                        multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 'test_info_property'})
+                        multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050814",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 'test_info_property'})
                 Resources.get_latest_info_properties_multiple = MagicMock(
                     return_value=multiple_info_properties_generated)
 

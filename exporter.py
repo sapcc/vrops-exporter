@@ -13,8 +13,8 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector 
 from collectors.CollectorUp import CollectorUp
-
 
 def parse_params():
     parser = OptionParser()
@@ -32,11 +32,6 @@ def parse_params():
     if options.debug:
         os.environ['DEBUG'] = "1"
         print('DEBUG enabled')
-    else:
-        if 'DEBUG' not in os.environ.keys():
-            os.environ['DEBUG'] = "0"
-        else:
-            print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
 
@@ -70,6 +65,7 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
+                ClusterPropertiesCollector(),
                 # add new collectors above this line
                 CollectorUp()
             ]
