@@ -1,3 +1,12 @@
+ClusterPropertiesCollector:
+   metrics:
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_admissionControlEnabled: test_enum_property",vccluster="cluster2"}'
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_enabled: test_enum_property",vccluster="cluster2"}'
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_admissionControlPolicyId",vccluster="cluster2"}'
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_admissionControlEnabled: test_enum_property",vccluster="cluster1"}'
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_enabled: test_enum_property",vccluster="cluster1"}'
+      - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_admissionControlPolicyId",vccluster="cluster1"}'
+
 HostSystemStatsCollector:
    metrics:
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="summary_running_VMs_number",vccluster="cluster2"}'
@@ -65,4 +74,5 @@ CollectorUp:
       - 'vrops_collector_up{collector="HostSystemStatsCollector",metric="vrops_hostsystem_stats"}'
       - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metric="vrops_hostsystem_properties"}'
       - 'vrops_collector_up{collector="DatastoreStatsCollector",metric="vrops_datastore_stats"}'
+      - 'vrops_collector_up{collector="ClusterPropertiesCollector",metric="vrops_cluster_properties"}'
       - 'vrops_collector_up{collector="CollectorUp",metric="vrops_collector_up"}'

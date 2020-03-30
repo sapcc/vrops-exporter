@@ -22,8 +22,14 @@ HostSystemPropertiesCollector:
       - label: "runtime_memory_capacity_kilobytes"
         property: "runtime|memoryCap"
 
-
-
-
-
-
+ClusterPropertiesCollector:
+    enum_metrics:
+      - label: "configuration_dasConfig_admissionControlEnabled"
+        expected: "true"
+        property: "configuration|dasConfig|admissionControlEnabled"
+      - label: "configuration_dasConfig_enabled"
+        expected: "true"
+        property: "configuration|dasConfig|enabled"
+    number_metrics:
+      - label: "configuration_dasConfig_admissionControlPolicyId"
+        property: "configuration|dasConfig|admissionControlPolicyId"
