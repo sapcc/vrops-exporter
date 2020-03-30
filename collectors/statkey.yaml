@@ -75,4 +75,3 @@ VMStatsCollector:
       statkey: "virtualDisk|vDiskOIO"
     - label: "datastore_outstanding_io_requests"
       statkey: "datastore|demand_oio"
->>>>>>> a744bd87db1b5f0b6d8a3e5688d7b4e4f732d0b6
