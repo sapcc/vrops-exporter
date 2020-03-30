@@ -44,7 +44,7 @@ HostSystemStatsCollector:
 
 HostSystemPropertiesCollector:
    metrics:
-      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem1",propkey="config_diskSpace_bytes",vccluster="cluster2"}'git 
+      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem1",propkey="config_diskSpace_bytes",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem1",propkey="runtime_memory_capacity_kilobytes",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="config_diskSpace_bytes",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_memory_capacity_kilobytes",vccluster="cluster2"}'
