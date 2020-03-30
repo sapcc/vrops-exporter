@@ -300,9 +300,9 @@ class Resources:
                 else:
                     latest_state = "unknown"
                 if latest_state == expected_state:
-                    d['data'] = 0
-                else:
                     d['data'] = 1
+                else:
+                    d['data'] = 0
                 d['latest_state'] = latest_state
                 properties_list.append(d)
             return properties_list

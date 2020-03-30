@@ -156,16 +156,17 @@ class TestCollectors(unittest.TestCase):
             metrics_yaml_list = metrics_yaml[collector]['metrics']
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
-            # check if all metrics from yaml are here
-            supersetdifference = set(metrics_yaml_list).difference(metrics)
-            self.assertTrue(set(metrics).issuperset(metrics_yaml_list),
-                            msg=collector + ": missing metrics from yaml:\n" + "\n".join(supersetdifference))
 
             # check if there are more metrics being produced and they are not listed in metrics.yaml?!
             issubsetdifference = set(metrics).difference(metrics_yaml_list)
             self.assertTrue(set(metrics).issubset(metrics_yaml_list),
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
+            # check if all metrics from yaml are here
+            supersetdifference = set(metrics_yaml_list).difference(metrics)
+            self.assertTrue(set(metrics).issuperset(metrics_yaml_list),
+                            msg=collector + ": missing metrics from yaml:\n" + "\n".join(supersetdifference))
+
             for t in thread_list:
                 t.join(timeout=5)
 
