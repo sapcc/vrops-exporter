@@ -74,4 +74,5 @@ CollectorUp:
       - 'vrops_collector_up{collector="HostSystemStatsCollector",metric="vrops_hostsystem_stats"}'
       - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metric="vrops_hostsystem_properties"}'
       - 'vrops_collector_up{collector="DatastoreStatsCollector",metric="vrops_datastore_stats"}'
+      - 'vrops_collector_up{collector="ClusterPropertiesCollector",metric="vrops_cluster_properties"}'
       - 'vrops_collector_up{collector="CollectorUp",metric="vrops_collector_up"}'
