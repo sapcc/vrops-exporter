@@ -9,7 +9,7 @@ class VMStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-        self.g = GaugeMetricFamily('vrops_vms_stats', 'testtext', labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
+        self.g = GaugeMetricFamily('vrops_vm_stats', 'testtext', labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
         self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
