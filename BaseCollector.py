@@ -86,12 +86,22 @@ class BaseCollector(ABC):
         if request.status_code != 200:
             print("request failed with status: {}".format(request.status_code))
 
+    def get_clusters_by_target(self):
+        self.target_clusters = dict()
+        cluster_dict = self.get_clusters()
+        for uuid in cluster_dict:
+            cluster = cluster_dict[uuid]
+            if cluster['target'] not in self.target_clusters:
+                self.target_clusters[cluster['target']] = list()
+            self.target_clusters[cluster['target']].append(uuid)
+        return self.target_clusters
+
     def get_hosts_by_target(self):
         self.target_hosts = dict()
         host_dict = self.get_hosts()
         for uuid in host_dict:
             host = host_dict[uuid]
-            if host['target'] not in self.target_hosts.keys():
+            if host['target'] not in self.target_hosts:
                 self.target_hosts[host['target']] = list()
             self.target_hosts[host['target']].append(uuid)
         return self.target_hosts
@@ -101,7 +111,7 @@ class BaseCollector(ABC):
         datastore_dict = self.get_datastores()
         for uuid in datastore_dict:
             host = datastore_dict[uuid]
-            if host['target'] not in self.target_datastores.keys():
+            if host['target'] not in self.target_datastores:
                 self.target_datastores[host['target']] = list()
             self.target_datastores[host['target']].append(uuid)
         return self.target_datastores
