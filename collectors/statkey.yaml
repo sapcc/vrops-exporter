@@ -33,13 +33,12 @@ HostSystemStatsCollector:
       statkey: "sys|uptime_latest"
 
 DatastoreStatsCollector:
-
-  - label: "diskspace_total_usage_gigabytes"
-    statkey: "diskspace|disktotal"
-  - label: "diskspace_freespace_gigabytes"
-    statkey: "diskspace|freespace"
-  - label: "diskspace_capacity_gigabytes"
-    statkey: "diskspace|capacity"
+    - label: "diskspace_total_usage_gigabytes"
+      statkey: "diskspace|disktotal"
+    - label: "diskspace_freespace_gigabytes"
+      statkey: "diskspace|freespace"
+    - label: "diskspace_capacity_gigabytes"
+      statkey: "diskspace|capacity"
 
 VMStatsCollector:
     - label: "number_vcpus_total"
