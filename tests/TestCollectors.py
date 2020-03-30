@@ -20,6 +20,8 @@ from collectors.DatastoreStatsCollector import DatastoreStatsCollector
 from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
 from collectors.CollectorUp import CollectorUp
 from prometheus_client.core import REGISTRY
+from collectors.VMStatsCollector import VMStatsCollector
+from collectors.VMPropertiesCollector import VMPropertiesCollector
 
 
 class TestCollectors(unittest.TestCase):
