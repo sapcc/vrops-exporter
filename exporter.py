@@ -32,6 +32,11 @@ def parse_params():
     if options.debug:
         os.environ['DEBUG'] = "1"
         print('DEBUG enabled')
+    else:
+        if 'DEBUG' not in os.environ.keys():
+            os.environ['DEBUG'] = "0"
+        else:
+            print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
 
