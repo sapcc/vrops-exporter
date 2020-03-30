@@ -22,8 +22,33 @@ HostSystemPropertiesCollector:
       - label: "runtime_memory_capacity_kilobytes"
         property: "runtime|memoryCap"
 
+ClusterPropertiesCollector:
+    enum_metrics:
+      - label: "configuration_dasConfig_admissionControlEnabled"
+        expected: "true"
+        property: "configuration|dasConfig|admissionControlEnabled"
+      - label: "configuration_dasConfig_enabled"
+        expected: "true"
+        property: "configuration|dasConfig|enabled"
+    number_metrics:
+      - label: "configuration_dasConfig_admissionControlPolicyId"
+        property: "configuration|dasConfig|admissionControlPolicyId"
 
+VMPropertiesCollector:
+    enum_metrics:
+      - label: "runtime_powerState"
+        expected: "Powered On"
+        property: "summary|runtime|powerState"
+      - label: "runtime_connectionState"
+        expected: "connected"
+        property: "summary|runtime|connectionState"
 
+    info_metrics:
+      - label: "virtualdisk_scsi0_0_datastore"
+        property: "virtualDisk:scsi0:0|datastore"
+      - label: "virtualdisk_scsi0_1_datastore"
+        property: "virtualDisk:scsi0:1|datastore"
 
-
-
+    number_metrics:
+      - label: "summary_ethernetCards"
+        property: "summary|config|numEthernetCards"

@@ -13,8 +13,10 @@ from collectors.SampleCollector import SampleCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
+from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector 
+from collectors.VMStatsCollector import VMStatsCollector
+from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.CollectorUp import CollectorUp
-
 
 def parse_params():
     parser = OptionParser()
@@ -70,6 +72,9 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
+                VMStatsCollector(),
+                VMPropertiesCollector(),
+                ClusterPropertiesCollector(),
                 # add new collectors above this line
                 CollectorUp()
             ]
