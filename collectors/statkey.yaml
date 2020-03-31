@@ -75,3 +75,7 @@ VMStatsCollector:
       statkey: "virtualDisk|vDiskOIO"
     - label: "datastore_outstanding_io_requests"
       statkey: "datastore|demand_oio"
+
+ClusterStatsCollector:
+    - label: "cluster_running_hosts"
+      statkey: "summary|number_running_hosts"
