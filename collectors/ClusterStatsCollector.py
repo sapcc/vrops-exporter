@@ -1,0 +1,49 @@
+from BaseCollector import BaseCollector
+import os, time, json
+from prometheus_client.core import GaugeMetricFamily
+from tools.Resources import Resources
+from tools.YamlRead import YamlRead
+
+
+class ClusterStatsCollector(BaseCollector):
+    def __init__(self):
+        self.wait_for_inventory_data()
+        self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+        self.g = GaugeMetricFamily('vrops_cluster_stats', 'testtest',
+                              labels=['datacenter', 'vccluster', 'statkey'])
+        self.name = self.__class__.__name__
+        self.post_registered_collector(self.name, self.g.name)
+
+    def describe(self):
+        yield self.g
+
+    def collect(self):
+        if os.environ['DEBUG'] >= '1':
+            print('ClusterStatsCollector starts with collecting the metrics')
+
+        for target in self.get_clusters_by_target():
+            token = self.get_target_tokens()
+            token = token[target]
+
+            if not token:
+                print("skipping " + target + " in " + self.name + ", no token")
+
+            uuids = self.target_clusters[target]
+            for statkey_pair in self.statkey_yaml["ClusterStatsCollector"]:
+                statkey_label = statkey_pair['label']
+                statkey = statkey_pair['statkey']
+                values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
+                if not values:
+                    print("skipping statkey " + str(statkey) + " in ClusterStatsCollector, no return")
+                    continue
+                for value_entry in values:
+                    #data = value_entry['data']
+                    metric_value = value_entry['stat-list']['stat'][0]['data'][0]
+                    cluster_id = value_entry['resourceId']
+                    self.g.add_metric(
+                            labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
+                                     statkey_label],
+                            value=metric_value)
+
+        self.post_metrics(self.g.name)
+        yield self.g
