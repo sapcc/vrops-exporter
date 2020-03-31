@@ -1,6 +1,6 @@
 from BaseCollector import BaseCollector
 import os, time, json
-from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 
@@ -11,11 +11,14 @@ class ClusterPropertiesCollector(BaseCollector):
         self.property_yaml = YamlRead('collectors/property.yaml').run()
         self.g = GaugeMetricFamily('vrops_cluster_properties', 'testtest',
                               labels=['datacenter', 'vccluster', 'propkey'])
+        self.i = InfoMetricFamily('vrops_cluster', 'testtest',
+                                  labels=['datacenter', 'vccluster'])
         self.name = self.__class__.__name__
-        self.post_registered_collector(self.name, self.g.name)
+        self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def describe(self):
         yield self.g
+        yield self.i
 
     def collect(self):
         if os.environ['DEBUG'] >= '1':
@@ -70,21 +73,13 @@ class ClusterPropertiesCollector(BaseCollector):
                         continue
                     for value_entry in values:
                         cluster_id = value_entry['resourceId']
-                        try:
-                            info_value = float(value_entry['data'])
-                            self.g.add_metric(
-                                labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
-                                        property_label],
-                                value=info_value)
-                        except ValueError:
-                            info = value_entry['data']
-                            info_value = 0
-                            self.g.add_metric(
-                                labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
-                                        property_label + ": " + info],
-                                value=info_value)
+                        info_value = value_entry['data']
+                        self.i.add_metric(
+                            labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name']],
+                            value={property_label: info_value})
 
             self.post_metrics(self.g.name)
+            self.post_metrics(self.i.name + '_info')
             yield self.g
-
+            yield self.i
 

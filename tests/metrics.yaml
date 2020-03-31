@@ -54,10 +54,10 @@ HostSystemPropertiesCollector:
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_powerState: test_enum_property",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_maintenanceState: test_enum_property",vccluster="cluster2"}'
       - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_connectionState: test_enum_property",vccluster="cluster2"}'
-      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem1",propkey="sys_build: test_info_property",vccluster="cluster2"}'
-      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem1",propkey="summary_version: test_info_property",vccluster="cluster2"}'
-      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_version: test_info_property",vccluster="cluster2"}'
-      - 'vrops_hostsystem_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="sys_build: test_info_property",vccluster="cluster2"}'
+      - 'vrops_hostsystem_info{datacenter="datacenter2",hostsystem="hostsystem1",sys_build="test_info_property",vccluster="cluster2"}'
+      - 'vrops_hostsystem_info{datacenter="datacenter2",hostsystem="hostsystem1",summary_version="test_info_property",vccluster="cluster2"}'
+      - 'vrops_hostsystem_info{datacenter="datacenter2",hostsystem="hostsystem2",sys_build="test_info_property",vccluster="cluster2"}'
+      - 'vrops_hostsystem_info{datacenter="datacenter2",hostsystem="hostsystem2",summary_version="test_info_property",vccluster="cluster2"}'
 
 DatastoreStatsCollector:
    metrics:
@@ -120,10 +120,10 @@ VMPropertiesCollector:
       - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="runtime_connectionState: test_enum_property",vccluster="cluster2",virtualmachine="vm1"}'
       - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_ethernetCards",vccluster="cluster2",virtualmachine="vm2"}'
       - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="summary_ethernetCards",vccluster="cluster2",virtualmachine="vm1"}'
-      - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="virtualdisk_scsi0_0_datastore: test_info_property",vccluster="cluster2",virtualmachine="vm1"}'
-      - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="virtualdisk_scsi0_0_datastore: test_info_property",vccluster="cluster2",virtualmachine="vm2"}'
-      - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="virtualdisk_scsi0_1_datastore: test_info_property",vccluster="cluster2",virtualmachine="vm1"}'
-      - 'vrops_vm_properties{datacenter="datacenter2",hostsystem="hostsystem2",propkey="virtualdisk_scsi0_1_datastore: test_info_property",vccluster="cluster2",virtualmachine="vm2"}'
+      - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm1"}'
+      - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm1"}'
+      - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm2"}'
+      - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm2"}'
 
 ClusterStatsCollector:
    metrics:
@@ -135,9 +135,12 @@ CollectorUp:
       - 'vrops_collector_up{collector="SampleCollector",metric="vrops_inventory_collection_iteration"}'
       - 'vrops_collector_up{collector="HostSystemStatsCollector",metric="vrops_hostsystem_stats"}'
       - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metric="vrops_hostsystem_properties"}'
+      - 'vrops_collector_up{collector="HostSystemPropertiesCollector",metric="vrops_hostsystem_info"}'
       - 'vrops_collector_up{collector="DatastoreStatsCollector",metric="vrops_datastore_stats"}'
       - 'vrops_collector_up{collector="VMStatsCollector",metric="vrops_vm_stats"}'
       - 'vrops_collector_up{collector="VMPropertiesCollector",metric="vrops_vm_properties"}'
+      - 'vrops_collector_up{collector="VMPropertiesCollector",metric="vrops_vm_info"}'
       - 'vrops_collector_up{collector="ClusterPropertiesCollector",metric="vrops_cluster_properties"}'
+      - 'vrops_collector_up{collector="ClusterPropertiesCollector",metric="vrops_cluster_info"}'
       - 'vrops_collector_up{collector="CollectorUp",metric="vrops_collector_up"}'
       - 'vrops_collector_up{collector="ClusterStatsCollector",metric="vrops_cluster_stats"}'
