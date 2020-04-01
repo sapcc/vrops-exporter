@@ -69,12 +69,12 @@ if __name__ == '__main__':
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-                SampleCollector(),
+                # SampleCollector(),
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
                 # VMStatsCollector(),
-                VMPropertiesCollector(),
+                # VMPropertiesCollector(),
                 ClusterStatsCollector(),
                 ClusterPropertiesCollector(),
                 # add new collectors above this line
