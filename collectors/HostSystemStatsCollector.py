@@ -27,7 +27,13 @@ class HostSystemStatsCollector(BaseCollector):
             if not token:
                 print("skipping " + target + " in HostSystemStatsCollector, no token")
 
-            uuids = self.target_hosts[target]
+            try:
+                uuids = self.target_hosts[target]
+            except Exception as e:
+                print("uuid problem")
+                print("target " + target)
+                print(self.target_hosts)
+                print(e)
             for statkey_pair in self.statkey_yaml["HostSystemStatsCollector"]:
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
