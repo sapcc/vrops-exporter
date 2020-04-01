@@ -17,6 +17,7 @@ from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
 from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.CollectorUp import CollectorUp
+from collectors.ClusterStatsCollector import ClusterStatsCollector
 
 def parse_params():
     parser = OptionParser()
@@ -74,6 +75,7 @@ if __name__ == '__main__':
                 DatastoreStatsCollector(),
                 # VMStatsCollector(),
                 VMPropertiesCollector(),
+                ClusterStatsCollector(),
                 ClusterPropertiesCollector(),
                 # add new collectors above this line
                 CollectorUp()
