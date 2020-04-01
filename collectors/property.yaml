@@ -9,41 +9,46 @@ HostSystemPropertiesCollector:
       - label: "runtime_maintenanceState"
         expected: "notInMaintenance"
         property: "runtime|maintenanceState"
-      - label: "config_hyperThread_active"
-        expected: "true"
-        property: "config|hyperThread|active"
 
     info_metrics:
-      - label: "config_product_apiVersion"
-        property: "config|product|apiVersion"
-      - label: "cpu_cpu_model"
-        property: "cpu|cpuModel"
-      - label: "config_productLineId"
-        property: "config|product|productLineId"
-      - label: "hardware_biosVersion"
-        property: "hardware|biosVersion"
-      - label: "hardware_powerManagementPolicy"
-        property: "hardware|powerManagementPolicy"
-      - label: "hardware_vendorModel"
-        property: "hardware_vendorModel"
-      - label: "net:vmnic0_discoveryProtocol_cdp_hardwarePlatform"
-        property: "net:vmnic0|discoveryProtocol|cdp|hardwarePlatform"
-      - label: "net:vmnic0_discoveryProtocol_cdp_softwareVersion"
-        property: "net:vmnic0|discoveryProtocol|cdp|softwareVersion"
+      - label: "summary_version"
+        property: "summary|version"
+      - label: "sys_build"
+        property: "sys|build"
 
     number_metrics:
       - label: "config_diskSpace_bytes"
         property: "config|diskSpace"
-      - label: "config_network_number_of_nnic"
-        property: "config|network|nnic"
       - label: "runtime_memory_capacity_kilobytes"
         property: "runtime|memoryCap"
-      - label: "cpu_speed_Mhz"
-        property: "cpu|speed"
-      - label: "config_network_linkspeed"
-        property: "config|network|linkspeed"
 
+ClusterPropertiesCollector:
+    enum_metrics:
+      - label: "configuration_dasConfig_admissionControlEnabled"
+        expected: "true"
+        property: "configuration|dasConfig|admissionControlEnabled"
+      - label: "configuration_dasConfig_enabled"
+        expected: "true"
+        property: "configuration|dasConfig|enabled"
+    number_metrics:
+      - label: "configuration_dasConfig_admissionControlPolicyId"
+        property: "configuration|dasConfig|admissionControlPolicyId"
 
+VMPropertiesCollector:
+    enum_metrics:
+      - label: "runtime_powerState"
+        expected: "Powered On"
+        property: "summary|runtime|powerState"
+      - label: "runtime_connectionState"
+        expected: "connected"
+        property: "summary|runtime|connectionState"
 
+    info_metrics:
+      - label: "virtualdisk_scsi0_0_datastore"
+        property: "virtualDisk:scsi0:0|datastore"
+      - label: "virtualdisk_scsi0_1_datastore"
+        property: "virtualDisk:scsi0:1|datastore"
 
-
+    number_metrics:
+      - label: "summary_ethernetCards"
+        property: "summary|config|numEthernetCards"
