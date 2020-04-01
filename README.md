@@ -90,7 +90,7 @@ follows best practices as it should appear in prometheus.
            - label: "config_diskSpace_bytes"
              property: "config|diskSpace"
            - label: "config_network_number_of_nnic"
-             property: "config|network|nnic"      
+             property: "config|network|nnic" 
     ```
 
 3. Create a new collector in the folder `/collectors/`
