@@ -9,15 +9,16 @@ class ClusterStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-        self.g = GaugeMetricFamily('vrops_cluster_stats', 'testtest',
-                              labels=['datacenter', 'vccluster', 'statkey'])
         self.name = self.__class__.__name__
-        self.post_registered_collector(self.name, self.g.name)
+        # self.post_registered_collector(self.name, g.name)
 
     def describe(self):
-        yield self.g
+        yield GaugeMetricFamily('vrops_cluster_stats', 'testtest',
+                              labels=['datacenter', 'vccluster', 'statkey'])
 
     def collect(self):
+        g = GaugeMetricFamily('vrops_cluster_stats', 'testtest',
+                              labels=['datacenter', 'vccluster', 'statkey'])
         if os.environ['DEBUG'] >= '1':
             print('ClusterStatsCollector starts with collecting the metrics')
 
@@ -40,10 +41,10 @@ class ClusterStatsCollector(BaseCollector):
                     #data = value_entry['data']
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     cluster_id = value_entry['resourceId']
-                    self.g.add_metric(
+                    g.add_metric(
                             labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
                                      statkey_label],
                             value=metric_value)
 
-        self.post_metrics(self.g.name)
-        yield self.g
+        # self.post_metrics(g.name)
+        yield g

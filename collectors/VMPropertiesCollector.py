@@ -9,18 +9,20 @@ class VMPropertiesCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.property_yaml = YamlRead('collectors/property.yaml').run()
-        self.g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
-                labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
-        self.i = InfoMetricFamily('vrops_vm', 'testtest',
-                                  labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem'])
         self.name = self.__class__.__name__
-        self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
+        # self.post_registered_collector(self.name, g.name, i.name + '_info')
 
     def describe(self):
-        yield self.g
-        yield self.i
+        yield GaugeMetricFamily('vrops_vm_properties', 'testtest',
+                labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
+        yield InfoMetricFamily('vrops_vm', 'testtest',
+                                  labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem'])
 
     def collect(self):
+        g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
+                labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
+        i = InfoMetricFamily('vrops_vm', 'testtest',
+                                  labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem'])
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
@@ -43,7 +45,7 @@ class VMPropertiesCollector(BaseCollector):
                     for value_entry in values:
                         data = value_entry['data']
                         vm_id = value_entry['resourceId']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
                                     self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], property_label],
                             value=data)
@@ -60,7 +62,7 @@ class VMPropertiesCollector(BaseCollector):
                         data = value_entry['data']
                         vm_id = value_entry['resourceId']
                         latest_state = value_entry['latest_state']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
                                     self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], property_label + ": " + latest_state],
                             value=data)
@@ -75,12 +77,12 @@ class VMPropertiesCollector(BaseCollector):
                     for value_entry in values:
                         vm_id = value_entry['resourceId']
                         info_value = value_entry['data']
-                        self.i.add_metric(
+                        i.add_metric(
                             labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
                                     self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name']],
                             value={property_label: info_value})
 
-        self.post_metrics(self.g.name)
-        self.post_metrics(self.i.name + '_info')
-        yield self.g
-        yield self.i
+        # self.post_metrics(g.name)
+        # self.post_metrics(i.name + '_info')
+        yield g
+        yield i

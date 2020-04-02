@@ -9,18 +9,20 @@ class ClusterPropertiesCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.property_yaml = YamlRead('collectors/property.yaml').run()
-        self.g = GaugeMetricFamily('vrops_cluster_properties', 'testtest',
-                              labels=['datacenter', 'vccluster', 'propkey'])
-        self.i = InfoMetricFamily('vrops_cluster', 'testtest',
-                                  labels=['datacenter', 'vccluster'])
         self.name = self.__class__.__name__
-        self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
+        # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def describe(self):
-        yield self.g
-        yield self.i
+        yield GaugeMetricFamily('vrops_cluster_properties', 'testtest',
+                              labels=['datacenter', 'vccluster', 'propkey'])
+        yield InfoMetricFamily('vrops_cluster', 'testtest',
+                                  labels=['datacenter', 'vccluster'])
 
     def collect(self):
+        g = GaugeMetricFamily('vrops_cluster_properties', 'testtest',
+                              labels=['datacenter', 'vccluster', 'propkey'])
+        i = InfoMetricFamily('vrops_cluster', 'testtest',
+                                  labels=['datacenter', 'vccluster'])
         if os.environ['DEBUG'] >= '1':
             print('ClusterPropertiesCollector starts with collecting the metrics')
 
@@ -42,7 +44,7 @@ class ClusterPropertiesCollector(BaseCollector):
                     for value_entry in values:
                         data = value_entry['data']
                         cluster_id = value_entry['resourceId']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
                                     property_label],
                             value=data)
@@ -59,7 +61,7 @@ class ClusterPropertiesCollector(BaseCollector):
                         data = value_entry['data']
                         cluster_id = value_entry['resourceId']
                         latest_state = value_entry['latest_state']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
                                     property_label + ": " + latest_state],
                             value=data)
@@ -74,12 +76,12 @@ class ClusterPropertiesCollector(BaseCollector):
                     for value_entry in values:
                         cluster_id = value_entry['resourceId']
                         info_value = value_entry['data']
-                        self.i.add_metric(
+                        i.add_metric(
                             labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name']],
                             value={property_label: info_value})
 
-        self.post_metrics(self.g.name)
-        self.post_metrics(self.i.name + '_info')
-        yield self.g
-        yield self.i
+        # self.post_metrics(self.g.name)
+        # self.post_metrics(self.i.name + '_info')
+        yield g
+        yield i
 
