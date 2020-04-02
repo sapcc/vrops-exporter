@@ -79,9 +79,9 @@ class HostSystemPropertiesCollector(BaseCollector):
                                     self.hosts[host_id]['name']],
                             value={property_label: info_value})
 
-            self.post_metrics(self.g.name)
-            self.post_metrics(self.i.name + '_info')
-            yield self.g
-            yield self.i
+        self.post_metrics(self.g.name)
+        self.post_metrics(self.i.name + '_info')
+        yield self.g
+        yield self.i
 
 

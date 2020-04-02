@@ -80,7 +80,7 @@ class VMPropertiesCollector(BaseCollector):
                                     self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name']],
                             value={property_label: info_value})
 
-            self.post_metrics(self.g.name)
-            self.post_metrics(self.i.name + '_info')
-            yield self.g
-            yield self.i
+        self.post_metrics(self.g.name)
+        self.post_metrics(self.i.name + '_info')
+        yield self.g
+        yield self.i
