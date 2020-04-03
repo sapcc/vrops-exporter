@@ -13,10 +13,8 @@ class ClusterPropertiesCollector(BaseCollector):
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def describe(self):
-        yield GaugeMetricFamily('vrops_cluster_properties', 'testtest',
-                              labels=['datacenter', 'vccluster', 'propkey'])
-        yield InfoMetricFamily('vrops_cluster', 'testtest',
-                                  labels=['datacenter', 'vccluster'])
+        yield GaugeMetricFamily('vrops_cluster_properties', 'testtest')
+        yield InfoMetricFamily('vrops_cluster', 'testtest')
 
     def collect(self):
         g = GaugeMetricFamily('vrops_cluster_properties', 'testtest',

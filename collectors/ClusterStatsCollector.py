@@ -13,8 +13,7 @@ class ClusterStatsCollector(BaseCollector):
         # self.post_registered_collector(self.name, g.name)
 
     def describe(self):
-        yield GaugeMetricFamily('vrops_cluster_stats', 'testtest',
-                              labels=['datacenter', 'vccluster', 'statkey'])
+        yield GaugeMetricFamily('vrops_cluster_stats', 'testtest')
 
     def collect(self):
         g = GaugeMetricFamily('vrops_cluster_stats', 'testtest',

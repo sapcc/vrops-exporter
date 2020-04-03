@@ -9,8 +9,7 @@ class SampleCollector(BaseCollector):
         # self.post_registered_collector(self.__class__.__name__, g.name)
 
     def describe(self):
-        yield GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
-                              labels=['vcenter'])
+        yield GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection')
 
     def collect(self):
         g = GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection',
