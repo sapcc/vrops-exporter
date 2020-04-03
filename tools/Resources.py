@@ -254,6 +254,7 @@ class Resources:
                     else:
                         d['data'] = content[0]['data'][0]
                 else:
+                    # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))
 
                 properties_list.append(d)
@@ -312,6 +313,7 @@ class Resources:
                         d['data'] = 0
                     d['latest_state'] = latest_state
                 else:
+                    # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))
                 properties_list.append(d)
             return properties_list
@@ -364,6 +366,7 @@ class Resources:
                         info = 'None'
                     d['data'] = info
                 else:
+                    # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))
                 properties_list.append(d)
             return properties_list
