@@ -40,6 +40,8 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         host_id = value_entry['resourceId']
                         g.add_metric(
@@ -56,6 +58,8 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         host_id = value_entry['resourceId']
                         latest_state = value_entry['latest_state']
@@ -72,6 +76,8 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         host_id = value_entry['resourceId']
                         info_value = value_entry['data']
                         i.add_metric(
