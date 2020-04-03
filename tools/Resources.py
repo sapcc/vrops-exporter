@@ -182,7 +182,7 @@ class Resources:
         if response.status_code == 200:
             return response.json()['values']
         else:
-            print("Return code not 200 for " + str(key) + ": " + str(response.json()))
+            print("Return code not 200 for " + str(key) + ": " + response.text)
             return False
 
     # this is for a single query of a property and returns the value only
