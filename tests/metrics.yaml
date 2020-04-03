@@ -1,3 +1,8 @@
+ClusterStatsCollector:
+   metrics:
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster2"}'
+
 ClusterPropertiesCollector:
    metrics:
       - 'vrops_cluster_properties{datacenter="datacenter2",propkey="configuration_dasConfig_admissionControlEnabled: test_enum_property",vccluster="cluster2"}'
@@ -124,11 +129,6 @@ VMPropertiesCollector:
       - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm1"}'
       - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm2"}'
       - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm2"}'
-
-ClusterStatsCollector:
-   metrics:
-      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster1"}'
-      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster2"}'
 
 #CollectorUp:
    #metrics:
