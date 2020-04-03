@@ -41,6 +41,8 @@ class VMPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         vm_id = value_entry['resourceId']
                         g.add_metric(
@@ -57,6 +59,8 @@ class VMPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         vm_id = value_entry['resourceId']
                         latest_state = value_entry['latest_state']
@@ -73,6 +77,8 @@ class VMPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         vm_id = value_entry['resourceId']
                         info_value = value_entry['data']
                         i.add_metric(
