@@ -70,13 +70,13 @@ if __name__ == '__main__':
     thread.start()
     collectors = [
                 # SampleCollector(),
+                ClusterStatsCollector(),
+                ClusterPropertiesCollector(),
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
                 VMStatsCollector(),
-                VMPropertiesCollector(),
-                ClusterStatsCollector(),
-                ClusterPropertiesCollector(),
+                VMPropertiesCollector()
                 # add new collectors above this line
                 # CollectorUp()
             ]

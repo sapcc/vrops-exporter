@@ -247,14 +247,20 @@ class Resources:
                 d = dict()
                 d['resourceId'] = resource['resourceId']
                 d['propkey'] = propkey
-                if 'values' in resource['property-contents']['property-content'][0]:
-                    d['data'] = resource['property-contents']['property-content'][0]['values'][0]
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        d['data'] = content[0]['values'][0]
+                    else:
+                        d['data'] = content[0]['data'][0]
                 else:
-                    d['data'] = resource['property-contents']['property-content'][0]['data'][0]
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
+
                 properties_list.append(d)
             return properties_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + str(response.json()))
+            print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
 
     # if the property describes a status that has several states
@@ -295,19 +301,24 @@ class Resources:
                 d = dict()
                 d['resourceId'] = resource['resourceId']
                 d['propkey'] = propkey
-                if 'values' in resource['property-contents']['property-content'][0]:
-                    latest_state = resource['property-contents']['property-content'][0]['values'][0]
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        latest_state = content[0]['values'][0]
+                    else:
+                        latest_state = "unknown"
+                    if latest_state == expected_state:
+                        d['data'] = 1
+                    else:
+                        d['data'] = 0
+                    d['latest_state'] = latest_state
                 else:
-                    latest_state = "unknown"
-                if latest_state == expected_state:
-                    d['data'] = 1
-                else:
-                    d['data'] = 0
-                d['latest_state'] = latest_state
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
                 properties_list.append(d)
             return properties_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + str(response.json()))
+            print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
 
     # for all other properties that return a string or numbers with special characters
@@ -347,14 +358,19 @@ class Resources:
                 d = dict()
                 d['resourceId'] = resource['resourceId']
                 d['propkey'] = propkey
-                if 'values' in resource['property-contents']['property-content'][0]:
-                    info = resource['property-contents']['property-content'][0]['values'][0]
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        info = content[0]['values'][0]
+                    else:
+                        info = 'None'
+                    d['data'] = info
                 else:
-                    info = 'None'
-                d['data'] = info
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
                 properties_list.append(d)
             return properties_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + str(response.json()))
+            print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
 
