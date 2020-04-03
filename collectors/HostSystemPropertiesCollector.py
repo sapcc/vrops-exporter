@@ -13,10 +13,8 @@ class HostSystemPropertiesCollector(BaseCollector):
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def describe(self):
-        yield GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
-                                   labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
-        yield InfoMetricFamily("vrops_hostsystem", 'testtest',
-                                  labels=['datacenter', 'vccluster', 'hostsystem'])
+        yield GaugeMetricFamily('vrops_hostsystem_properties', 'testtest')
+        yield InfoMetricFamily("vrops_hostsystem", 'testtest')
 
     def collect(self):
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
