@@ -35,6 +35,8 @@ class VMStatsCollector(BaseCollector):
                     print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                     continue
                 for value_entry in values:
+                    if 'resourceId' or 'stat-list' not in value_entry:
+                        continue
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     vm_id = value_entry['resourceId']
