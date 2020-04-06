@@ -131,7 +131,7 @@ class InventoryBuilder:
         # first iteration to fill is 1. while this is not ready, curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
-            if self.iteration >= self.keep_iterations:
+            if self.iteration > self.keep_iterations:
                 obsolete_iteration = self.iteration - self.keep_iterations
                 self.iterated_inventory.pop(str(obsolete_iteration))
                 if os.environ['DEBUG'] >= '1':
@@ -151,6 +151,8 @@ class InventoryBuilder:
             self.get_datastores()
             self.get_vms()
             self.iteration += 1
+            if os.environ['DEBUG'] >= '1':
+                print("inventory relaxing before going to work again")
             time.sleep(180)
 
     def query_vrops(self, vrops):
