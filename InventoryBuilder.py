@@ -14,9 +14,6 @@ import os
 class InventoryBuilder:
     def __init__(self, json, port):
         self.json = json
-        self.port = int(port)
-        self._user = os.environ["USER"]
-        self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
@@ -40,7 +37,7 @@ class InventoryBuilder:
 
         @app.route('/vrops_list', methods=['GET'])
         def vrops_list():
-            return json.dumps(self.vrops_list)
+            return json.dumps(map(lambda x: x.server_name, self.vrops_list))
 
         print('serving /inventory on', str(self.port))
 
@@ -134,7 +131,11 @@ class InventoryBuilder:
         vrops_list = list()
         for target in netbox_json:
             if target['labels']['job'] == "vrops":
-                vrops = target['labels']['server_name']
+                vrops = types.SimpleNamespace()
+                vrops.server_name = target['labels']['server_name']
+                vrops.username    = target['labels'].get('username', None)
+                vrops.password    = target['labels'].get('password', None)
+                vrops.auth_source = target['labels'].get('auth_source', None)
                 vrops_list.append(vrops)
         self.vrops_list = vrops_list
 
@@ -160,7 +161,7 @@ class InventoryBuilder:
                 print("real run " + str(self.iteration))
             for vrops in self.vrops_list:
                 if not self.query_vrops(vrops):
-                    print("retrying connection to", vrops, "in next iteration", str(self.iteration + 1))
+                    print("retrying connection to", vrops.server_name, "in next iteration", str(self.iteration + 1))
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
@@ -181,13 +182,13 @@ class InventoryBuilder:
 
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
-            print("querying " + vrops)
-        token = Resources.get_token(target=vrops)
+            print("querying " + vrops.server_name)
+        token = Resources.get_token(target=vrops.server_name, user=vrops.username, password=vrops.password, auth_source=vrops.auth_source)
         if not token:
             return False
-        self.target_tokens[vrops] = token
-        vcenter = self.create_resource_objects(vrops, token)
-        self.vcenter_dict[vrops] = vcenter
+        self.target_tokens[vrops.server_name] = token
+        vcenter = self.create_resource_objects(vrops.server_name, token)
+        self.vcenter_dict[vrops.server_name] = vcenter
         return True
 
     def create_resource_objects(self, vrops, token):

@@ -8,16 +8,24 @@ import os
 
 
 class Resources:
-    def get_token(target):
+    
+    def get_token(target, user=None, password=None, auth_source=None):
+        if auth_source == None:
+            auth_source = "Local"
+        if user == None:
+            user =  os.environ['USER']
+        if password == None:
+            password =  os.environ['PASSWORD']
+
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
         }
         payload = {
-            "username": os.environ['USER'],
-            "authSource": "Local",
-            "password": os.environ['PASSWORD']
+            "username": user,
+            "password": password,
+            "authSource": auth_source
         }
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
