@@ -67,7 +67,9 @@ class InventoryBuilder:
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
-            return str(self.iteration)
+            #the latest iteration is the only which is currently filled, go back by 1
+            return_iteration = self.iteration - 1
+            return str(return_iteration)
 
         @app.route('/register', methods=['POST'])
         def post_registered_collectors():
@@ -126,7 +128,8 @@ class InventoryBuilder:
         self.vrops_list = vrops_list
 
     def query_inventory_permanent(self):
-        self.iteration = 0
+        # first iteration to fill is 1. while this is not ready, curl to /iteration would still report 0 to wait for actual data
+        self.iteration = 1
         while True:
             if self.iteration >= self.keep_iterations:
                 obsolete_iteration = self.iteration - self.keep_iterations
@@ -135,7 +138,6 @@ class InventoryBuilder:
                     print("deleting iteration " + str(self.iteration))
 
             #initialize empty inventory per iteration
-            self.iteration += 1
             self.iterated_inventory[str(self.iteration)] = dict()
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
@@ -148,6 +150,7 @@ class InventoryBuilder:
             self.get_hosts()
             self.get_datastores()
             self.get_vms()
+            self.iteration += 1
             time.sleep(180)
 
     def query_vrops(self, vrops):
