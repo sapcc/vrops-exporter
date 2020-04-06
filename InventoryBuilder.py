@@ -19,6 +19,8 @@ class InventoryBuilder:
         self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
         self.target_tokens = dict()
+        self.iterated_inventory = dict()
+        self.keep_iterations = 3
         self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
@@ -39,29 +41,29 @@ class InventoryBuilder:
 
         print('serving /inventory on 8000')
 
-        @app.route('/vcenters', methods=['GET'])
-        def vcenters():
-            return self.vcenters
+        @app.route('/vcenters/<iteration>', methods=['GET'])
+        def vcenters(iteration):
+            return self.iterated_inventory[str(iteration)]['vcenters']
 
-        @app.route('/datacenters', methods=['GET'])
-        def datacenters():
-            return self.datacenters
+        @app.route('/datacenters/<iteration>', methods=['GET'])
+        def datacenters(iteration):
+            return self.iterated_inventory[str(iteration)]['datacenters']
 
-        @app.route('/clusters', methods=['GET'])
-        def clusters():
-            return self.clusters
+        @app.route('/clusters/<iteration>', methods=['GET'])
+        def clusters(iteration):
+            return self.iterated_inventory[str(iteration)]['clusters']
 
-        @app.route('/hosts', methods=['GET'])
-        def hosts():
-            return self.hosts
+        @app.route('/hosts/<iteration>', methods=['GET'])
+        def hosts(iteration):
+            return self.iterated_inventory[str(iteration)]['hosts']
 
-        @app.route('/datastores', methods=['GET'])
-        def datastores():
-            return self.datastores
+        @app.route('/datastores/<iteration>', methods=['GET'])
+        def datastores(iteration):
+            return self.iterated_inventory[str(iteration)]['datastores']
 
-        @app.route('/vms', methods=['GET'])
-        def vms():
-            return self.vms
+        @app.route('/vms/<iteration>', methods=['GET'])
+        def vms(iteration):
+            return self.iterated_inventory[str(iteration)]['vms']
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
@@ -126,6 +128,14 @@ class InventoryBuilder:
     def query_inventory_permanent(self):
         self.iteration = 0
         while True:
+            if self.iteration >= self.keep_iterations:
+                obsolete_iteration = self.iteration - self.keep_iterations
+                self.iterated_inventory.pop[str(obsolete_iteration)]
+                if os.environ['DEBUG'] >= '1':
+                    print("deleting iteration " +  str(self.iteration))
+
+            #initialize empty inventory per iteration
+            self.iterated_inventory[str(self.iteration)] = dict()
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
             for vrops in self.vrops_list:
@@ -188,7 +198,7 @@ class InventoryBuilder:
                     'target': vcenter.target,
                     'token': vcenter.token,
                     }
-        self.vcenters = tree
+        self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 
     def get_datacenters(self):
@@ -204,7 +214,7 @@ class InventoryBuilder:
                         'target': dc.target,
                         'token': dc.token,
                         }
-        self.datacenters = tree
+        self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
 
     def get_clusters(self):
@@ -222,7 +232,7 @@ class InventoryBuilder:
                             'target': cluster.target,
                             'token': cluster.token,
                             }
-        self.clusters = tree
+        self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
 
     def get_hosts(self):
@@ -241,7 +251,7 @@ class InventoryBuilder:
                                 'target': host.target,
                                 'token': host.token,
                                 }
-        self.hosts = tree
+        self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
 
     def get_datastores(self):
@@ -262,7 +272,7 @@ class InventoryBuilder:
                                     'target': ds.target,
                                     'token': ds.token,
                                     }
-        self.datastores = tree
+        self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
 
     def get_vms(self):
@@ -283,5 +293,5 @@ class InventoryBuilder:
                                     'target': vm.target,
                                     'token': vm.token,
                                     }
-        self.vms = tree
+        self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree
