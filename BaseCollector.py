@@ -143,7 +143,7 @@ class BaseCollector(ABC):
         return self.target_vms
 
     def wait_for_inventory_data(self):
-        iteration = self.get_iteration()
+        iteration = 0
         while not iteration:
             time.sleep(5)
             iteration = self.get_iteration()
