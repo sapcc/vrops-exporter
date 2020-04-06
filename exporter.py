@@ -69,15 +69,15 @@ if __name__ == '__main__':
     thread = Thread(target=InventoryBuilder, args=(options.atlas,))
     thread.start()
     collectors = [
-                SampleCollector(),
+                # SampleCollector(),
+                ClusterStatsCollector(),
+                ClusterPropertiesCollector(),
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
-                # VMStatsCollector(),
-                VMPropertiesCollector(),
-                ClusterStatsCollector(),
-                ClusterPropertiesCollector(),
+                VMStatsCollector(),
+                VMPropertiesCollector()
                 # add new collectors above this line
-                CollectorUp()
+                # CollectorUp()
             ]
     run_prometheus_server(int(os.environ['PORT']), collectors)

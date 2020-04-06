@@ -9,18 +9,18 @@ class HostSystemPropertiesCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.property_yaml = YamlRead('collectors/property.yaml').run()
-        self.g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
-                                   labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
-        self.i = InfoMetricFamily("vrops_hostsystem", 'testtest',
-                                  labels=['datacenter', 'vccluster', 'hostsystem'])
         self.name = self.__class__.__name__
-        self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
+        # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def describe(self):
-        yield self.g
-        yield self.i
+        yield GaugeMetricFamily('vrops_hostsystem_properties', 'testtest')
+        yield InfoMetricFamily("vrops_hostsystem", 'testtest')
 
     def collect(self):
+        g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
+                                   labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
+        i = InfoMetricFamily("vrops_hostsystem", 'testtest',
+                                  labels=['datacenter', 'vccluster', 'hostsystem'])
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
@@ -40,9 +40,11 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         host_id = value_entry['resourceId']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                     self.hosts[host_id]['name'], property_label],
                             value=data)
@@ -56,10 +58,12 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         data = value_entry['data']
                         host_id = value_entry['resourceId']
                         latest_state = value_entry['latest_state']
-                        self.g.add_metric(
+                        g.add_metric(
                             labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                     self.hosts[host_id]['name'], property_label + ": " + latest_state],
                             value=data)
@@ -72,16 +76,18 @@ class HostSystemPropertiesCollector(BaseCollector):
                     if not values:
                         continue
                     for value_entry in values:
+                        if 'data' not in value_entry:
+                            continue
                         host_id = value_entry['resourceId']
                         info_value = value_entry['data']
-                        self.i.add_metric(
+                        i.add_metric(
                             labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                     self.hosts[host_id]['name']],
                             value={property_label: info_value})
 
-            self.post_metrics(self.g.name)
-            self.post_metrics(self.i.name + '_info')
-            yield self.g
-            yield self.i
+        # self.post_metrics(self.g.name)
+        # self.post_metrics(self.i.name + '_info')
+        yield g
+        yield i
 
 

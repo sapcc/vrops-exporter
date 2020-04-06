@@ -87,7 +87,8 @@ class BaseCollector(ABC):
             print("request failed with status: {}".format(request.status_code))
 
     def get_clusters_by_target(self):
-        self.target_clusters = dict()
+        if not hasattr(self, 'target_clusters'):
+            self.target_clusters = dict()
         cluster_dict = self.get_clusters()
         for uuid in cluster_dict:
             cluster = cluster_dict[uuid]
@@ -97,7 +98,8 @@ class BaseCollector(ABC):
         return self.target_clusters
 
     def get_hosts_by_target(self):
-        self.target_hosts = dict()
+        if not hasattr(self, 'target_hosts'):
+            self.target_hosts = dict()
         host_dict = self.get_hosts()
         for uuid in host_dict:
             host = host_dict[uuid]
@@ -107,7 +109,8 @@ class BaseCollector(ABC):
         return self.target_hosts
 
     def get_datastores_by_target(self):
-        self.target_datastores = dict()
+        if not hasattr(self, 'target_datastores'):
+            self.target_datastores = dict()
         datastore_dict = self.get_datastores()
         for uuid in datastore_dict:
             host = datastore_dict[uuid]
@@ -117,11 +120,12 @@ class BaseCollector(ABC):
         return self.target_datastores
 
     def get_vms_by_target(self):
-        self.target_vms = dict()
+        if not hasattr(self, 'target_vms'):
+            self.target_vms = dict()
         vms_dict = self.get_vms()
         for uuid in vms_dict:
             vm = vms_dict[uuid]
-            if vm['target'] not in self.target_vms.keys():
+            if vm['target'] not in self.target_vms:
                 self.target_vms[vm['target']] = list()
             self.target_vms[vm['target']].append(uuid)
         return self.target_vms

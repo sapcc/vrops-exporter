@@ -10,13 +10,13 @@ class HostSystemStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
         self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
-        self.g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'statkey'])
-        self.post_registered_collector(self.__class__.__name__, self.g.name)
+        # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
-        yield self.g
+        yield GaugeMetricFamily('vrops_hostsystem_stats', 'testtext')
 
     def collect(self):
+        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'statkey'])
         if os.environ['DEBUG'] >= '1':
             print('HostSystemStatsCollector starts with collecting the metrics')
 
@@ -39,7 +39,7 @@ class HostSystemStatsCollector(BaseCollector):
                     #there is just one, because we are querying latest only
                     metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                     host_id = value_entry['resourceId']
-                    self.g.add_metric(labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
+                    g.add_metric(labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
                                      self.hosts[host_id]['name'], statkey_label], value=metric_value)
-        self.post_metrics(self.g.name)
-        yield self.g
+        # self.post_metrics(self.g.name)
+        yield g
