@@ -41,27 +41,27 @@ class InventoryBuilder:
 
         print('serving /inventory on 8000')
 
-        @app.route('/vcenters/<iteration>', methods=['GET'])
+        @app.route('/vcenters/<int:iteration>', methods=['GET'])
         def vcenters(iteration):
             return self.iterated_inventory[str(iteration)]['vcenters']
 
-        @app.route('/datacenters/<iteration>', methods=['GET'])
+        @app.route('/datacenters/<int:iteration>', methods=['GET'])
         def datacenters(iteration):
             return self.iterated_inventory[str(iteration)]['datacenters']
 
-        @app.route('/clusters/<iteration>', methods=['GET'])
+        @app.route('/clusters/<int:iteration>', methods=['GET'])
         def clusters(iteration):
             return self.iterated_inventory[str(iteration)]['clusters']
 
-        @app.route('/hosts/<iteration>', methods=['GET'])
+        @app.route('/hosts/<int:iteration>', methods=['GET'])
         def hosts(iteration):
             return self.iterated_inventory[str(iteration)]['hosts']
 
-        @app.route('/datastores/<iteration>', methods=['GET'])
+        @app.route('/datastores/<int:iteration>', methods=['GET'])
         def datastores(iteration):
             return self.iterated_inventory[str(iteration)]['datastores']
 
-        @app.route('/vms/<iteration>', methods=['GET'])
+        @app.route('/vms/<int:iteration>', methods=['GET'])
         def vms(iteration):
             return self.iterated_inventory[str(iteration)]['vms']
 
@@ -130,11 +130,12 @@ class InventoryBuilder:
         while True:
             if self.iteration >= self.keep_iterations:
                 obsolete_iteration = self.iteration - self.keep_iterations
-                self.iterated_inventory.pop[str(obsolete_iteration)]
+                self.iterated_inventory.pop(str(obsolete_iteration))
                 if os.environ['DEBUG'] >= '1':
-                    print("deleting iteration " +  str(self.iteration))
+                    print("deleting iteration " + str(self.iteration))
 
             #initialize empty inventory per iteration
+            self.iteration += 1
             self.iterated_inventory[str(self.iteration)] = dict()
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
@@ -147,7 +148,6 @@ class InventoryBuilder:
             self.get_hosts()
             self.get_datastores()
             self.get_vms()
-            self.iteration += 1
             time.sleep(180)
 
     def query_vrops(self, vrops):
