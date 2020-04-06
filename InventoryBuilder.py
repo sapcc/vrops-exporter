@@ -17,7 +17,7 @@ class InventoryBuilder:
         self.json = json
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
-        self.vcenter_list = list()
+        self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.get_vrops()
 
@@ -148,7 +148,7 @@ class InventoryBuilder:
             return False
         self.target_tokens[vrops] = token
         vcenter = self.create_resource_objects(vrops, token)
-        self.vcenter_list.append(vcenter)
+        self.vcenter_dict[vrops] = vcenter
         return True
 
     def create_resource_objects(self, vrops, token):
@@ -180,7 +180,8 @@ class InventoryBuilder:
 
     def get_vcenters(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             tree[vcenter.uuid] = {
                     'uuid': vcenter.uuid,
                     'name': vcenter.name,
@@ -192,7 +193,8 @@ class InventoryBuilder:
 
     def get_datacenters(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             for dc in vcenter.datacenter:
                 tree[dc.name] = {
                         'uuid': dc.uuid,
@@ -207,7 +209,8 @@ class InventoryBuilder:
 
     def get_clusters(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     tree[cluster.uuid] = {
@@ -224,7 +227,8 @@ class InventoryBuilder:
 
     def get_hosts(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
@@ -242,7 +246,8 @@ class InventoryBuilder:
 
     def get_datastores(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
@@ -262,7 +267,8 @@ class InventoryBuilder:
 
     def get_vms(self):
         tree = dict()
-        for vcenter in self.vcenter_list:
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
