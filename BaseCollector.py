@@ -10,32 +10,44 @@ class BaseCollector(ABC):
         pass
 
     def get_vcenters(self):
-        request = requests.get(url = "http://localhost:8000/vcenters")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/vcenters/{}".format(current_iteration)
+        request = requests.get(url)
         self.vcenters = request.json()
         return self.vcenters
 
     def get_datacenters(self):
-        request = requests.get(url = "http://localhost:8000/datacenters")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/datacenters/{}".format(current_iteration)
+        request = requests.get(url)
         self.datacenters = request.json()
         return self.datacenters
 
     def get_clusters(self):
-        request = requests.get(url = "http://localhost:8000/clusters")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/clusters/{}".format(current_iteration)
+        request = requests.get(url)
         self.clusters = request.json()
         return self.clusters
 
     def get_hosts(self):
-        request = requests.get(url = "http://localhost:8000/hosts")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/hosts/{}".format(current_iteration)
+        request = requests.get(url)
         self.hosts = request.json()
         return self.hosts
 
     def get_datastores(self):
-        request = requests.get(url = "http://localhost:8000/datastores")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/datastores/{}".format(current_iteration)
+        request = requests.get(url)
         self.datastores = request.json()
         return self.datastores
 
     def get_vms(self):
-        request = requests.get(url = "http://localhost:8000/vms")
+        current_iteration = self.get_iteration()
+        url = "http://localhost:8000/vms/{}".format(current_iteration)
+        request = requests.get(url)
         self.vms = request.json()
         return self.vms
 

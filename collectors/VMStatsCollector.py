@@ -35,10 +35,17 @@ class VMStatsCollector(BaseCollector):
                     print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                     continue
                 for value_entry in values:
+                    if 'resourceId' not in value_entry:
+                        continue
                     #there is just one, because we are querying latest only
-                    metric_value = value_entry['stat-list']['stat'][0]['data'][0]
+                    metric_value = value_entry['stat-list']['stat'][0]['data']
+                    if not metric_value:
+                        continue
                     vm_id = value_entry['resourceId']
+                    if vm_id not in self.vms:
+                        continue
                     g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
-                                self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label], value=metric_value)
+                                self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label],
+                                 value=metric_value[0])
         # self.post_metrics(g.name)
         yield g
