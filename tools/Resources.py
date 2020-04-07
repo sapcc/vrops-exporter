@@ -29,7 +29,7 @@ class Resources:
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            print("problem getting token " + str(target) + ": " + json.dumps(response.json(), indent=3))
+            print("problem getting token " + str(target) + ": " + response.text)
             return False
 
     def get_adapter(target, token):
