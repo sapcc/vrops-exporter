@@ -23,6 +23,8 @@ from prometheus_client.core import REGISTRY
 from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
+from collectors.VCenterPropertiesCollector import VcenterPropertiesCollector
+
 
 
 class TestCollectors(unittest.TestCase):
