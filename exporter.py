@@ -75,8 +75,8 @@ if __name__ == '__main__':
                 HostSystemStatsCollector(),
                 HostSystemPropertiesCollector(),
                 DatastoreStatsCollector(),
-                # VMStatsCollector(),
-                # VMPropertiesCollector()
+                VMStatsCollector(),
+                VMPropertiesCollector()
                 # add new collectors above this line
                 # CollectorUp()
             ]
