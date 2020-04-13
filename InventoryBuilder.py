@@ -37,7 +37,7 @@ class InventoryBuilder:
 
         @app.route('/vrops_list', methods=['GET'])
         def vrops_list():
-            return json.dumps(map(lambda x: x.server_name, self.vrops_list))
+            return json.dumps(list(map(lambda x: x.server_name, self.vrops_list)))
 
         print('serving /inventory on', str(self.port))
 
