@@ -249,25 +249,24 @@ class Resources:
                 if not response.json()['values']:
                     print("skipping propkey " + str(propkey) + ", no return")
                     return False
-                for resource in response.json()['values']:
-                    d = dict()
-                    d['resourceId'] = resource['resourceId']
-                    d['propkey'] = propkey
-                    content = resource['property-contents']['property-content']
-                    if content:
-                        if 'values' in content[0]:
-                            d['data'] = content[0]['values'][0]
-                        else:
-                            d['data'] = content[0]['data'][0]
-                    else:
-                        # resources can go away, so None is returned
-                        print("skipping resource for get", str(propkey))
-                    properties_list.append(d)
             except json.decoder.JSONDecodeError as e:
                 print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
                       "\nerror msg:", str(e))
                 return False
-
+            for resource in response.json()['values']:
+                d = dict()
+                d['resourceId'] = resource['resourceId']
+                d['propkey'] = propkey
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        d['data'] = content[0]['values'][0]
+                    else:
+                        d['data'] = content[0]['data'][0]
+                else:
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
+                properties_list.append(d)
             return properties_list
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
@@ -308,28 +307,29 @@ class Resources:
                 if not response.json()['values']:
                     print("skipping propkey " + str(propkey) + ", no return")
                     return False
-                for resource in response.json()['values']:
-                    d = dict()
-                    d['resourceId'] = resource['resourceId']
-                    d['propkey'] = propkey
-                    content = resource['property-contents']['property-content']
-                    if content:
-                        if 'values' in content[0]:
-                            latest_state = content[0]['values'][0]
-                        else:
-                            latest_state = "unknown"
-                        if latest_state == expected_state:
-                            d['data'] = 1
-                        else:
-                            d['data'] = 0
-                        d['latest_state'] = latest_state
-                    else:
-                        # resources can go away, so None is returned
-                        print("skipping resource for get", str(propkey))
-                    properties_list.append(d)
             except json.decoder.JSONDecodeError as e:
                 print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
                       "\nerror msg:", str(e))
+                return False
+            for resource in response.json()['values']:
+                d = dict()
+                d['resourceId'] = resource['resourceId']
+                d['propkey'] = propkey
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        latest_state = content[0]['values'][0]
+                    else:
+                        latest_state = "unknown"
+                    if latest_state == expected_state:
+                        d['data'] = 1
+                    else:
+                        d['data'] = 0
+                    d['latest_state'] = latest_state
+                else:
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
+                properties_list.append(d)
             return properties_list
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
@@ -369,24 +369,25 @@ class Resources:
                 if not response.json()['values']:
                     print("skipping propkey " + str(propkey) + ", no return")
                     return False
-                for resource in response.json()['values']:
-                    d = dict()
-                    d['resourceId'] = resource['resourceId']
-                    d['propkey'] = propkey
-                    content = resource['property-contents']['property-content']
-                    if content:
-                        if 'values' in content[0]:
-                            info = content[0]['values'][0]
-                        else:
-                            info = 'None'
-                        d['data'] = info
-                    else:
-                        # resources can go away, so None is returned
-                        print("skipping resource for get", str(propkey))
-                    properties_list.append(d)
             except json.decoder.JSONDecodeError as e:
                 print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
                       "\nerror msg:", str(e))
+                return False
+            for resource in response.json()['values']:
+                d = dict()
+                d['resourceId'] = resource['resourceId']
+                d['propkey'] = propkey
+                content = resource['property-contents']['property-content']
+                if content:
+                    if 'values' in content[0]:
+                        info = content[0]['values'][0]
+                    else:
+                        info = 'None'
+                    d['data'] = info
+                else:
+                    # resources can go away, so None is returned
+                    print("skipping resource for get", str(propkey))
+                properties_list.append(d)
             return properties_list
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
