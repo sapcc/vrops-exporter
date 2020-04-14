@@ -88,7 +88,7 @@ class Resources:
                                     headers=headers)
         except Exception as e:
             print("Problem connecting to " + target + "Error: " + str(e))
-            return False
+            return resources
 
         if response.status_code == 200:
             for resource in response.json()["resourceList"]:
@@ -180,7 +180,12 @@ class Resources:
             return False
 
         if response.status_code == 200:
-            return response.json()['values']
+            try:
+                return response.json()['values']
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
+                      "\nerror msg:", str(e))
+                return False
         else:
             print("Return code not 200 for " + str(key) + ": " + response.text)
             return False
@@ -240,8 +245,13 @@ class Resources:
         properties_list = list()
 
         if response.status_code == 200:
-            if not response.json()['values']:
-                print("skipping propkey " + str(propkey) + ", no return")
+            try:
+                if not response.json()['values']:
+                    print("skipping propkey " + str(propkey) + ", no return")
+                    return False
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
+                      "\nerror msg:", str(e))
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -256,7 +266,6 @@ class Resources:
                 else:
                     # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))
-
                 properties_list.append(d)
             return properties_list
         else:
@@ -294,8 +303,13 @@ class Resources:
         properties_list = list()
 
         if response.status_code == 200:
-            if not response.json()['values']:
-                print("skipping propkey " + str(propkey) + ", no return")
+            try:
+                if not response.json()['values']:
+                    print("skipping propkey " + str(propkey) + ", no return")
+                    return False
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
+                      "\nerror msg:", str(e))
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -351,8 +365,13 @@ class Resources:
         properties_list = list()
 
         if response.status_code == 200:
-            if not response.json()['values']:
-                print("skipping propkey " + str(propkey) + ", no return")
+            try:
+                if not response.json()['values']:
+                    print("skipping propkey " + str(propkey) + ", no return")
+                    return False
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
+                      "\nerror msg:", str(e))
                 return False
             for resource in response.json()['values']:
                 d = dict()
