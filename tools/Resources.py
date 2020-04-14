@@ -88,7 +88,7 @@ class Resources:
                                     headers=headers)
         except Exception as e:
             print("Problem connecting to " + target + "Error: " + str(e))
-            return []
+            return resources
 
         if response.status_code == 200:
             for resource in response.json()["resourceList"]:
