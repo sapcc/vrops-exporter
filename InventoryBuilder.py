@@ -20,7 +20,7 @@ class InventoryBuilder:
         self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
-        self.keep_iterations = 3
+        self.successful_iteration_list = [0]
         self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
@@ -67,9 +67,14 @@ class InventoryBuilder:
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
-            #the latest iteration is the only which is currently filled, go back by 1
-            return_iteration = self.iteration - 1
+            return_iteration = self.successful_iteration_list[-1]
             return str(return_iteration)
+
+        #debugging purpose
+        @app.route('/iteration_store', methods=['GET'])
+        def iteration_store():
+            return_iteration = self.successful_iteration_list
+            return(json.dumps(return_iteration))
 
         @app.route('/register', methods=['POST'])
         def post_registered_collectors():
@@ -131,11 +136,14 @@ class InventoryBuilder:
         # first iteration to fill is 1. while this is not ready, curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
-            if self.iteration > self.keep_iterations:
-                obsolete_iteration = self.iteration - self.keep_iterations
-                self.iterated_inventory.pop(str(obsolete_iteration))
+            if len(self.successful_iteration_list) > 3:
+                iteration_to_be_deleted = self.successful_iteration_list.pop(0)
+                #initial case, since 0 is never filled in iterated_inventory
+                if iteration_to_be_deleted == 0:
+                    continue
+                self.iterated_inventory.pop(str(iteration_to_be_deleted))
                 if os.environ['DEBUG'] >= '1':
-                    print("deleting iteration " + str(self.iteration))
+                    print("deleting iteration", str(iteration_to_be_deleted))
 
             #initialize empty inventory per iteration
             self.iterated_inventory[str(self.iteration)] = dict()
@@ -143,13 +151,20 @@ class InventoryBuilder:
                 print("real run " + str(self.iteration))
             for vrops in self.vrops_list:
                 if not self.query_vrops(vrops):
-                    print("retrying connection to " + vrops + " in next iteration")
+                    print("retrying connection to", vrops, "in next iteration", str(self.iteration + 1))
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
             self.get_hosts()
             self.get_datastores()
             self.get_vms()
+            if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
+                self.successful_iteration_list.append(self.iteration)
+            else:
+                #immediately withdraw faulty inventory
+                if os.environ['DEBUG'] >= '1':
+                    print("withdrawing current iteration",self.iteration)
+                self.iterated_inventory.pop(str(self.iteration))
             self.iteration += 1
             if os.environ['DEBUG'] >= '1':
                 print("inventory relaxing before going to work again")
