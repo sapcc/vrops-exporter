@@ -118,10 +118,10 @@ class InventoryBuilder:
             return json.dumps(self.target_tokens)
 
         if os.environ['DEBUG'] >= '2':
-            WSGIServer(('127.0.0.1', self.port), app).serve_forever()
+            WSGIServer(('0.0.0.0', self.port), app).serve_forever()
         else:
-            WSGIServer(('127.0.0.1', self.port), app, log=None).serve_forever()
-        # WSGIServer(('0.0.0.0', self.port), app).serve_forever()
+            WSGIServer(('0.0.0.0', self.port), app, log=None).serve_forever()
+        # WSGIServer(('127.0.0.1', self.port), app).serve_forever()
 
     def get_vrops(self):
         with open(self.json) as json_file:
