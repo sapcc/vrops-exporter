@@ -45,4 +45,4 @@ def parse_params():
 
 if __name__ == '__main__':
     options = parse_params()
-    InventoryBuilder(options.atlas, options.port)
+    InventoryBuilder(options.atlas, os.environ['PORT'])
