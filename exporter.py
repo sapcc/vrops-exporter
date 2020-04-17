@@ -20,18 +20,11 @@ from collectors.ClusterStatsCollector import ClusterStatsCollector
 
 def parse_params():
     parser = OptionParser()
-    parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
-    parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
     parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)", action="store", dest="port")
-    parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
     parser.add_option("-i", "--inventory", help="inventory service address", action="store", dest="inventory")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     (options, args) = parser.parse_args()
 
-    if options.user:
-        os.environ['USER'] = options.user
-    if options.password:
-        os.environ['PASSWORD'] = options.password
     if options.inventory:
         os.environ['INVENTORY'] = options.inventory
     if options.debug:
@@ -47,12 +40,6 @@ def parse_params():
 
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
-        sys.exit(0)
-    if "USER" not in os.environ and not options.user:
-        print("Can't start, please specify user with ENV or -u")
-        sys.exit(0)
-    if "PASSWORD" not in os.environ and not options.password:
-        print("Can't start, please specify password with ENV or -p")
         sys.exit(0)
     if "INVENTORY" not in os.environ and not options.inventory:
         print("Can't start, please specify inventory with ENV or -i")
@@ -70,7 +57,6 @@ def run_prometheus_server(port, collectors,  *args):
 
 if __name__ == '__main__':
     options = parse_params()
-    print(options.atlas)
     collectors = [
                 # SampleCollector(),
                 ClusterStatsCollector(),
