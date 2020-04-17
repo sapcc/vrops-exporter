@@ -24,6 +24,7 @@ def parse_params():
     parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
     parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
+    parser.add_option("-i", "--inventory", help="inventory service address", action="store", dest="inventory")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     (options, args) = parser.parse_args()
 
@@ -31,6 +32,8 @@ def parse_params():
         os.environ['USER'] = options.user
     if options.password:
         os.environ['PASSWORD'] = options.password
+    if options.inventory:
+        os.environ['INVENTORY'] = options.inventory
     if options.debug:
         os.environ['DEBUG'] = "1"
         print('DEBUG enabled')
@@ -50,6 +53,9 @@ def parse_params():
         sys.exit(0)
     if "PASSWORD" not in os.environ and not options.password:
         print("Can't start, please specify password with ENV or -p")
+        sys.exit(0)
+    if "INVENTORY" not in os.environ and not options.inventory:
+        print("Can't start, please specify inventory with ENV or -i")
         sys.exit(0)
 
     return options
