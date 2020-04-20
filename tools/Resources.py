@@ -91,11 +91,16 @@ class Resources:
             return resources
 
         if response.status_code == 200:
-            for resource in response.json()["resourceList"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["identifier"]
-                resources.append(res)
+            try:
+                resourcelist = response.json()["resourceList"]
+                for resource in resourcelist:
+                    res = dict()
+                    res['name'] = resource["resourceKey"]["name"]
+                    res['uuid'] = resource["identifier"]
+                    resources.append(res)
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
+                      "\nerror msg:", str(e))
         else:
             print("problem getting resource " + str(response.json()))
         return resources

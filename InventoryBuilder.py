@@ -306,6 +306,7 @@ class InventoryBuilder:
                             tree[vm.uuid] = {
                                     'uuid': vm.uuid,
                                     'name': vm.name,
+                                    'project_id': vm.project_id,
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
