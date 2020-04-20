@@ -30,6 +30,9 @@ def parse_params():
             print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
+    if options.atlas:
+        os.environ['ATLAS'] = options.atlas
+
 
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
@@ -39,6 +42,9 @@ def parse_params():
         sys.exit(0)
     if "PASSWORD" not in os.environ and not options.password:
         print("Can't start, please specify password with ENV or -p")
+        sys.exit(0)
+    if "ATLAS" not in os.environ and not options.atlas:
+        print("Can't start, please specify atlas with ENV or -a")
         sys.exit(0)
 
     return options

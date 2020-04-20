@@ -39,7 +39,7 @@ class TestCollectors(unittest.TestCase):
 
         Resources.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
         Resources.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
-        thread = Thread(target=InventoryBuilder, args=('./tests/test.json',))
+        thread = Thread(target=InventoryBuilder, args=('./tests/test.json',80,))
         thread.daemon = True
         thread.start()
 
