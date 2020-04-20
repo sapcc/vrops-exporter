@@ -99,7 +99,7 @@ class Resources:
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
+                print("Catching JSONDecodeError for target:", str(target), "and resourcekind:", str(resourcekind),
                       "\nerror msg:", str(e))
         else:
             print("problem getting resource " + str(response.json()))
