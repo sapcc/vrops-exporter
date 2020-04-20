@@ -109,7 +109,7 @@ This **token** can be retrieved from the REST API with `get_target_tokens`.
 Test module is called using ENV variables. Specifying these on the fly would look like this:
 
 ```
-DEBUG=0 USER=foo PASSWORD=bar python3 tests/TestCollectors.py
+DEBUG=0 INVENTORY=127.0.0.1 USER=FOO PASSWORD=Bar python3 tests/TestCollectors.py
 ```
 
 Please note that USER and PASSWORD are currently doing nothing at all, they are only passed on because the test

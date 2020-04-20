@@ -11,58 +11,58 @@ class BaseCollector(ABC):
 
     def get_vcenters(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/vcenters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/vcenters/{}".format(current_iteration)
         request = requests.get(url)
         self.vcenters = request.json()
         return self.vcenters
 
     def get_datacenters(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/datacenters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/datacenters/{}".format(current_iteration)
         request = requests.get(url)
         self.datacenters = request.json()
         return self.datacenters
 
     def get_clusters(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/clusters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/clusters/{}".format(current_iteration)
         request = requests.get(url)
         self.clusters = request.json()
         return self.clusters
 
     def get_hosts(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/hosts/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/hosts/{}".format(current_iteration)
         request = requests.get(url)
         self.hosts = request.json()
         return self.hosts
 
     def get_datastores(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/datastores/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/datastores/{}".format(current_iteration)
         request = requests.get(url)
         self.datastores = request.json()
         return self.datastores
 
     def get_vms(self):
         current_iteration = self.get_iteration()
-        url = "http://localhost:8000/vms/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/vms/{}".format(current_iteration)
         request = requests.get(url)
         self.vms = request.json()
         return self.vms
 
     def get_iteration(self):
-        request = requests.get(url = "http://localhost:8000/iteration")
+        request = requests.get(url = "http://" + os.environ['INVENTORY'] + "/iteration")
         self.iteration = request.json()
         return self.iteration
 
     def get_targets(self):
-        request = requests.get(url="http://localhost:8000/vrops_list")
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
         self.target = request.json()
         return self.target
 
     def get_target_tokens(self):
-        request = requests.get(url="http://localhost:8000/target_tokens")
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
         self.target_tokens = request.json()
         return self.target_tokens
 
@@ -71,12 +71,12 @@ class BaseCollector(ABC):
             'collector': collector,
             'metric_names': list(metric_names)
         }
-        request = requests.post(json=payload, url="http://localhost:8000/register")
+        request = requests.post(json=payload, url="http://" + os.environ['INVENTORY'] + "/register")
         if request.status_code != 200:
             print("request failed with status: {}".format(request.status_code))
 
     def get_registered_collectors(self):
-        request = requests.get(url="http://localhost:8000/register")
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/register")
         self.collectors_up = request.json()
         return self.collectors_up
 
@@ -84,17 +84,17 @@ class BaseCollector(ABC):
         payload = {
             'metric_name': metric
         }
-        r = requests.post(json=payload, url="http://localhost:8000/metrics")
+        r = requests.post(json=payload, url="http://" + os.environ['INVENTORY'] + "/metrics")
         if r.status_code != 200:
             print("request failed with status: {}".format(r.status_code))
 
     def get_metrics(self):
-        request = requests.get(url="http://localhost:8000/metrics")
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/metrics")
         self.metrics = request.json()
         return self.metrics
 
     def delete_metrics(self):
-        request = requests.delete(url="http://localhost:8000/metrics")
+        request = requests.delete(url="http://" + os.environ['INVENTORY'] + "/metrics")
         if request.status_code != 200:
             print("request failed with status: {}".format(request.status_code))
 

@@ -13,8 +13,9 @@ from urllib3.exceptions import HTTPError
 
 
 class InventoryBuilder:
-    def __init__(self, json):
+    def __init__(self, json, port):
         self.json = json
+        self.port = int(port)
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
@@ -33,13 +34,13 @@ class InventoryBuilder:
         metrics = []
 
         app = Flask(__name__)
-        print('serving /vrops_list on 8000')
+        print('serving /vrops_list on', str(self.port))
 
         @app.route('/vrops_list', methods=['GET'])
         def vrops_list():
             return json.dumps(self.vrops_list)
 
-        print('serving /inventory on 8000')
+        print('serving /inventory on', str(self.port))
 
         @app.route('/vcenters/<int:iteration>', methods=['GET'])
         def vcenters(iteration):
@@ -117,10 +118,10 @@ class InventoryBuilder:
             return json.dumps(self.target_tokens)
 
         if os.environ['DEBUG'] >= '2':
-            WSGIServer(('127.0.0.1', 8000), app).serve_forever()
+            WSGIServer(('0.0.0.0', self.port), app).serve_forever()
         else:
-            WSGIServer(('127.0.0.1', 8000), app, log=None).serve_forever()
-        # WSGIServer(('0.0.0.0', 8000), app).serve_forever()
+            WSGIServer(('0.0.0.0', self.port), app, log=None).serve_forever()
+        # WSGIServer(('127.0.0.1', self.port), app).serve_forever()
 
     def get_vrops(self):
         with open(self.json) as json_file:
