@@ -3,26 +3,31 @@ Prometheus exporter to scrape metrics from vRealize Operations Manager
 
 ### Running the exporter
 
-The container is defaulting to /vrops-exporter path. 
-Use exporter.py with one of the two ways of specifying the necessary credentials. 
-They could also be mixed of course.
+The exporter consists of two main components:
+* inventorybuilder
+* exporter
+
+In the past, these have been in one launch script (exporter.py) but this was not really working out, since a restart of the exporter would always need to wait for a whole inventory rebuild. That's why one part is building the inventory permanently and exposing it to the exporter. The exporter fetches the data (http) and uses this to run the actual vROps queries.
 
 1. CLI
 
-    ```
-    Usage: pyhton3 exporter.py [options]
-    ```
-    Options:
-    
-    short | long | description
-    --- | --- | ---
-      -h | --help |           show this help message and exit
-      -u USER | --user=USER | specify user to log in
-      -p PASSWORD | --password=PASSWORD | specify password to log in
-      -o PORT | --port=PORT | specify exporter port
-      -a | --atlas | specify atlas configfile 
-      -d | --debug    |       enable debug
+    Either specify the vars via environment or cli params. Here an example start command for both, inventory and exporter:
 
+       ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
+       ./exporter.py -o 9000 -i localhost -d
+
+    [Atlas](https://github.com/sapcc/atlas) refers to our netbox extractor, which is in the end providing netbox data as a configmap in k8s. You don't have to use it, a json file with this structure would be sufficient, too.
+
+   ```json 
+   [
+     {
+         "labels": {
+             "job": "vrops",
+             "server_name": "vrops.dns.address",
+         }
+     },
+     { ... }
+   ]
 
 2. Enviroment variables
 
@@ -30,8 +35,14 @@ They could also be mixed of course.
     USER
     PASSWORD
     PORT
+    INVENTORY
     ```
+
+For running this in kubernetes (like we do), you might want to have a look at our [helm chart](https://github.com/sapcc/helm-charts/tree/master/prometheus-exporters/vrops-exporter)
+
 ### Architecture
+
+Not up to date with latest inventory - exporter split
 
 ![](images/architecture.jpeg)
 
@@ -105,7 +116,7 @@ It's also important to use the same token already generated for building the inv
 This **token** can be retrieved from the REST API with `get_target_tokens`. 
 7. Import and register your collector in exporter.py. 
 
- ### Test
+### Test
 Test module is called using ENV variables. Specifying these on the fly would look like this:
 
 ```
