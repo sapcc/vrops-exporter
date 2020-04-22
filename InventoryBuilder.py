@@ -14,6 +14,9 @@ import os
 class InventoryBuilder:
     def __init__(self, json, port):
         self.json = json
+        self.port = int(port)
+        self._user = os.environ["USER"]
+        self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
