@@ -39,33 +39,32 @@ class TestCollectors(unittest.TestCase):
 
         Resources.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
         Resources.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
-        thread = Thread(target=InventoryBuilder, args=('./tests/test.json',80,))
+        # test tool get_resources to create resource objects
+
+        Resources.get_datacenter = MagicMock(
+            return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
+                            {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
+                                                        {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
+                                                        {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
+                                                            {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
+                                                                {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_datastores = MagicMock(
+            return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
+                            {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
+                                                            {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+        Resources.get_latest_stat = MagicMock(return_value=1)
+        Resources.get_property = MagicMock(return_value="test_property")
+        thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 80,))
         thread.daemon = True
         thread.start()
 
         for collector in metrics_yaml.keys():
             print("\nTesting " + collector)
-
-            # test tool get_resources to create resource objects
-
-            Resources.get_datacenter = MagicMock(
-                return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
-                              {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
-                                                            {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                                          {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                              {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
-                                                                    {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_datastores = MagicMock(
-                return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                              {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
-                                                              {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
-            Resources.get_latest_stat = MagicMock(return_value=1)
-            Resources.get_property = MagicMock(return_value="test_property")
 
             if 'Stats' in collector:
                 # mocking all values from yaml
