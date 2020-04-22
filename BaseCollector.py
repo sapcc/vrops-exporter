@@ -116,8 +116,6 @@ class BaseCollector(ABC):
             if host['target'] not in self.target_hosts:
                 self.target_hosts[host['target']] = list()
             self.target_hosts[host['target']].append(uuid)
-        print("target_hosts")
-        print(self.target_hosts)
         return self.target_hosts
 
     def get_datastores_by_target(self):
