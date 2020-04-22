@@ -7,7 +7,7 @@ HostSystemStatsCollector:
       statkey: "cpu|usagemhz_average"
     - label: "cpu_demand_percentage"
       statkey: "cpu|demandPct"
-    - label: "cpu_usage_average"
+    - label: "cpu_usage_average_percentage"
       statkey: "cpu|usage_average"
     - label: "memory_host_usage_kilobytes"
       statkey: "mem|host_usage"
