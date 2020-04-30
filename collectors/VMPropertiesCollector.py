@@ -27,19 +27,16 @@ class VMPropertiesCollector(BaseCollector):
 
         thread_list = list()
         for target in self.get_vms_by_target():
-            print("threading for", target)
-            t = Thread(target=self.do_vm_metrics, args=(target,g,i))
+            t = Thread(target=self.do_metrics, args=(target,g,i))
             thread_list.append(t)
             t.start()
-
         for t in thread_list:
-            print("joining")
             t.join()
+
         yield g
         yield i
 
-
-    def do_vm_metrics(self, target, g, i):
+    def do_metrics(self, target, g, i):
         token = self.get_target_tokens()
         token = token[target]
         if not token:

@@ -22,20 +22,17 @@ class VMStatsCollector(BaseCollector):
 
         thread_list = list()
         for target in self.get_vms_by_target():
-            print("threading for", target)
-            t = Thread(target=self.do_vm_metrics, args=(target,g))
+            t = Thread(target=self.do_metrics, args=(target,g))
             thread_list.append(t)
             t.start()
-
         for t in thread_list:
-            print("joining")
             t.join()
 
        # #make one big request per stat id with all resource id's in its belly
         # self.post_metrics(g.name)
         yield g
 
-    def do_vm_metrics(self, target, g):
+    def do_metrics(self, target, g):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
