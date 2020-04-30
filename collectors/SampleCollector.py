@@ -5,8 +5,12 @@ from prometheus_client.core import GaugeMetricFamily
 
 class SampleCollector(BaseCollector):
     def __init__(self):
-        self.wait_for_inventory_data()
-        # self.post_registered_collector(self.__class__.__name__, g.name)
+        if os.environ.get('INVENTORY', None):
+            self.wait_for_inventory_data()
+            # self.post_registered_collector(self.__class__.__name__, g.name)
+        else:
+            print("No InventoryService in ENV. Cannot start {}".format(self.__class__.__name__))
+
 
     def describe(self):
         yield GaugeMetricFamily('vrops_inventory_collection_iteration', 'actual run of resource collection')

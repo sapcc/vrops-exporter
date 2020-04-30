@@ -4,7 +4,6 @@ import unittest
 
 sys.path.append('.')
 from unittest import TestCase
-from unittest.mock import call, patch, MagicMock
 from exporter import parse_params
 from exporter import default_collectors
 
@@ -47,13 +46,13 @@ class TestLaunchExporter(TestCase):
     def test_with_one_collector(self):
         sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector']
         options = parse_params()
-        self.assertEqual(options.collectors, ['VMStatsCollector'], 'Default collector list does not match the default')
+        self.assertEqual(options.collectors, ['VMStatsCollector'], 'Collector list does not match given single collector')
 
     # test multiple enabled collectors
     def test_with_multiple_collector(self):
         sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector', '-c', 'VMPropertiesCollector']
         options = parse_params()
-        self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'], 'Default collector list does not match the default')
+        self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'], 'Collector list does not match given multiple collectors')
 
     def test_with_bogus_options(self):
         os.environ.clear()
@@ -68,27 +67,6 @@ class TestLaunchExporter(TestCase):
         with self.assertRaises(SystemExit) as se:
             parse_params()
         self.assertEqual(se.exception.code, 0, 'PORT or INVENTORY are not set properly in ENV or command line!')
-
-import collectors.CollectorUp
-import importlib
-from exporter import initialize_collector_by_name
-class TestCollectorInitialization(TestCase):
-    def test_valid_collector(self):
-        collector = initialize_collector_by_name('CollectorUp')
-        self.assertIsInstance(collector, collectors.CollectorUp.CollectorUp)
-
-    @patch('builtins.print')
-    def test_with_bogus_collector(self, mocked_print):
-        collector = initialize_collector_by_name('BogusCollector')
-        self.assertIsNone(collector)
-        self.assertEqual(mocked_print.mock_calls, [call('No Collector "BogusCollector" defined. Ignoring...')])
-
-    @patch('builtins.print')
-    def test_with_invalid_collector(self, mocked_print):
-        importlib.import_module = MagicMock(return_value=collectors.CollectorUp)
-        collector = initialize_collector_by_name('ClassNotDefinedCollector')
-        self.assertIsNone(collector)
-        self.assertEqual(mocked_print.mock_calls, [call('Unable to initialize "ClassNotDefinedCollector". Ignoring...')])
 
 if __name__ == '__main__':
     unittest.main()

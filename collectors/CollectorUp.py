@@ -6,7 +6,7 @@ from BaseCollector import BaseCollector
 class CollectorUp(BaseCollector):
     def __init__(self):
         self.g = GaugeMetricFamily('vrops_collector_up', 'testtext', labels=['collector', 'metric'])
-        # self.post_registered_collector(self.__class__.__name__, self.g.name)
+        self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
         yield self.g
