@@ -80,5 +80,4 @@ def initialize_collector_by_name(class_name):
 
 if __name__ == '__main__':
     options = parse_params()
-    collectors = list(map(lambda c: initialize_collector_by_name(c), options.collectors))
     run_prometheus_server(int(os.environ['PORT']), collectors)
