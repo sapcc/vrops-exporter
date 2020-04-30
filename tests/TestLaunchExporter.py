@@ -5,6 +5,7 @@ import unittest
 sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
+from exporter import default_collectors
 
 
 class TestLaunchExporter(TestCase):
@@ -34,6 +35,24 @@ class TestLaunchExporter(TestCase):
         # cli params preferred
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
+
+    # test use default collectors when nothing is specified
+    def test_with_no_collector(self):
+        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url']
+        options = parse_params()
+        self.assertEqual(options.collectors, default_collectors(), 'Default collector list does not match the default')
+
+    # test with only one collector enabled
+    def test_with_one_collector(self):
+        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector']
+        options = parse_params()
+        self.assertEqual(options.collectors, ['VMStatsCollector'], 'Collector list does not match given single collector')
+
+    # test multiple enabled collectors
+    def test_with_multiple_collector(self):
+        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector', '-c', 'VMPropertiesCollector']
+        options = parse_params()
+        self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'], 'Collector list does not match given multiple collectors')
 
     def test_with_bogus_options(self):
         os.environ.clear()

@@ -2,27 +2,35 @@
 import sys
 import time
 import os
+import importlib
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY #GaugeMetricFamily, REGISTRY, CounterMetricFamily
 from optparse import OptionParser
 from threading import Thread
 
 # from VropsCollector import VropsCollector
-from collectors.SampleCollector import SampleCollector
-from collectors.HostSystemStatsCollector import HostSystemStatsCollector
-from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
-from collectors.DatastoreStatsCollector import DatastoreStatsCollector
-from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector 
-from collectors.VMStatsCollector import VMStatsCollector
-from collectors.VMPropertiesCollector import VMPropertiesCollector
-from collectors.CollectorUp import CollectorUp
-from collectors.ClusterStatsCollector import ClusterStatsCollector
+from InventoryBuilder import InventoryBuilder
+
+def default_collectors():
+    return [
+        # 'SampleCollector',
+        # 'CollectorUp',
+        # add new collectors below this line
+        'ClusterStatsCollector',
+        'ClusterPropertiesCollector',
+        'HostSystemStatsCollector',
+        'HostSystemPropertiesCollector',
+        'DatastoreStatsCollector',
+        'VMStatsCollector',
+        'VMPropertiesCollector'
+    ]
 
 def parse_params():
     parser = OptionParser()
     parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)", action="store", dest="port")
     parser.add_option("-i", "--inventory", help="inventory service address", action="store", dest="inventory")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
+    parser.add_option("-c", "--collector", help="enable collector (use multiple times)", action="append", dest="collectors")
     (options, args) = parser.parse_args()
 
     if options.inventory:
@@ -37,6 +45,8 @@ def parse_params():
             print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
+    if not options.collectors:
+        options.collectors = default_collectors()
 
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
@@ -55,18 +65,19 @@ def run_prometheus_server(port, collectors,  *args):
     while True:
         time.sleep(1)
 
+def initialize_collector_by_name(class_name):
+    try:
+        class_module = importlib.import_module('collectors.%s' % (class_name))
+    except:
+        print('No Collector "%s" defined. Ignoring...' % (class_name))
+        return None
+
+    try:
+        return getattr(class_module, class_name)()
+    except AttributeError:
+        print('Unable to initialize "%s". Ignoring...' % (class_name))
+        return None
+
 if __name__ == '__main__':
     options = parse_params()
-    collectors = [
-                # SampleCollector(),
-                ClusterStatsCollector(),
-                ClusterPropertiesCollector(),
-                HostSystemStatsCollector(),
-                HostSystemPropertiesCollector(),
-                DatastoreStatsCollector(),
-                VMStatsCollector(),
-                VMPropertiesCollector()
-                # add new collectors above this line
-                # CollectorUp()
-            ]
     run_prometheus_server(int(os.environ['PORT']), collectors)
