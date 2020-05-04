@@ -2,6 +2,25 @@ ClusterStatsCollector:
    metrics:
       - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster1"}'
       - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cluster_running_hosts",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_capacity_usage_percentage",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_capacity_usage_percentage",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_usage_mhz",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_usage_mhz",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_capacity_mhz",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_capacity_mhz",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_usable_capcity_for_vms_after_ha",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="cpu_usable_capcity_for_vms_after_ha",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_consumed_by_vms",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_consumed_by_vms",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_capacity_on_hosts",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_capacity_on_hosts",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_usable_capcity_for_vms_after_ha",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_usable_capcity_for_vms_after_ha",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_usage_kilobytes",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_usage_kilobytes",vccluster="cluster2"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_utilization_based_on_vms",vccluster="cluster1"}'
+      - 'vrops_cluster_stats{datacenter="datacenter2",statkey="memory_utilization_based_on_vms",vccluster="cluster2"}'
+
 
 ClusterPropertiesCollector:
    metrics:
