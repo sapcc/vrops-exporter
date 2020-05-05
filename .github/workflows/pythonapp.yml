@@ -33,4 +33,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        INVENTORY=127.0.0.1 DEBUG=2 USER=FOO PASSWORD=Bar pytest -s tests/Test*.py
+        INVENTORY=0.0.0.0 DEBUG=2 USER=FOO PASSWORD=Bar pytest -s tests/Test*.py
