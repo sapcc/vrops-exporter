@@ -22,6 +22,10 @@ class InventoryBuilder:
         self.target_tokens = dict()
         self.iterated_inventory = dict()
         self.successful_iteration_list = [0]
+        if os.environ['LOOPBACK'] == '1':
+            self.wsgi_address = '127.0.0.1'
+        else:
+            self.wsgi_address = '0.0.0.0'
         self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
@@ -117,11 +121,11 @@ class InventoryBuilder:
         def token():
             return json.dumps(self.target_tokens)
 
+
         if os.environ['DEBUG'] >= '2':
-            WSGIServer(('0.0.0.0', self.port), app).serve_forever()
+            WSGIServer((self.wsgi_address, self.port), app).serve_forever()
         else:
-            WSGIServer(('0.0.0.0', self.port), app, log=None).serve_forever()
-        # WSGIServer(('127.0.0.1', self.port), app).serve_forever()
+            WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
 
     def get_vrops(self):
         with open(self.json) as json_file:

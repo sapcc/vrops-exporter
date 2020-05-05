@@ -14,6 +14,7 @@ def parse_params():
     parser.add_option("-o", "--port", help="specify exporter port", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
+    parser.add_option("-l", "--loopback", help="use 127.0.0.1 address instead of listen to 0.0.0.0", action="store_true", dest="loopback")
     (options, args) = parser.parse_args()
 
     if options.user:
@@ -28,6 +29,8 @@ def parse_params():
             os.environ['DEBUG'] = "0"
         else:
             print('DEBUG enabled')
+    if options.loopback:
+        os.environ['LOOPBACK'] = "1"
     if options.port:
         os.environ['PORT'] = options.port
     if options.atlas:
