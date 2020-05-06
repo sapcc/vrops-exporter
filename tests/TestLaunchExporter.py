@@ -1,12 +1,10 @@
 import sys
-import os
-import unittest
+sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
 from exporter import default_collectors
-
-
-sys.path.append('.')
+import os
+import unittest
 
 
 class TestLaunchExporter(TestCase):

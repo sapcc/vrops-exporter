@@ -1,4 +1,5 @@
 import sys
+sys.path.append('.')
 import unittest
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
@@ -7,7 +8,6 @@ import collectors.VMStatsCollector
 from exporter import initialize_collector_by_name
 
 
-sys.path.append('.')
 
 
 class TestCollectorInitialization(TestCase):

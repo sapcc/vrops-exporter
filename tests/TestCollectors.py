@@ -1,3 +1,5 @@
+import sys
+sys.path.append('.')
 from unittest.mock import MagicMock
 from threading import Thread
 from exporter import run_prometheus_server
@@ -13,14 +15,11 @@ from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
 from prometheus_client.core import REGISTRY
-import sys
 import unittest
 import random
 import http.client
 import os
 import time
-
-sys.path.append('.')
 
 
 class TestCollectors(unittest.TestCase):

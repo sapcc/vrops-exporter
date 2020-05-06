@@ -1,11 +1,9 @@
+import sys
+sys.path.append('.')
 from unittest import TestCase
 from inventory import parse_params
-import sys
 import os
 import unittest
-
-
-sys.path.append('.')
 
 
 class TestLaunchExporter(TestCase):
