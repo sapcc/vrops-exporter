@@ -4,12 +4,9 @@ import time
 import os
 import importlib
 from prometheus_client import start_http_server
-from prometheus_client.core import REGISTRY #GaugeMetricFamily, REGISTRY, CounterMetricFamily
+from prometheus_client.core import REGISTRY
 from optparse import OptionParser
-from threading import Thread
 
-# from VropsCollector import VropsCollector
-from InventoryBuilder import InventoryBuilder
 
 def default_collectors():
     return [
@@ -25,9 +22,11 @@ def default_collectors():
         'VMPropertiesCollector'
     ]
 
+
 def parse_params():
     parser = OptionParser()
-    parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)", action="store", dest="port")
+    parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)",
+                      action="store", dest="port")
     parser.add_option("-i", "--inventory", help="inventory service address", action="store", dest="inventory")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     parser.add_option("-c", "--collector", help="enable collector (use multiple times)", action="append", dest="collectors")
@@ -65,10 +64,11 @@ def run_prometheus_server(port, collectors,  *args):
     while True:
         time.sleep(1)
 
+
 def initialize_collector_by_name(class_name):
     try:
         class_module = importlib.import_module('collectors.%s' % (class_name))
-    except:
+    except ModuleNotFoundError:
         print('No Collector "%s" defined. Ignoring...' % (class_name))
         return None
 
@@ -77,6 +77,7 @@ def initialize_collector_by_name(class_name):
     except AttributeError:
         print('Unable to initialize "%s". Ignoring...' % (class_name))
         return None
+
 
 if __name__ == '__main__':
     options = parse_params()

@@ -1,9 +1,9 @@
 from BaseCollector import BaseCollector
-import os, time, json
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 from threading import Thread
+import os
 
 
 class ClusterStatsCollector(BaseCollector):
@@ -24,7 +24,7 @@ class ClusterStatsCollector(BaseCollector):
 
         thread_list = list()
         for target in self.get_clusters_by_target():
-            t = Thread(target=self.do_metrics, args=(target,g))
+            t = Thread(target=self.do_metrics, args=(target, g))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -48,10 +48,9 @@ class ClusterStatsCollector(BaseCollector):
                 print("skipping statkey " + str(statkey) + " in ClusterStatsCollector, no return")
                 continue
             for value_entry in values:
-                #data = value_entry['data']
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 cluster_id = value_entry['resourceId']
                 g.add_metric(
                         labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
-                                 statkey_label],
+                                statkey_label],
                         value=metric_value)

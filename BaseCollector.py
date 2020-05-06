@@ -3,6 +3,7 @@ import requests
 import time
 import os
 
+
 class BaseCollector(ABC):
 
     @abstractmethod
@@ -52,7 +53,7 @@ class BaseCollector(ABC):
         return self.vms
 
     def get_iteration(self):
-        request = requests.get(url = "http://" + os.environ['INVENTORY'] + "/iteration")
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
         self.iteration = request.json()
         return self.iteration
 
