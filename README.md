@@ -1,4 +1,5 @@
 ![Python application](https://github.com/sapcc/vrops-exporter/workflows/Python%20application/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/sapcc/vrops-exporter/badge.svg?branch=master)](https://coveralls.io/github/sapcc/vrops-exporter?branch=master)
 
 # vrops-exporter
 Prometheus exporter to scrape metrics from vRealize Operations Manager
