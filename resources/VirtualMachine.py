@@ -6,4 +6,3 @@ class VirtualMachine:
         self.name = name
         self.uuid = uuid
         self.project_id = project_id
-

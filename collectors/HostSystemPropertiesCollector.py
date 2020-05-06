@@ -1,9 +1,10 @@
 from BaseCollector import BaseCollector
-import os, time, json
-from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily
+from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 from threading import Thread
+import os
 
 
 class HostSystemPropertiesCollector(BaseCollector):
@@ -19,15 +20,15 @@ class HostSystemPropertiesCollector(BaseCollector):
 
     def collect(self):
         g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
-                                   labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
+                              labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
         i = InfoMetricFamily("vrops_hostsystem", 'testtest',
-                                  labels=['datacenter', 'vccluster', 'hostsystem'])
+                             labels=['datacenter', 'vccluster', 'hostsystem'])
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_hosts_by_target():
-            t = Thread(target=self.do_metrics, args=(target,g,i))
+            t = Thread(target=self.do_metrics, args=(target, g, i))
             thread_list.append(t)
             t.start()
         for t in thread_list:

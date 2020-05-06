@@ -1,9 +1,9 @@
 from BaseCollector import BaseCollector
-import os, time
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 from threading import Thread
+import os
 
 
 class DatastoreStatsCollector(BaseCollector):
@@ -16,13 +16,14 @@ class DatastoreStatsCollector(BaseCollector):
         yield GaugeMetricFamily('vrops_datastore_stats', 'testtext')
 
     def collect(self):
-        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext', labels=['datacenter', 'vccluster', 'hostsystem', 'datastore', 'statkey'])
+        g = GaugeMetricFamily('vrops_datastore_stats', 'testtext',
+                              labels=['datacenter', 'vccluster', 'hostsystem', 'datastore', 'statkey'])
         if os.environ['DEBUG'] >= '1':
             print(self.__class__.__name__ + " starts with collecting the metrics")
 
         thread_list = list()
         for target in self.get_datastores_by_target():
-            t = Thread(target=self.do_metrics, args=(target,g))
+            t = Thread(target=self.do_metrics, args=(target, g))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -45,11 +46,11 @@ class DatastoreStatsCollector(BaseCollector):
                 print("skipping statkey " + str(statkey) + " in " + self.__class__.__name__ + " , no return")
                 continue
             for value_entry in values:
-                #there is just one, because we are querying latest only
+                # there is just one, because we are querying latest only
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 datastore_id = value_entry['resourceId']
                 g.add_metric(labels=[self.datastores[datastore_id]['datacenter'],
-                                 self.datastores[datastore_id]['cluster'],
-                                 self.datastores[datastore_id]['parent_host_name'],
-                                 self.datastores[datastore_id]['name'],
-                                 statkey_label], value=metric_value)
+                             self.datastores[datastore_id]['cluster'],
+                             self.datastores[datastore_id]['parent_host_name'],
+                             self.datastores[datastore_id]['name'],
+                             statkey_label], value=metric_value)

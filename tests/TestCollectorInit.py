@@ -1,16 +1,16 @@
 import sys
-import os
 import unittest
-
-sys.path.append('.')
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 import importlib
 import collectors.VMStatsCollector
 from exporter import initialize_collector_by_name
 
-class TestCollectorInitialization(TestCase):
 
+sys.path.append('.')
+
+
+class TestCollectorInitialization(TestCase):
     @patch('BaseCollector.BaseCollector.wait_for_inventory_data')
     def test_valid_collector2(self, mocked_wait):
         mocked_wait.return_value = None
@@ -29,6 +29,7 @@ class TestCollectorInitialization(TestCase):
         collector = initialize_collector_by_name('ClassNotDefinedCollector')
         self.assertIsNone(collector)
         self.assertEqual(mocked_print.mock_calls, [call('Unable to initialize "ClassNotDefinedCollector". Ignoring...')])
+
 
 if __name__ == '__main__':
     unittest.main()

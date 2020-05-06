@@ -1,15 +1,14 @@
-import json, os
-from flask import Flask, request, abort, jsonify
+from flask import Flask
+from flask import request
+from flask import abort
+from flask import jsonify
 from gevent.pywsgi import WSGIServer
-import re, yaml, sys, time
-import traceback
-import requests
 from threading import Thread
 from resources.Vcenter import Vcenter
 from tools.Resources import Resources
-from urllib.parse import urlparse, parse_qs
-from urllib3 import disable_warnings, exceptions
-from urllib3.exceptions import HTTPError
+import time
+import json
+import os
 
 
 class InventoryBuilder:
@@ -75,7 +74,7 @@ class InventoryBuilder:
             return_iteration = self.successful_iteration_list[-1]
             return str(return_iteration)
 
-        #debugging purpose
+        # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
         def iteration_store():
             return_iteration = self.successful_iteration_list
@@ -115,12 +114,10 @@ class InventoryBuilder:
             metrics.clear()
             return jsonify({"metrics": metrics})
 
-
-        #FIXME: this could basically be the always active token list. no active token? refresh!
+        # FIXME: this could basically be the always active token list. no active token? refresh!
         @app.route('/target_tokens', methods=['GET'])
         def token():
             return json.dumps(self.target_tokens)
-
 
         if os.environ['DEBUG'] >= '2':
             WSGIServer((self.wsgi_address, self.port), app).serve_forever()
@@ -138,19 +135,20 @@ class InventoryBuilder:
         self.vrops_list = vrops_list
 
     def query_inventory_permanent(self):
-        # first iteration to fill is 1. while this is not ready, curl to /iteration would still report 0 to wait for actual data
+        # first iteration to fill is 1. while this is not ready,
+        # curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
             if len(self.successful_iteration_list) > 3:
                 iteration_to_be_deleted = self.successful_iteration_list.pop(0)
-                #initial case, since 0 is never filled in iterated_inventory
+                # initial case, since 0 is never filled in iterated_inventory
                 if iteration_to_be_deleted == 0:
                     continue
                 self.iterated_inventory.pop(str(iteration_to_be_deleted))
                 if os.environ['DEBUG'] >= '1':
                     print("deleting iteration", str(iteration_to_be_deleted))
 
-            #initialize empty inventory per iteration
+            # initialize empty inventory per iteration
             self.iterated_inventory[str(self.iteration)] = dict()
             if os.environ['DEBUG'] >= '1':
                 print("real run " + str(self.iteration))
@@ -166,9 +164,9 @@ class InventoryBuilder:
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
-                #immediately withdraw faulty inventory
+                # immediately withdraw faulty inventory
                 if os.environ['DEBUG'] >= '1':
-                    print("withdrawing current iteration",self.iteration)
+                    print("withdrawing current iteration", self.iteration)
                 self.iterated_inventory.pop(str(self.iteration))
             self.iteration += 1
             if os.environ['DEBUG'] >= '1':

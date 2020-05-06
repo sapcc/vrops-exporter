@@ -1,11 +1,12 @@
 import sys
 import os
 import unittest
-
-sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
 from exporter import default_collectors
+
+
+sys.path.append('.')
 
 
 class TestLaunchExporter(TestCase):
@@ -50,9 +51,11 @@ class TestLaunchExporter(TestCase):
 
     # test multiple enabled collectors
     def test_with_multiple_collector(self):
-        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector', '-c', 'VMPropertiesCollector']
+        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector',
+                    '-c', 'VMPropertiesCollector']
         options = parse_params()
-        self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'], 'Collector list does not match given multiple collectors')
+        self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'],
+                         'Collector list does not match given multiple collectors')
 
     def test_with_bogus_options(self):
         os.environ.clear()
@@ -67,6 +70,7 @@ class TestLaunchExporter(TestCase):
         with self.assertRaises(SystemExit) as se:
             parse_params()
         self.assertEqual(se.exception.code, 0, 'PORT or INVENTORY are not set properly in ENV or command line!')
+
 
 if __name__ == '__main__':
     unittest.main()

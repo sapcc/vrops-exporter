@@ -2,7 +2,6 @@ from tools.Resources import Resources
 from resources.Host import Host
 
 
-
 class Cluster:
 
     def __init__(self, target, token, name, uuid):

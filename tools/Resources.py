@@ -1,9 +1,11 @@
-import requests, json, os
-from urllib3 import disable_warnings, exceptions
+from urllib3 import disable_warnings
+from urllib3 import exceptions
+import requests
+import json
+import os
 
 
 class Resources:
-    
     def get_token(target):
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
         headers = {
@@ -397,4 +399,3 @@ class Resources:
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
-

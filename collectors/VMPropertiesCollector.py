@@ -1,9 +1,10 @@
 from BaseCollector import BaseCollector
-import os, time, json
-from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily
+from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
 from threading import Thread
+import os
 
 
 class VMPropertiesCollector(BaseCollector):
@@ -19,15 +20,15 @@ class VMPropertiesCollector(BaseCollector):
 
     def collect(self):
         g = GaugeMetricFamily('vrops_vm_properties', 'testtest',
-                labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
+                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'propkey'])
         i = InfoMetricFamily('vrops_vm', 'testtest',
-                                  labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem'])
+                             labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem'])
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_vms_by_target():
-            t = Thread(target=self.do_metrics, args=(target,g,i))
+            t = Thread(target=self.do_metrics, args=(target, g, i))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -79,7 +80,8 @@ class VMPropertiesCollector(BaseCollector):
                         continue
                     g.add_metric(
                         labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
-                                self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], property_label + ": " + latest_state],
+                                self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'],
+                                property_label + ": " + latest_state],
                         value=data)
 
         if 'info_metrics' in self.property_yaml[self.name]:

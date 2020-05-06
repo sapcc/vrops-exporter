@@ -1,14 +1,5 @@
-import sys
-import os
-import unittest
-import random
-import http.client
 from unittest.mock import MagicMock
 from threading import Thread
-import time
-
-sys.path.append('.')
-
 from exporter import run_prometheus_server
 from tools.YamlRead import YamlRead
 from tools.Resources import Resources
@@ -18,17 +9,25 @@ from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
 from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
-# from collectors.CollectorUp import CollectorUp
-from prometheus_client.core import REGISTRY
 from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
+from prometheus_client.core import REGISTRY
+import sys
+import unittest
+import random
+import http.client
+import os
+import time
+
+sys.path.append('.')
 
 
 class TestCollectors(unittest.TestCase):
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
+
 
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
@@ -43,20 +42,20 @@ class TestCollectors(unittest.TestCase):
 
         Resources.get_datacenter = MagicMock(
             return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
-                            {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
+                          {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
                                                         {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                                        {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                      {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                            {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                          {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
                                                                 {'name': 'vm2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_datastores = MagicMock(
             return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                            {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
+                          {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
-                                                            {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
+                                                          {'name': 'resource2', 'uuid': '5628-9ba1-55e847050814'}])
         Resources.get_latest_stat = MagicMock(return_value=1)
         Resources.get_property = MagicMock(return_value="test_property")
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000,))
@@ -127,7 +126,7 @@ class TestCollectors(unittest.TestCase):
             thread_list.append(thread1)
             # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
             time.sleep(10)
-            
+
             print("prometheus query port " + str(random_prometheus_port))
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")

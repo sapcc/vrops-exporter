@@ -1,11 +1,9 @@
 #!/usr/bin/python3
-import sys
-import time
-import os
-from optparse import OptionParser
-
-# from VropsCollector import VropsCollector
 from InventoryBuilder import InventoryBuilder
+from optparse import OptionParser
+import sys
+import os
+
 
 def parse_params():
     parser = OptionParser()
@@ -14,7 +12,8 @@ def parse_params():
     parser.add_option("-o", "--port", help="specify exporter port", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
-    parser.add_option("-l", "--loopback", help="use 127.0.0.1 address instead of listen to 0.0.0.0", action="store_true", dest="loopback")
+    parser.add_option("-l", "--loopback", help="use 127.0.0.1 address instead of listen to 0.0.0.0",
+                      action="store_true", dest="loopback")
     (options, args) = parser.parse_args()
 
     if options.user:
@@ -36,7 +35,6 @@ def parse_params():
     if options.atlas:
         os.environ['ATLAS'] = options.atlas
 
-
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
         sys.exit(0)
@@ -51,6 +49,7 @@ def parse_params():
         sys.exit(0)
 
     return options
+
 
 if __name__ == '__main__':
     options = parse_params()
