@@ -99,10 +99,6 @@ DatastoreStatsCollector:
       - 'vrops_datastore_stats{datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_freespace_gigabytes",vccluster="cluster2"}'
       - 'vrops_datastore_stats{datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_total_usage_gigabytes",vccluster="cluster2"}'
 
-SampleCollector:
-   metrics:
-      - 'vrops_inventory_collection_iteration{vcenter="vcenter1"}'
-
 
 VMStatsCollector:
    metrics:
