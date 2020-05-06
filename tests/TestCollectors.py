@@ -28,7 +28,6 @@ class TestCollectors(unittest.TestCase):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
 
-
     def test_collector_metrics(self):
         metrics_yaml = YamlRead('tests/metrics.yaml').run()
 
