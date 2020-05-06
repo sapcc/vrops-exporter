@@ -5,3 +5,4 @@ six
 pyyaml
 flask
 gevent
+cffi
