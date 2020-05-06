@@ -1,3 +1,5 @@
+![Python application](https://github.com/sapcc/vrops-exporter/workflows/Python%20application/badge.svg)
+
 # vrops-exporter
 Prometheus exporter to scrape metrics from vRealize Operations Manager
 
