@@ -21,10 +21,10 @@ class InventoryBuilder:
         self.target_tokens = dict()
         self.iterated_inventory = dict()
         self.successful_iteration_list = [0]
-        if os.environ['LOOPBACK'] == '1':
-            self.wsgi_address = '127.0.0.1'
-        else:
-            self.wsgi_address = '0.0.0.0'
+        self.wsgi_address = '0.0.0.0'
+        if 'LOOPBACK' in os.environ:
+            if os.environ['LOOPBACK'] == '1':
+                self.wsgi_address = '127.0.0.1'
         self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
@@ -119,10 +119,15 @@ class InventoryBuilder:
         def token():
             return json.dumps(self.target_tokens)
 
-        if os.environ['DEBUG'] >= '2':
-            WSGIServer((self.wsgi_address, self.port), app).serve_forever()
-        else:
-            WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
+        try:
+            if os.environ['DEBUG'] >= '2':
+                WSGIServer((self.wsgi_address, self.port), app).serve_forever()
+            else:
+                WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
+        except TypeError as e:
+            print('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
+            print('Current used options:', str(self.wsgi_address), 'on port', str(self.port))
+            print(e)
 
     def get_vrops(self):
         with open(self.json) as json_file:

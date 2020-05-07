@@ -20,6 +20,7 @@ In the past, these have been in one launch script (exporter.py) but this was not
        ./exporter.py -o 9000 -i localhost -d
 
     [Atlas](https://github.com/sapcc/atlas) refers to our netbox extractor, which is in the end providing netbox data as a configmap in k8s. You don't have to use it, a json file with this structure would be sufficient, too.
+    If case the WSGI server can't be connected to you might want to try `-l` to hook up the loopback interface (127.0.0.1).
 
    ```json 
    [
@@ -39,6 +40,7 @@ In the past, these have been in one launch script (exporter.py) but this was not
     PASSWORD
     PORT
     INVENTORY
+    LOOPBACK
     ```
 
 For running this in kubernetes (like we do), you might want to have a look at our [helm chart](https://github.com/sapcc/helm-charts/tree/master/prometheus-exporters/vrops-exporter)
@@ -122,8 +124,17 @@ This **token** can be retrieved from the REST API with `get_target_tokens`.
 ### Test
 Test module is called using ENV variables. Specifying these on the fly would look like this:
 
+Main test:
 ```
-DEBUG=0 INVENTORY=127.0.0.1 USER=FOO PASSWORD=Bar python3 tests/TestCollectors.py
+LOOPBACK=0 DEBUG=0 INVENTORY=127.0.0.1:8000 USER=FOO PASSWORD=Bar python3 tests/TestCollectors.py
+```
+
+To run all tests you got to loop over it.
+```
+for i in $(ls tests/Test*)
+do
+  LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar python3 $i
+done
 ```
 
 Please note that USER and PASSWORD are currently doing nothing at all, they are only passed on because the test
