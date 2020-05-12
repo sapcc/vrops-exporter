@@ -104,4 +104,12 @@ ClusterStatsCollector:
     - label: "memory_capacity_kilobytes"
       statkey: "mem|totalCapacity_average"
 
-
+VCenterStatsCollector:
+    - label: "cpu_used_percent"
+      statkey: "cpu|capacity_usagepct_average"
+    - label: "memory_used_percent"
+      statkey: "mem|host_usagePct"
+    - label: "diskspace_total_gigabytes"
+      statkey: "diskspace|total_capacity"
+    - label: "diskspace_usage_gigabytes"
+      statkey: "diskspace|total_usage"

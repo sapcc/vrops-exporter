@@ -152,6 +152,14 @@ VMPropertiesCollector:
       - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm2"}'
       - 'vrops_vm_info{datacenter="datacenter2",hostsystem="hostsystem2",vccluster="cluster2",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm2"}'
 
+
+VCenterStatsCollector:
+   metrics:
+      - 'vrops_vcenter_stats{statkey="cpu_used_percent",vcenter="vcenter1"}'
+      - 'vrops_vcenter_stats{statkey="memory_used_percent",vcenter="vcenter1"}'
+      - 'vrops_vcenter_stats{statkey="diskspace_total_gigabytes",vcenter="vcenter1"}'
+      - 'vrops_vcenter_stats{statkey="diskspace_usage_gigabytes",vcenter="vcenter1"}'
+
 #CollectorUp:
    #metrics:
       #- 'vrops_collector_up{collector="SampleCollector",metric="vrops_inventory_collection_iteration"}'

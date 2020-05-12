@@ -19,7 +19,8 @@ def default_collectors():
         'HostSystemPropertiesCollector',
         'DatastoreStatsCollector',
         'VMStatsCollector',
-        'VMPropertiesCollector'
+        'VMPropertiesCollector',
+        'VCenterStatsCollector'
     ]
 
 

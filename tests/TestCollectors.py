@@ -13,6 +13,7 @@ from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
 from collectors.VMStatsCollector import VMStatsCollector
 from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
+from collectors.VCenterStatsCollector import VCenterStatsCollector
 from prometheus_client.core import REGISTRY
 import unittest
 import random
