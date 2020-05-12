@@ -85,6 +85,8 @@ VMStatsCollector:
       statkey: "summary|number_datastore"
     - label: "virtualdisk_outstanding_io"
       statkey: "virtualDisk|vDiskOIO"
+    - label: "diskspace_virtual_machine_used_gigabytes"
+      statkey: "diskspace|perDsUsed"
     - label: "datastore_outstanding_io_requests"
       statkey: "datastore|demand_oio"
 
