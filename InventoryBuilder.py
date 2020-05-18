@@ -25,7 +25,6 @@ class InventoryBuilder:
         if 'LOOPBACK' in os.environ:
             if os.environ['LOOPBACK'] == '1':
                 self.wsgi_address = '127.0.0.1'
-        self.get_vrops()
 
         thread = Thread(target=self.run_rest_server)
         thread.start()
@@ -144,6 +143,8 @@ class InventoryBuilder:
         # curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
+            # get vrops targets every run in case we have new targets appearing
+            self.get_vrops()
             if len(self.successful_iteration_list) > 3:
                 iteration_to_be_deleted = self.successful_iteration_list.pop(0)
                 # initial case, since 0 is never filled in iterated_inventory

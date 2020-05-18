@@ -138,6 +138,9 @@ VMStatsCollector:
       - 'vrops_vm_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="virtualdisk_outstanding_io",vccluster="cluster2",virtualmachine="vm1"}'
       - 'vrops_vm_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="datastore_outstanding_io_requests",vccluster="cluster2",virtualmachine="vm2"}'
       - 'vrops_vm_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="datastore_outstanding_io_requests",vccluster="cluster2",virtualmachine="vm1"}'
+      - 'vrops_vm_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="diskspace_virtual_machine_used_gigabytes",vccluster="cluster2",virtualmachine="vm2"}'
+      - 'vrops_vm_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="diskspace_virtual_machine_used_gigabytes",vccluster="cluster2",virtualmachine="vm1"}'
+
 
 VMPropertiesCollector:
    metrics:
