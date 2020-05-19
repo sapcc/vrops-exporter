@@ -163,6 +163,11 @@ VCenterStatsCollector:
       - 'vrops_vcenter_stats{statkey="diskspace_total_gigabytes",vcenter="vcenter1"}'
       - 'vrops_vcenter_stats{statkey="diskspace_usage_gigabytes",vcenter="vcenter1"}'
 
+VCenterPropertiesCollector:
+   metrics:
+      - 'vrops_vcenter_info{summary_version="test_property",vcenter="vcenter1"}'
+      - 'vrops_vcenter_info{vc_fullname="test_property",vcenter="vcenter1"}'
+
 #CollectorUp:
    #metrics:
       #- 'vrops_collector_up{collector="SampleCollector",metric="vrops_inventory_collection_iteration"}'

@@ -1,6 +1,5 @@
 from BaseCollector import BaseCollector
 import os
-import requests
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
 from tools.YamlRead import YamlRead
@@ -21,14 +20,11 @@ class VCenterStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('VCenterStatsCollector starts with collecting the metrics')
 
-        #make one big request per stat id with all resource id's in its belly
+        # make one big request per stat id with all resource id's in its belly
         thread_list = list()
         for vc in self.get_vcenters():
             target = self.vcenters[vc]['target']
-            target_vc = self.vcenters[vc]['name']
-            token = self.vcenters[vc]['token']
-            vc_uuids = self.vcenters[vc]['uuid']
-            t = Thread(target=self.do_metrics, args=(target,g))
+            t = Thread(target=self.do_metrics, args=(target, g))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -43,8 +39,8 @@ class VCenterStatsCollector(BaseCollector):
             print("skipping " + target + " in , no token")
 
         for vc in self.get_vcenters():
-          uuid = self.vcenters[vc]['uuid']
-          target_vc = self.vcenters[vc]['name']
+            uuid = self.vcenters[vc]['uuid']
+            target_vc = self.vcenters[vc]['name']
 
         for statkey_pair in self.statkey_yaml["VCenterStatsCollector"]:
             statkey_label = statkey_pair['label']
