@@ -52,3 +52,10 @@ VMPropertiesCollector:
     number_metrics:
       - label: "summary_ethernetCards"
         property: "summary|config|numEthernetCards"
+
+VCenterPropertiesCollector:
+    info_metrics:
+      - label: "summary_version"
+        property: "summary|version"
+      - label: "vc_fullname"
+        property: "summary|vcfullname"
