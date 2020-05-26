@@ -55,10 +55,5 @@ class VCenterPropertiesCollector(BaseCollector):
 
                     if not values:
                         continue
-                    try:
-                        info_value = str(values)
-                        i.add_metric(labels=[target_vc], value={property_label: info_value})
-                    except (ValueError, TypeError):
-                        info = values
-                        info_value = 0
-                        i.add_metric(labels=[target_vc + ": " + info], value={property_label: info_value})
+                    info_value = str(values)
+                    i.add_metric(labels=[target_vc], value={property_label: info_value})

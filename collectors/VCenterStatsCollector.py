@@ -49,12 +49,6 @@ class VCenterStatsCollector(BaseCollector):
             if not values:
                 print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
                 continue
+            metric_value = int(values)
+            g.add_metric(labels=[target_vc, statkey_label], value=metric_value)
 
-            try:
-                metric_value = int(values)
-                g.add_metric(labels=[target_vc, statkey_label], value=metric_value)
-
-            except (ValueError, TypeError):
-                info = values
-                metric_value = 0
-                g.add_metric(labels=[target_vc, statkey_label + ":" + info], value=metric_value)
