@@ -48,6 +48,8 @@ VMPropertiesCollector:
         property: "virtualDisk:scsi0:0|datastore"
       - label: "virtualdisk_scsi0_1_datastore"
         property: "virtualDisk:scsi0:1|datastore"
+      - label: "config_hardware_memory_kilobytes"
+        property: "config|hardware|memoryKB"
 
     number_metrics:
       - label: "summary_ethernetCards"
