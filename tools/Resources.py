@@ -1,5 +1,7 @@
 from urllib3 import disable_warnings
 from urllib3 import exceptions
+from tools.helper import chunk_list
+from threading import Thread
 import requests
 import json
 import os
@@ -160,42 +162,6 @@ class Resources:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
 
-    def get_latest_stat_multiple(target, token, uuids, key):
-
-        if not isinstance(uuids, list):
-            print("Error in get multiple: uuids must be a list with multiple entries")
-            return False
-
-        url = "https://" + target + "/suite-api/api/resources/stats/latest/query"
-        headers = {
-            'Content-Type': "application/json",
-            'Accept': "application/json",
-            'Authorization': "vRealizeOpsToken " + token
-        }
-        payload = {
-            "resourceId": uuids,
-            "statKey": [key]
-        }
-        disable_warnings(exceptions.InsecureRequestWarning)
-        try:
-            response = requests.post(url,
-                                     data=json.dumps(payload),
-                                     verify=False,
-                                     headers=headers)
-        except Exception as e:
-            print("Problem getting stats Error: " + str(e))
-            return False
-
-        if response.status_code == 200:
-            try:
-                return response.json()['values']
-            except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
-                      "\nerror msg:", str(e))
-                return False
-        else:
-            print("Return code not 200 for " + str(key) + ": " + response.text)
-            return False
 
     # this is for a single query of a property and returns the value only
     def get_property(target, token, uuid, key):
@@ -224,11 +190,11 @@ class Resources:
 
     # if we expect a number without special characters
     def get_latest_number_properties_multiple(target, token, uuids, propkey):
-
         if not isinstance(uuids, list):
             print("Error in get multiple: uuids must be a list with multiple entries")
             return False
 
+        return_list = list()
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
             'Content-Type': "application/json",
@@ -249,7 +215,6 @@ class Resources:
             print("Problem getting property Error: " + str(e))
             return False
 
-        properties_list = list()
 
         if response.status_code == 200:
             try:
@@ -273,8 +238,8 @@ class Resources:
                 else:
                     # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))
-                properties_list.append(d)
-            return properties_list
+                return_list.append(d)
+            return return_list
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
@@ -398,4 +363,66 @@ class Resources:
             return properties_list
         else:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
+            return False
+
+
+    def get_latest_stat_multiple(target, token, uuids, key):
+        if not isinstance(uuids, list):
+            print("Error in get multiple: uuids must be a list with multiple entries")
+            return False
+
+        # vrops can not handle more than 1000 uuids
+        uuids_chunked = list(chunk_list(uuids, 1000))
+        return_list = list()
+        url = "https://" + target + "/suite-api/api/resources/stats/latest/query"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+
+        m = MultipleThread0r()
+        thread_list = list()
+        for uuid_list in uuids_chunked:
+            t = Thread(target=m.get_chunk, args=(uuid_list, url, headers, key, target))
+            thread_list.append(t)
+            t.start()
+        for t in thread_list:
+            t.join()
+        return m.return_list
+
+# helper class to allow to thread
+class MultipleThread0r:
+    def __init__(self):
+        self.return_list = list()
+        self.chunk_iteration = 0
+
+    def get_chunk(self, uuid_list, url, headers, key, target):
+        self.chunk_iteration += 1
+        if os.environ['DEBUG'] >= '2':
+            print(key, 'chunk:', self.chunk_iteration)
+
+        payload = {
+            "resourceId": uuid_list,
+            "statKey": [key]
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+        except Exception as e:
+            print("Problem getting stats Error: " + str(e))
+            return False
+
+        if response.status_code == 200:
+            try:
+                self.return_list += response.json()['values']
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
+                      "chunk_iteration:", str(self.chunk_iteration), "\nerror msg:", str(e))
+                return False
+        else:
+            print("Return code not 200 for " + str(key) + ": " + response.text)
             return False
