@@ -52,6 +52,8 @@ VMPropertiesCollector:
     number_metrics:
       - label: "summary_ethernetCards"
         property: "summary|config|numEthernetCards"
+      - label: "config_hardware_memory_kilobytes"
+        property: "config|hardware|memoryKB"
 
 VCenterPropertiesCollector:
     info_metrics:
