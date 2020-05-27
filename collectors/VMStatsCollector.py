@@ -1,15 +1,16 @@
 from BaseCollector import BaseCollector
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
-from tools.YamlRead import YamlRead
+from tools.helper import yaml_read
 from threading import Thread
 import os
+import json
 
 
 class VMStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+        self.statkey_yaml = yaml_read('collectors/statkey.yaml')
         # self.post_registered_collector(self.__class__.__name__, g.name)
 
     def describe(self):
@@ -38,10 +39,17 @@ class VMStatsCollector(BaseCollector):
             print("skipping " + target + " in VMStatsCollector, no token")
 
         uuids = self.target_vms[target]
+        print(target)
+        print("amount uuids",str(len(uuids)))
+        with open('uuids','w') as f:
+            json.dump(uuids,f)
         for statkey_pair in self.statkey_yaml["VMStatsCollector"]:
             statkey_label = statkey_pair['label']
             statkey = statkey_pair['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
+            print("fetched     ", str(len(values)))
+            # with open('values_4vms','w') as f:
+                # json.dump(values,f)
             if not values:
                 print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                 continue

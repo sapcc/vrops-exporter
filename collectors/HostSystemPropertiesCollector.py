@@ -2,7 +2,7 @@ from BaseCollector import BaseCollector
 from prometheus_client.core import GaugeMetricFamily
 from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
-from tools.YamlRead import YamlRead
+from tools.helper import yaml_read
 from threading import Thread
 import os
 
@@ -10,7 +10,7 @@ import os
 class HostSystemPropertiesCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.property_yaml = YamlRead('collectors/property.yaml').run()
+        self.property_yaml = yaml_read('collectors/property.yaml')
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 

@@ -381,7 +381,7 @@ class Resources:
             'Authorization': "vRealizeOpsToken " + token
         }
 
-        m = MultipleThread0r()
+        m = ChunkFechter()
         thread_list = list()
         for uuid_list in uuids_chunked:
             t = Thread(target=m.get_chunk, args=(uuid_list, url, headers, key, target))
@@ -392,7 +392,7 @@ class Resources:
         return m.return_list
 
 # helper class to allow to thread
-class MultipleThread0r:
+class ChunkFetcher:
     def __init__(self):
         self.return_list = list()
         self.chunk_iteration = 0

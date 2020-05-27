@@ -1,7 +1,7 @@
 from BaseCollector import BaseCollector
 from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
-from tools.YamlRead import YamlRead
+from tools.helper import yaml_read
 from threading import Thread
 import os
 
@@ -9,7 +9,7 @@ import os
 class ClusterStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
+        self.statkey_yaml = yaml_read('collectors/statkey.yaml')
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, g.name)
 
