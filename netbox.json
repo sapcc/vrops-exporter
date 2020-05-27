@@ -1,0 +1,15 @@
+[
+  {
+    "targets": [
+      "****"
+    ],
+    "labels": {
+      "job": "vrops",
+      "metrics_label": "vrops",
+      "role": "virtual-appliance",
+      "server_id": "544",
+      "server_name": "vrops-vc-a-0.cc.la-br-1.cloud.sap",
+      "state": "Active"
+    }
+  }
+]
