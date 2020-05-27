@@ -381,7 +381,7 @@ class Resources:
             'Authorization': "vRealizeOpsToken " + token
         }
 
-        m = ChunkFechter()
+        m = ChunkFetcher()
         thread_list = list()
         for uuid_list in uuids_chunked:
             t = Thread(target=m.get_chunk, args=(uuid_list, url, headers, key, target))
