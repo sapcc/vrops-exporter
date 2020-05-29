@@ -2,6 +2,7 @@ from urllib3 import disable_warnings
 from urllib3 import exceptions
 from tools.helper import chunk_list
 from threading import Thread
+from threading import Semaphore
 import requests
 import json
 import os
@@ -366,6 +367,7 @@ class Resources:
             return False
 
     def get_latest_stat_multiple(target, token, uuids, key):
+        semaphore = Semaphore(5)
         if not isinstance(uuids, list):
             print("Error in get multiple: uuids must be a list with multiple entries")
             return False
@@ -387,7 +389,7 @@ class Resources:
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
             t = Thread(target = Resources.get_chunk,
-                      args = (q, uuid_list, url, headers, key, target, chunk_iteration))
+                      args = (q, uuid_list, url, headers, key, target, chunk_iteration, semaphore))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -397,7 +399,8 @@ class Resources:
             return_list += q.get()
         return return_list
 
-    def get_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
+    def get_chunk(q, uuid_list, url, headers, key, target, chunk_iteration, semaphore):
+        semaphore.acquire()
         if os.environ['DEBUG'] >= '2':
             print(target, key, 'chunk:', chunk_iteration)
 
@@ -418,10 +421,13 @@ class Resources:
         if response.status_code == 200:
             try:
                 q.put(response.json()['values'])
+                semaphore.release()
             except json.decoder.JSONDecodeError as e:
                 print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
                       "chunk_iteration:", str(chunk_iteration), "\nerror msg:", str(e))
+                semaphore.release()
                 return False
         else:
             print("Return code not 200 for " + str(key) + ": " + response.text)
+            semaphore.release()
             return False
