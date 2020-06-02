@@ -14,10 +14,22 @@ In the past, these have been in one launch script (exporter.py) but this was not
 
 1. CLI
 
-    Either specify the vars via environment or cli params. Here an example start command for both, inventory and exporter:
+    Either specify the vars via environment or cli params. Because the inventory and the exporter is running seperately,
+    you need to enter the Docker container at least twice. Start the Docker container:
+    
+        docker run -it hub.global.cloud.sap/monsoon/vrops_exporter /bin/sh
+    This will start the container and directly enter the shell. Start the inventory:
 
        ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
+       
+    Now you need to enter the container a second time:
+    
+        docker exec -it <container_name> /bin/sh
+    Now run the exporter:
+    
        ./exporter.py -o 9000 -i localhost -d
+       
+    You can also enter the container a third time to fetch the prometheus metrics from localhost (i.e. with wget)
 
     [Atlas](https://github.com/sapcc/atlas) refers to our netbox extractor, which is in the end providing netbox data as a configmap in k8s. You don't have to use it, a json file with this structure would be sufficient, too.
     If case the WSGI server can't be connected to you might want to try `-l` to hook up the loopback interface (127.0.0.1).
