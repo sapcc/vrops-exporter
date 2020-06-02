@@ -164,6 +164,7 @@ VCenterStatsCollector:
       - 'vrops_vcenter_stats{statkey="memory_used_percent",vcenter="vcenter1"}'
       - 'vrops_vcenter_stats{statkey="diskspace_total_gigabytes",vcenter="vcenter1"}'
       - 'vrops_vcenter_stats{statkey="diskspace_usage_gigabytes",vcenter="vcenter1"}'
+      - 'vrops_vcenter_stats{statkey="vcsa_certificate_remaining_days",vcenter="vcenter1"}'
 
 VCenterPropertiesCollector:
    metrics:
