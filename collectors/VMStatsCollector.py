@@ -39,17 +39,16 @@ class VMStatsCollector(BaseCollector):
             print("skipping " + target + " in VMStatsCollector, no token")
 
         uuids = self.target_vms[target]
-        print(target)
-        print("amount uuids",str(len(uuids)))
         with open('uuids','w') as f:
             json.dump(uuids,f)
         for statkey_pair in self.statkey_yaml["VMStatsCollector"]:
             statkey_label = statkey_pair['label']
             statkey = statkey_pair['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
-            print("fetched     ", str(len(values)))
-            # with open('values_4vms','w') as f:
-                # json.dump(values,f)
+            if os.environ['DEBUG'] >= '1':
+                print(target, statkey)
+                print("amount uuids",str(len(uuids)))
+                print("fetched     ", str(len(values)))
             if not values:
                 print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                 continue

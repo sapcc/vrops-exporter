@@ -365,7 +365,6 @@ class Resources:
             print("Return code not 200 for " + str(propkey) + ": " + response.text)
             return False
 
-
     def get_latest_stat_multiple(target, token, uuids, key):
         if not isinstance(uuids, list):
             print("Error in get multiple: uuids must be a list with multiple entries")
@@ -381,26 +380,26 @@ class Resources:
             'Authorization': "vRealizeOpsToken " + token
         }
 
-        m = ChunkFetcher()
+        import queue
+        q = queue.Queue()
         thread_list = list()
+        chunk_iteration = 0
         for uuid_list in uuids_chunked:
-            t = Thread(target=m.get_chunk, args=(uuid_list, url, headers, key, target))
+            chunk_iteration += 1
+            t = Thread(target = Resources.get_chunk,
+                      args = (q, uuid_list, url, headers, key, target, chunk_iteration))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
-        return m.return_list
 
-# helper class to allow to thread
-class ChunkFetcher:
-    def __init__(self):
-        self.return_list = list()
-        self.chunk_iteration = 0
+        while not q.empty():
+            return_list += q.get()
+        return return_list
 
-    def get_chunk(self, uuid_list, url, headers, key, target):
-        self.chunk_iteration += 1
+    def get_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
         if os.environ['DEBUG'] >= '2':
-            print(key, 'chunk:', self.chunk_iteration)
+            print(target, key, 'chunk:', chunk_iteration)
 
         payload = {
             "resourceId": uuid_list,
@@ -418,10 +417,10 @@ class ChunkFetcher:
 
         if response.status_code == 200:
             try:
-                self.return_list += response.json()['values']
+                q.put(response.json()['values'])
             except json.decoder.JSONDecodeError as e:
                 print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
-                      "chunk_iteration:", str(self.chunk_iteration), "\nerror msg:", str(e))
+                      "chunk_iteration:", str(chunk_iteration), "\nerror msg:", str(e))
                 return False
         else:
             print("Return code not 200 for " + str(key) + ": " + response.text)
