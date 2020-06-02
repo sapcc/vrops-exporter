@@ -14,8 +14,8 @@ In the past, these have been in one launch script (exporter.py) but this was not
 
 1. CLI
 
-    Either specify the vars via environment or cli params. Because the inventory and the exporter is running seperately,
-    you need to enter the Docker container at least twice. Start the Docker container:
+    Either specify the vars via environment or cli params. Because the inventory and the exporter are running seperately,
+    you need to enter the Docker container at least twice. Start the container:
     
         docker run -it hub.global.cloud.sap/monsoon/vrops_exporter /bin/sh
     This will start the container and directly enter the shell. Start the inventory:
