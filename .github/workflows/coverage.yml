@@ -30,6 +30,6 @@ jobs:
       run: |
          for i in $(ls tests/Test*)
          do 
-           LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar coverage run -a $i
+           LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar coverage run -a --omit "*.md","*.txt",LICENSE,Makefile,Dockerfile $i
          done
          coveralls
