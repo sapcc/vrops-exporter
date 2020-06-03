@@ -20,8 +20,8 @@ def default_collectors():
         'DatastoreStatsCollector',
         'VMStatsCollector',
         'VMPropertiesCollector',
-        'VCenterStatsCollector',
-        'VCenterPropertiesCollector'
+        # 'VCenterStatsCollector',
+        # 'VCenterPropertiesCollector'
     ]
 
 
