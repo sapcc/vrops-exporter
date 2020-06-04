@@ -42,13 +42,13 @@ class VCenterStatsCollector(BaseCollector):
             uuid = self.vcenters[vc]['uuid']
             target_vc = self.vcenters[vc]['name']
 
-        for statkey_pair in self.statkey_yaml["VCenterStatsCollector"]:
-            statkey_label = statkey_pair['label']
-            statkey = statkey_pair['statkey']
-            values = Resources.get_latest_stat(target, token, uuid, statkey)
-            if not values:
-                print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
-                continue
-            metric_value = int(values)
-            g.add_metric(labels=[target_vc, statkey_label], value=metric_value)
+            for statkey_pair in self.statkey_yaml["VCenterStatsCollector"]:
+                statkey_label = statkey_pair['label']
+                statkey = statkey_pair['statkey']
+                values = Resources.get_latest_stat(target, token, uuid, statkey)
+                if not values:
+                    print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
+                    continue
+                metric_value = int(values)
+                g.add_metric(labels=[target_vc, statkey_label], value=metric_value)
 
