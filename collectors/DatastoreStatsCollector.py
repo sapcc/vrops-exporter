@@ -49,7 +49,7 @@ class DatastoreStatsCollector(BaseCollector):
                 # there is just one, because we are querying latest only
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 datastore_id = value_entry['resourceId']
-                g.add_metric(labels=[self.datastores[datastore_id]['datacenter'],
+                g.add_metric(labels=[self.datastores[datastore_id]['datacenter'].lower(),
                              self.datastores[datastore_id]['cluster'],
                              self.datastores[datastore_id]['parent_host_name'],
                              self.datastores[datastore_id]['name'],
