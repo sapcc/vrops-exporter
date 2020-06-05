@@ -60,7 +60,7 @@ class HostSystemPropertiesCollector(BaseCollector):
                     data = value_entry['data']
                     host_id = value_entry['resourceId']
                     g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
+                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
                                 self.hosts[host_id]['name'], property_label],
                         value=data)
 
@@ -79,7 +79,7 @@ class HostSystemPropertiesCollector(BaseCollector):
                     host_id = value_entry['resourceId']
                     latest_state = value_entry['latest_state']
                     g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
+                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
                                 self.hosts[host_id]['name'], property_label + ": " + latest_state],
                         value=data)
 
@@ -96,6 +96,6 @@ class HostSystemPropertiesCollector(BaseCollector):
                     host_id = value_entry['resourceId']
                     info_value = value_entry['data']
                     i.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
+                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
                                 self.hosts[host_id]['name']],
                         value={property_label: info_value})

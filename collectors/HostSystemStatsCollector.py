@@ -49,5 +49,5 @@ class HostSystemStatsCollector(BaseCollector):
                 # there is just one, because we are querying latest only
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 host_id = value_entry['resourceId']
-                g.add_metric(labels=[self.hosts[host_id]['datacenter'], self.hosts[host_id]['parent_cluster_name'],
+                g.add_metric(labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
                              self.hosts[host_id]['name'], statkey_label], value=metric_value)
