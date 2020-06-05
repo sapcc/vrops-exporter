@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import requests
 import time
 import os
+from tools.helper import yaml_read
 
 
 class BaseCollector(ABC):
@@ -9,6 +10,10 @@ class BaseCollector(ABC):
     @abstractmethod
     def collect(self):
         pass
+
+    def read_collector_config(self):
+        config_file = yaml_read(os.environ['CONFIG'])
+        return config_file
 
     def get_vcenters(self):
         current_iteration = self.get_iteration()

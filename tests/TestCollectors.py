@@ -76,7 +76,7 @@ class TestCollectors(unittest.TestCase):
                 Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
 
             if "Properties" in collector:
-                propkey_yaml = yaml_read('collectors/property.yaml')
+                propkey_yaml = yaml_read('collectors/collector_conf.yaml')
                 multiple_enum_properties_generated = list()
                 if 'enum_metrics' in propkey_yaml[collector]:
                     for propkey_pair in propkey_yaml[collector]['enum_metrics']:
