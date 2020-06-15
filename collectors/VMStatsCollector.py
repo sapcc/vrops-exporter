@@ -38,8 +38,6 @@ class VMStatsCollector(BaseCollector):
             print("skipping " + target + " in VMStatsCollector, no token")
 
         uuids = self.target_vms[target]
-        print(target)
-        print("amount uuids",str(len(uuids)))
         with open('uuids','w') as f:
             json.dump(uuids,f)
         statkey_yaml = self.read_collector_config()['statkeys']
@@ -47,9 +45,10 @@ class VMStatsCollector(BaseCollector):
             statkey_label = statkey_pair['label']
             statkey = statkey_pair['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
-            print("fetched     ", str(len(values)))
-            # with open('values_4vms','w') as f:
-                # json.dump(values,f)
+            if os.environ['DEBUG'] >= '1':
+                print(target, statkey)
+                print("amount uuids",str(len(uuids)))
+                print("fetched     ", str(len(values)))
             if not values:
                 print("skipping statkey " + str(statkey) + " in VMStatsCollector, no return")
                 continue
@@ -63,6 +62,6 @@ class VMStatsCollector(BaseCollector):
                 vm_id = value_entry['resourceId']
                 if vm_id not in self.vms:
                     continue
-                g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
+                g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
                              self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label],
                              value=metric_value[0])

@@ -58,7 +58,7 @@ class VMPropertiesCollector(BaseCollector):
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
-                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
+                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
                                 self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], property_label],
                         value=data)
 
@@ -79,7 +79,7 @@ class VMPropertiesCollector(BaseCollector):
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
-                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
+                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
                                 self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'],
                                 property_label + ": " + latest_state],
                         value=data)
@@ -99,6 +99,6 @@ class VMPropertiesCollector(BaseCollector):
                     if vm_id not in self.vms:
                         continue
                     i.add_metric(
-                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'],
+                        labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
                                 self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name']],
                         value={property_label: info_value})

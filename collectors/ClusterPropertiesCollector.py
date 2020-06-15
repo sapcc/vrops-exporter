@@ -58,7 +58,7 @@ class ClusterPropertiesCollector(BaseCollector):
                     data = value_entry['data']
                     cluster_id = value_entry['resourceId']
                     g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
+                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
                                 property_label],
                         value=data)
 
@@ -77,7 +77,7 @@ class ClusterPropertiesCollector(BaseCollector):
                     cluster_id = value_entry['resourceId']
                     latest_state = value_entry['latest_state']
                     g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
+                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
                                 property_label + ": " + latest_state],
                         value=data)
 
@@ -94,5 +94,5 @@ class ClusterPropertiesCollector(BaseCollector):
                     cluster_id = value_entry['resourceId']
                     info_value = value_entry['data']
                     i.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name']],
+                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name']],
                         value={property_label: info_value})

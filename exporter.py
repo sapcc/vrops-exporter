@@ -13,7 +13,6 @@ def default_collectors():
     default = [collector.append() for collector in yaml_read(os.environ['CONFIG'])['default_collectors']]
     return default
 
-
 def parse_params():
     parser = OptionParser()
     parser.add_option("-o", "--port", help="specify exporter (exporter.py) or inventory serving port(inventory.py)",

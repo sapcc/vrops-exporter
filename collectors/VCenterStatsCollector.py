@@ -42,6 +42,7 @@ class VCenterStatsCollector(BaseCollector):
 
             statkey_yaml = self.read_collector_config()['statkeys']
             for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
+
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
                 values = Resources.get_latest_stat(target, token, uuid, statkey)
@@ -50,4 +51,5 @@ class VCenterStatsCollector(BaseCollector):
                     continue
                 metric_value = int(values)
                 g.add_metric(labels=[self.vcenters[vc]['name'], statkey_label], value=metric_value)
+
 

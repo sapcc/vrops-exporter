@@ -51,6 +51,6 @@ class ClusterStatsCollector(BaseCollector):
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 cluster_id = value_entry['resourceId']
                 g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'], self.clusters[cluster_id]['name'],
+                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
                                 statkey_label],
                         value=metric_value)
