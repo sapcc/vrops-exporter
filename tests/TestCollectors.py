@@ -27,6 +27,7 @@ class TestCollectors(unittest.TestCase):
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
+        self.assertTrue(os.getenv('CONFIG'), 'no collector CONFIG set')
 
     def test_collector_metrics(self):
         metrics_yaml = yaml_read('tests/metrics.yaml')
@@ -66,7 +67,7 @@ class TestCollectors(unittest.TestCase):
 
             if 'Stats' in collector:
                 # mocking all values from yaml
-                statkey_yaml = yaml_read('collectors/statkey.yaml')
+                statkey_yaml = yaml_read(os.environ['CONFIG'])['statkeys']
                 multiple_metrics_generated = list()
                 for statkey_pair in statkey_yaml[collector]:
                     multiple_metrics_generated.append({"resourceId": "3628-93a1-56e84634050814", "stat-list": {"stat": [
@@ -76,7 +77,7 @@ class TestCollectors(unittest.TestCase):
                 Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
 
             if "Properties" in collector:
-                propkey_yaml = yaml_read('collectors/collector_conf.yaml')
+                propkey_yaml = yaml_read(os.environ['CONFIG'])['properties']
                 multiple_enum_properties_generated = list()
                 if 'enum_metrics' in propkey_yaml[collector]:
                     for propkey_pair in propkey_yaml[collector]['enum_metrics']:

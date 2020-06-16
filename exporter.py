@@ -10,8 +10,7 @@ from tools.helper import yaml_read
 
 
 def default_collectors():
-    default = [collector.append() for collector in yaml_read(os.environ['CONFIG'])['default_collectors']]
-    return default
+    return [i for i in yaml_read(os.environ['CONFIG'])['default_collectors']]
 
 def parse_params():
     parser = OptionParser()
@@ -21,8 +20,8 @@ def parse_params():
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     parser.add_option("-c", "--collector", help="enable collector (use multiple times)", action="append",
                       dest="collectors")
-    parser.add_option("-m", "--config", help="set default collectors, statkeys and properties for collectors",
-                      action="store", dest="config")
+    parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
+                                             "collectors", action="store", dest="config")
     (options, args) = parser.parse_args()
 
     if options.inventory:
