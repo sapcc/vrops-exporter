@@ -48,7 +48,7 @@ HostSystemStatsCollector:
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_capacity_available_to_vms_kilobytes",vccluster="cluster2"}'
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem1",statkey="memory_usage_percentage",vccluster="cluster2"}'
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem1",statkey="network_packets_dropped_percentage",vccluster="cluster2"}'
-      - 'vrops_hostsystem_stats{datacenter="datacenter2"tsystem="hostsystem2",statkey="memory_useable_kilobytes",vccluster="cluster2"}'
+      - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="memory_useable_kilobytes",vccluster="cluster2"}'
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_percentage",vccluster="cluster2"}'
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="network_packets_dropped_tx_number",vccluster="cluster2"}'
       - 'vrops_hostsystem_stats{datacenter="datacenter2",hostsystem="hostsystem2",statkey="hardware_number_of_cpu_cores_info",vccluster="cluster2"}'
