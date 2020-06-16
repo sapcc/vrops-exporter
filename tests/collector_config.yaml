@@ -19,6 +19,8 @@ statkeys:
       statkey: "diskspace|total_capacity"
     - label: "diskspace_usage_gigabytes"
       statkey: "diskspace|total_usage"
+    - label: "vcsa_certificate_remaining_days"
+      statkey: "summary|CPO vCSA Certificate Remaining Days"
   ClusterStatsCollector:
     - label: "cluster_running_hosts"
       statkey: "summary|number_running_hosts"
@@ -125,7 +127,7 @@ statkeys:
       statkey: "diskspace|perDsUsed"
     - label: "datastore_outstanding_io_requests"
       statkey: "datastore|demand_oio"
-  
+
 properties:
   VCenterPropertiesCollector:
     info_metrics:
