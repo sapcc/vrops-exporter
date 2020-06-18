@@ -10,7 +10,6 @@ import json
 class VMStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.statkey_yaml = yaml_read('collectors/statkey.yaml')
         # self.post_registered_collector(self.__class__.__name__, g.name)
 
     def describe(self):
@@ -41,7 +40,8 @@ class VMStatsCollector(BaseCollector):
         uuids = self.target_vms[target]
         with open('uuids','w') as f:
             json.dump(uuids,f)
-        for statkey_pair in self.statkey_yaml["VMStatsCollector"]:
+        statkey_yaml = self.read_collector_config()['statkeys']
+        for statkey_pair in statkey_yaml["VMStatsCollector"]:
             statkey_label = statkey_pair['label']
             statkey = statkey_pair['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)

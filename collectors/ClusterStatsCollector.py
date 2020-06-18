@@ -9,7 +9,6 @@ import os
 class ClusterStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.statkey_yaml = yaml_read('collectors/statkey.yaml')
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, g.name)
 
@@ -40,7 +39,8 @@ class ClusterStatsCollector(BaseCollector):
             print("skipping " + target + " in " + self.name + ", no token")
 
         uuids = self.target_clusters[target]
-        for statkey_pair in self.statkey_yaml["ClusterStatsCollector"]:
+        statkey_yaml = self.read_collector_config()['statkeys']
+        for statkey_pair in statkey_yaml["ClusterStatsCollector"]:
             statkey_label = statkey_pair['label']
             statkey = statkey_pair['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)

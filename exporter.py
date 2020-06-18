@@ -6,24 +6,11 @@ import importlib
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
 from optparse import OptionParser
+from tools.helper import yaml_read
 
 
 def default_collectors():
-    return [
-        # 'SampleCollector',
-        # 'CollectorUp',
-        # add new collectors below this line
-        'ClusterStatsCollector',
-        'ClusterPropertiesCollector',
-        'HostSystemStatsCollector',
-        'HostSystemPropertiesCollector',
-        'DatastoreStatsCollector',
-        # 'VMStatsCollector',
-        # 'VMPropertiesCollector',
-        'VCenterStatsCollector',
-        'VCenterPropertiesCollector'
-    ]
-
+    return [i for i in yaml_read(os.environ['CONFIG'])['default_collectors']]
 
 def parse_params():
     parser = OptionParser()
@@ -31,7 +18,10 @@ def parse_params():
                       action="store", dest="port")
     parser.add_option("-i", "--inventory", help="inventory service address", action="store", dest="inventory")
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
-    parser.add_option("-c", "--collector", help="enable collector (use multiple times)", action="append", dest="collectors")
+    parser.add_option("-c", "--collector", help="enable collector (use multiple times)", action="append",
+                      dest="collectors")
+    parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
+                                             "collectors", action="store", dest="config")
     (options, args) = parser.parse_args()
 
     if options.inventory:
@@ -46,8 +36,11 @@ def parse_params():
             print('DEBUG enabled')
     if options.port:
         os.environ['PORT'] = options.port
+    if options.config:
+        os.environ['CONFIG'] = options.config
     if not options.collectors:
         options.collectors = default_collectors()
+
 
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
@@ -55,11 +48,14 @@ def parse_params():
     if "INVENTORY" not in os.environ and not options.inventory:
         print("Can't start, please specify inventory with ENV or -i")
         sys.exit(0)
+    if "CONFIG" not in os.environ and not options.config:
+        print("Can't start, please specify statkeys with ENV or -m")
+        sys.exit(0)
 
     return options
 
 
-def run_prometheus_server(port, collectors,  *args):
+def run_prometheus_server(port, collectors, *args):
     start_http_server(int(port))
     for c in collectors:
         REGISTRY.register(c)

@@ -9,7 +9,6 @@ from threading import Thread
 class VCenterPropertiesCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.property_yaml = YamlRead('collectors/property.yaml').run()
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
@@ -43,11 +42,12 @@ class VCenterPropertiesCollector(BaseCollector):
         if not token:
             print("skipping " + target + " in , no token")
 
+        property_yaml = self.read_collector_config()['properties']
         for vc in self.get_vcenters():
             uuid = self.vcenters[vc]['uuid']
             target_vc = self.vcenters[vc]['name']
-            if 'info_metrics' in self.property_yaml[self.name]:
-                for property_pair in self.property_yaml["VCenterPropertiesCollector"]['info_metrics']:
+            if 'info_metrics' in property_yaml[self.name]:
+                for property_pair in property_yaml["VCenterPropertiesCollector"]['info_metrics']:
                     property_label = property_pair['label']
                     propkey = property_pair['property']
 

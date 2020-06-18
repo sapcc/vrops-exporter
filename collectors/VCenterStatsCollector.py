@@ -9,7 +9,6 @@ from threading import Thread
 class VCenterStatsCollector(BaseCollector):
     def __init__(self):
         self.wait_for_inventory_data()
-        self.statkey_yaml = YamlRead('collectors/statkey.yaml').run()
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
@@ -40,9 +39,10 @@ class VCenterStatsCollector(BaseCollector):
 
         for vc in self.get_vcenters():
             uuid = self.vcenters[vc]['uuid']
-            target_vc = self.vcenters[vc]['name']
 
-            for statkey_pair in self.statkey_yaml["VCenterStatsCollector"]:
+            statkey_yaml = self.read_collector_config()['statkeys']
+            for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
+
                 statkey_label = statkey_pair['label']
                 statkey = statkey_pair['statkey']
                 values = Resources.get_latest_stat(target, token, uuid, statkey)
@@ -50,5 +50,6 @@ class VCenterStatsCollector(BaseCollector):
                     print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
                     continue
                 metric_value = int(values)
-                g.add_metric(labels=[target_vc, statkey_label], value=metric_value)
+                g.add_metric(labels=[self.vcenters[vc]['name'], statkey_label], value=metric_value)
+
 
