@@ -112,6 +112,10 @@ DatastoreStatsCollector:
       - 'vrops_datastore_stats{datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",statkey="diskspace_freespace_gigabytes",vccluster="cluster2"}'
       - 'vrops_datastore_stats{datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",statkey="diskspace_total_usage_gigabytes",vccluster="cluster2"}'
 
+DatastorePropertiesCollector:
+   metrics:
+      - 'vrops_datastore_properties{datacenter="datacenter2",datastore="datastore1",hostsystem="hostsystem2",propkey="summary_datastore_accessible: test_enum_property",vccluster="cluster2"}'
+      - 'vrops_datastore_properties{datacenter="datacenter2",datastore="datastore2",hostsystem="hostsystem2",propkey="summary_datastore_accessible: test_enum_property",vccluster="cluster2"}'
 
 VMStatsCollector:
    metrics:

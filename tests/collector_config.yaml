@@ -185,4 +185,9 @@ properties:
         property: "summary|config|numEthernetCards"
       - label: "config_hardware_memory_kilobytes"
         property: "config|hardware|memoryKB"
+  DatastorePropertiesCollector:
+    enum_metrics:
+      - label: "summary_datastore_accessible"
+        expected: "PoweredOn"
+        property: "summary|accessible"
 
