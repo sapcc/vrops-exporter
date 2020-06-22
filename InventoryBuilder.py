@@ -9,6 +9,7 @@ from tools.Resources import Resources
 import time
 import json
 import os
+import types
 
 
 class InventoryBuilder:
