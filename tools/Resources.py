@@ -10,11 +10,11 @@ import os
 class Resources:
     
     def get_token(target, user=None, password=None, auth_source=None):
-        if auth_source == None:
-            auth_source = "Local"
-        if user == None:
+        if not auth_source:
+            auth_source = os.environ.get('VROPS_AUTH_SOURCE', 'Local')
+        if not user:
             user =  os.environ['USER']
-        if password == None:
+        if not password:
             password =  os.environ['PASSWORD']
 
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
