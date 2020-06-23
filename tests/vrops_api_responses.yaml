@@ -1,0 +1,99 @@
+---
+Adapter:
+  - data:
+      id: vcenter-uuid
+      resourceKey:
+        name: "vcenter adapter"
+        adapterKindKey: "VMWARE"
+  - data:
+      id: some-uuid
+      resourceKey:
+        name: "Another Kind of Adapter that is not implemented"
+        adapterKindKey: "not implemented"
+
+CustomDatacenter:
+  - parent:
+    data:
+      identifier: "custom-dc-uuid1"
+      resourceKey:
+        name: "Custom DC 1"
+  - parent:
+    data:
+      identifier: "custom-dc-uuid2"
+      resourceKey:
+        name: "Custom DC 2"
+
+Datacenter:
+  - parent: vcenter-uuid
+    data:
+      identifier: "dc-uuid1"
+      resourceKey:
+        name: "DC 1"
+  - parent: vcenter-uuid
+    data:
+      identifier: "dc-uuid2"
+      resourceKey:
+        name: "DC 2"
+  - parent: vcenter-uuid2
+    data:
+      identifier: "dc-uuid3"
+      resourceKey:
+        name: "DC in a different vcenter"
+
+ClusterComputeResource:
+  - parent: "custom-dc-uuid1"
+    data:
+      identifier: "cluster-uuid1"
+      resourceKey:
+        name: "Cluster in CustomDC only"
+  - parent: "dc-uuid1"
+    data:
+      identifier: "cluster-uuid2"
+      resourceKey:
+        name: "Cluster in normal DC only"
+  - parent: "dc-uuid2"
+    data:
+      identifier: "cluster-uuid3"
+      resourceKey:
+        name: "Cluster in CustomeDC and normal DC"
+  - parent: "custom-dc-uuid2"
+    data:
+      identifier: "cluster-uuid3"
+      resourceKey:
+        name: "Cluster in CustomDC and normal DC"
+
+HostSystem:
+  - parent: "cluster-uuid2"
+    data:
+      identifier: "host-uuid1"
+      resourceKey:
+        name: "Host 1"
+  - parent: "cluster-uuid2"
+    data:
+      identifier: "host-uuid2"
+      resourceKey:
+        name: "Host 2"
+
+Datastore:
+  - parent: "host-uuid1"
+    data:
+      identifier: "ds-uuid1"
+      resourceKey:
+        name: "Datastore 1"
+  - parent: "host-uuid2"
+    data:
+      identifier: "ds-uuid2"
+      resourceKey:
+        name: "Datastore 2"
+
+VirtualMachine:
+  - parent: "host-uuid1"
+    data:
+      identifier: "vm-uuid1"
+      resourceKey:
+        name: "VM 1"
+  - parent: "host-uuid2"
+    data:
+      identifier: "vm-uuid2"
+      resourceKey:
+        name: "VM 2"

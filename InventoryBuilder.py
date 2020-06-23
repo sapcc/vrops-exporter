@@ -195,6 +195,8 @@ class InventoryBuilder:
             if os.environ['DEBUG'] >= '2':
                 print("Collecting vcenter: " + adapter['name'])
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
+            # Note: if a cluster is in multiple Datacenters, parent_dc_name will be the last DC the cluster is a member
+            vcenter.add_custom_datacenter()
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
                 if os.environ['DEBUG'] >= '2':

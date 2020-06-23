@@ -122,6 +122,10 @@ class Resources:
     def get_datacenter(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="Datacenter")
 
+    def get_custom_datacenter(self, target, token, parentid):
+        # CustomDatacenters have no parentid
+        return self.get_resources(target, token, parentid=None, resourcekind="CustomDatacenter")
+
     def get_cluster(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="ClusterComputeResource")
 
