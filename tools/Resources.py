@@ -109,14 +109,34 @@ class Resources:
             print("problem getting resource " + str(response.json()))
         return resources
 
-    def get_project_id(self, target, token):
+    def get_project_ids(target, token, uuids):
+        if not isinstance(uuids, list):
+            print("Error in get project_ids: uuids must be a list with multiple entries")
+            return False
+        # vrops can not handle more than 1000 uuids
+        uuids_chunked = list(chunk_list(uuids, 1000))
         project_ids = list()
-        for project in self.get_vmfolders(target=target, token=token):
-            if project['name'].startswith('Project'):
-                p_ids = dict()
-                p_ids['project_id'] = project['name'][project['name'].find("(") + 1:project['name'].find(")")]
-                p_ids['uuid'] = project['uuid']
-                project_ids.append(p_ids)
+        url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        import queue
+        q = queue.Queue()
+        thread_list = list()
+        chunk_iteration = 0
+        for uuid_list in uuids_chunked:
+            chunk_iteration += 1
+            t = Thread(target=Resources.get_project_id_chunk,
+                       args=(q, uuid_list, url, headers, target, chunk_iteration))
+            thread_list.append(t)
+            t.start()
+        for t in thread_list:
+            t.join()
+
+        while not q.empty():
+            project_ids += q.get()
         return project_ids
 
     def get_datacenter(self, target, token, parentid):
@@ -134,7 +154,7 @@ class Resources:
     def get_virtualmachines(self, target, token, parentid):
         return self.get_resources(target, token, parentid=parentid, resourcekind="VirtualMachine")
 
-    def get_vmfolders(self, target, token):
+    def get_project_folders(self, target, token):
         return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
     # not recommended
@@ -161,7 +181,6 @@ class Resources:
         else:
             print("Return code not 200 for " + str(key) + ": " + str(response.json()))
             return False
-
 
     # this is for a single query of a property and returns the value only
     def get_property(target, token, uuid, key):
@@ -214,7 +233,6 @@ class Resources:
         except Exception as e:
             print("Problem getting property Error: " + str(e))
             return False
-
 
         if response.status_code == 200:
             try:
@@ -386,8 +404,8 @@ class Resources:
         chunk_iteration = 0
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
-            t = Thread(target = Resources.get_chunk,
-                      args = (q, uuid_list, url, headers, key, target, chunk_iteration))
+            t = Thread(target=Resources.get_stat_chunk,
+                       args=(q, uuid_list, url, headers, key, target, chunk_iteration))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -397,7 +415,46 @@ class Resources:
             return_list += q.get()
         return return_list
 
-    def get_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
+    def get_project_id_chunk(q, uuid_list, url, headers, target, chunk_iteration):
+        if os.environ['DEBUG'] >= '2':
+            print(target, 'chunk:', chunk_iteration)
+
+        payload = {
+            "relationshipType": "ANCESTOR",
+            "resourceIds": uuid_list,
+            "resourceQuery": {
+                "name": ["Project"],
+                "adapterKind": ["VMWARE"],
+                "resourceKind": ["VMFolder"]
+            },
+            "hierarchyDepth": 5
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+        except Exception as e:
+            print("Problem getting project folder Error: " + str(e))
+            return False
+        if response.status_code == 200:
+            try:
+                for project in response.json()['resourcesRelations']:
+                    p_ids = dict()
+                    p_ids[project["relatedResources"][0]] = project["resource"]["resourceKey"]["name"][
+                                          project["resource"]["resourceKey"]["name"].find("(") + 1:
+                                          project["resource"]["resourceKey"]["name"].find(")")]
+                    q.put([p_ids])
+            except json.decoder.JSONDecodeError as e:
+                print("Catching JSONDecodeError for target:", str(target),
+                      "chunk_iteration:", str(chunk_iteration), "\nerror msg:", str(e))
+                return False
+        else:
+            print("Return code not 200 for: " + response.text)
+            return False
+
+    def get_stat_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
         if os.environ['DEBUG'] >= '2':
             print(target, key, 'chunk:', chunk_iteration)
 

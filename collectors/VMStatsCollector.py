@@ -17,7 +17,7 @@ class VMStatsCollector(BaseCollector):
 
     def collect(self):
         g = GaugeMetricFamily('vrops_vm_stats', 'testtext',
-                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
+                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'project', 'statkey'])
         if os.environ['DEBUG'] >= '1':
             print('VMStatsCollector starts with collecting the metrics')
 
@@ -36,10 +36,10 @@ class VMStatsCollector(BaseCollector):
         token = token[target]
         if not token:
             print("skipping " + target + " in VMStatsCollector, no token")
-
         uuids = self.target_vms[target]
         with open('uuids','w') as f:
             json.dump(uuids,f)
+        project_ids = Resources.get_project_ids(target, token, uuids)
         statkey_yaml = self.read_collector_config()['statkeys']
         for statkey_pair in statkey_yaml["VMStatsCollector"]:
             statkey_label = statkey_pair['label']
@@ -60,8 +60,12 @@ class VMStatsCollector(BaseCollector):
                 if not metric_value:
                     continue
                 vm_id = value_entry['resourceId']
+                project_id = "internal"
+                for pid in project_ids:
+                    if vm_id in pid.keys():
+                        project_id = pid[vm_id]
                 if vm_id not in self.vms:
                     continue
                 g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
-                             self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label],
+                             self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], project_id, statkey_label],
                              value=metric_value[0])
