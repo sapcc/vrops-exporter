@@ -59,9 +59,9 @@ class VMPropertiesCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
                     if project_ids:
-                        for vmid in project_ids:
-                            if vm_id in vmid:
-                                project_id = vmid[vm_id]
+                        for vm_id_project_mapping in project_ids:
+                            if vm_id in vm_id_project_mapping:
+                                project_id = vm_id_project_mapping[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -86,9 +86,9 @@ class VMPropertiesCollector(BaseCollector):
                     latest_state = value_entry['latest_state']
                     project_id = "internal"
                     if project_ids:
-                        for vmid in project_ids:
-                            if vm_id in vmid:
-                                project_id = vmid[vm_id]
+                        for vm_id_project_mapping in project_ids:
+                            if vm_id in vm_id_project_mapping:
+                                project_id = vm_id_project_mapping[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -110,9 +110,9 @@ class VMPropertiesCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
                     if project_ids:
-                        for vmid in project_ids:
-                            if vm_id in vmid:
-                                project_id = vmid[vm_id]
+                        for vm_id_project_mapping in project_ids:
+                            if vm_id in vm_id_project_mapping:
+                                project_id = vm_id_project_mapping[vm_id]
                     info_value = value_entry['data']
                     if vm_id not in self.vms:
                         continue
