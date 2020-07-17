@@ -1,8 +1,8 @@
-urllib3
-prometheus_client
-requests
-six
-pyyaml
-flask
-gevent
-cffi
+urllib3==1.25.7
+prometheus-client==0.7.1
+requests==2.22.0
+sixsix==1.13.0
+PyYAML==5.2
+Flask==1.1.1
+gevent==1.4.0
+cffi==1.14.0
