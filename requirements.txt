@@ -3,6 +3,6 @@ prometheus-client
 requests
 six
 PyYAML
-Flask
+Flask==1.1.1
 gevent
 cffi
