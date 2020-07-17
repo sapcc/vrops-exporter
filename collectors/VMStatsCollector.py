@@ -24,8 +24,8 @@ class VMStatsCollector(BaseCollector):
         project_ids = self.get_project_ids_by_target()
         thread_list = list()
         for target in self.get_vms_by_target():
-            pids = project_ids[target]
-            t = Thread(target=self.do_metrics, args=(target, g, pids))
+            project_ids_target = project_ids[target]
+            t = Thread(target=self.do_metrics, args=(target, g, project_ids_target))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -63,9 +63,9 @@ class VMStatsCollector(BaseCollector):
                 vm_id = value_entry['resourceId']
                 project_id = "internal"
                 if project_ids:
-                    for pid in project_ids:
-                        if vm_id in pid.keys():
-                            project_id = pid[vm_id]
+                    for vmid in project_ids:
+                        if vm_id in vmid:
+                            project_id = vmid[vm_id]
                 if vm_id not in self.vms:
                     continue
                 g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),

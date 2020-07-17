@@ -28,8 +28,8 @@ class VMPropertiesCollector(BaseCollector):
 
         thread_list = list()
         for target in self.get_vms_by_target():
-            pids = project_ids[target]
-            t = Thread(target=self.do_metrics, args=(target, g, i, pids))
+            project_ids_target = project_ids[target]
+            t = Thread(target=self.do_metrics, args=(target, g, i, project_ids_target))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -59,9 +59,9 @@ class VMPropertiesCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
                     if project_ids:
-                        for pid in project_ids:
-                            if vm_id in pid.keys():
-                                project_id = pid[vm_id]
+                        for vmid in project_ids:
+                            if vm_id in vmid:
+                                project_id = vmid[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -86,9 +86,9 @@ class VMPropertiesCollector(BaseCollector):
                     latest_state = value_entry['latest_state']
                     project_id = "internal"
                     if project_ids:
-                        for pid in project_ids:
-                            if vm_id in pid.keys():
-                                project_id = pid[vm_id]
+                        for vmid in project_ids:
+                            if vm_id in vmid:
+                                project_id = vmid[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -110,9 +110,9 @@ class VMPropertiesCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
                     if project_ids:
-                        for pid in project_ids:
-                            if vm_id in pid.keys():
-                                project_id = pid[vm_id]
+                        for vmid in project_ids:
+                            if vm_id in vmid:
+                                project_id = vmid[vm_id]
                     info_value = value_entry['data']
                     if vm_id not in self.vms:
                         continue
