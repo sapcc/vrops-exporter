@@ -24,10 +24,12 @@ class VMPropertiesCollector(BaseCollector):
                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'project'])
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
+        project_ids = self.get_project_ids_by_target()
 
         thread_list = list()
         for target in self.get_vms_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g, i))
+            pids = project_ids[target]
+            t = Thread(target=self.do_metrics, args=(target, g, i, pids))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -36,13 +38,12 @@ class VMPropertiesCollector(BaseCollector):
         yield g
         yield i
 
-    def do_metrics(self, target, g, i):
+    def do_metrics(self, target, g, i, project_ids):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
             print("skipping", target, "in", self.name, ", no token")
         uuids = self.target_vms[target]
-        project_ids = Resources.get_project_ids(target, token, uuids)
         property_yaml = self.read_collector_config()['properties']
         if 'number_metrics' in property_yaml[self.name]:
             for property_pair in property_yaml[self.name]['number_metrics']:
@@ -57,9 +58,10 @@ class VMPropertiesCollector(BaseCollector):
                     data = value_entry['data']
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
-                    for pid in project_ids:
-                        if vm_id in pid.keys():
-                            project_id = pid[vm_id]
+                    if project_ids:
+                        for pid in project_ids:
+                            if vm_id in pid.keys():
+                                project_id = pid[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -83,9 +85,10 @@ class VMPropertiesCollector(BaseCollector):
                     vm_id = value_entry['resourceId']
                     latest_state = value_entry['latest_state']
                     project_id = "internal"
-                    for pid in project_ids:
-                        if vm_id in pid.keys():
-                            project_id = pid[vm_id]
+                    if project_ids:
+                        for pid in project_ids:
+                            if vm_id in pid.keys():
+                                project_id = pid[vm_id]
                     if vm_id not in self.vms:
                         continue
                     g.add_metric(
@@ -106,9 +109,10 @@ class VMPropertiesCollector(BaseCollector):
                         continue
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
-                    for pid in project_ids:
-                        if vm_id in pid.keys():
-                            project_id = pid[vm_id]
+                    if project_ids:
+                        for pid in project_ids:
+                            if vm_id in pid.keys():
+                                project_id = pid[vm_id]
                     info_value = value_entry['data']
                     if vm_id not in self.vms:
                         continue

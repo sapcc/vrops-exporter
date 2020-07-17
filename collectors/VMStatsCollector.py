@@ -21,9 +21,11 @@ class VMStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print('VMStatsCollector starts with collecting the metrics')
 
+        project_ids = self.get_project_ids_by_target()
         thread_list = list()
         for target in self.get_vms_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g))
+            pids = project_ids[target]
+            t = Thread(target=self.do_metrics, args=(target, g, pids))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -31,7 +33,7 @@ class VMStatsCollector(BaseCollector):
 
         yield g
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, g, project_ids):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
@@ -39,7 +41,6 @@ class VMStatsCollector(BaseCollector):
         uuids = self.target_vms[target]
         with open('uuids','w') as f:
             json.dump(uuids,f)
-        project_ids = Resources.get_project_ids(target, token, uuids)
         statkey_yaml = self.read_collector_config()['statkeys']
         for statkey_pair in statkey_yaml["VMStatsCollector"]:
             statkey_label = statkey_pair['label']
@@ -61,9 +62,10 @@ class VMStatsCollector(BaseCollector):
                     continue
                 vm_id = value_entry['resourceId']
                 project_id = "internal"
-                for pid in project_ids:
-                    if vm_id in pid.keys():
-                        project_id = pid[vm_id]
+                if project_ids:
+                    for pid in project_ids:
+                        if vm_id in pid.keys():
+                            project_id = pid[vm_id]
                 if vm_id not in self.vms:
                     continue
                 g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),

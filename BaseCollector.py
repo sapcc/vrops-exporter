@@ -3,7 +3,7 @@ import requests
 import time
 import os
 from tools.helper import yaml_read
-
+from tools.Resources import Resources
 
 class BaseCollector(ABC):
 
@@ -143,6 +143,15 @@ class BaseCollector(ABC):
                 self.target_vms[vm['target']] = list()
             self.target_vms[vm['target']].append(uuid)
         return self.target_vms
+
+    def get_project_ids_by_target(self):
+        project_ids = dict()
+        for target in self.get_vms_by_target():
+            token = self.get_target_tokens()
+            token = token[target]
+            uuids = self.target_vms[target]
+            project_ids[target] = Resources.get_project_ids(target, token, uuids)
+        return project_ids
 
     def wait_for_inventory_data(self):
         iteration = 0
