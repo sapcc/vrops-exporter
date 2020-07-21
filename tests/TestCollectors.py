@@ -59,6 +59,8 @@ class TestCollectors(unittest.TestCase):
                                                           {'name': 'resource2', 'uuid': '5628-9ba1-55e847050815'}])
         Resources.get_latest_stat = MagicMock(return_value=1)
         Resources.get_property = MagicMock(return_value="test_property")
+        Resources.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
+                                                            {"5628-9ba1-55e847050815": "internal"}])
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000,))
         thread.daemon = True
         thread.start()

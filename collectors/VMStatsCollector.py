@@ -17,13 +17,15 @@ class VMStatsCollector(BaseCollector):
 
     def collect(self):
         g = GaugeMetricFamily('vrops_vm_stats', 'testtext',
-                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'statkey'])
+                              labels=['vccluster', 'datacenter', 'virtualmachine', 'hostsystem', 'project', 'statkey'])
         if os.environ['DEBUG'] >= '1':
             print('VMStatsCollector starts with collecting the metrics')
 
+        project_ids = self.get_project_ids_by_target()
         thread_list = list()
         for target in self.get_vms_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g))
+            project_ids_target = project_ids[target]
+            t = Thread(target=self.do_metrics, args=(target, g, project_ids_target))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -31,12 +33,11 @@ class VMStatsCollector(BaseCollector):
 
         yield g
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, g, project_ids):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
             print("skipping " + target + " in VMStatsCollector, no token")
-
         uuids = self.target_vms[target]
         with open('uuids','w') as f:
             json.dump(uuids,f)
@@ -60,8 +61,13 @@ class VMStatsCollector(BaseCollector):
                 if not metric_value:
                     continue
                 vm_id = value_entry['resourceId']
+                project_id = "internal"
+                if project_ids:
+                    for vm_id_project_mapping in project_ids:
+                        if vm_id in vm_id_project_mapping:
+                            project_id = vm_id_project_mapping[vm_id]
                 if vm_id not in self.vms:
                     continue
                 g.add_metric(labels=[self.vms[vm_id]['cluster'], self.vms[vm_id]['datacenter'].lower(),
-                             self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], statkey_label],
+                             self.vms[vm_id]['name'], self.vms[vm_id]['parent_host_name'], project_id, statkey_label],
                              value=metric_value[0])

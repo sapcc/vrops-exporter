@@ -21,13 +21,5 @@ class Host:
 
     def add_vm(self):
         r = Resources()
-        project_ids = Resources.get_project_id(r, target=self.target, token=self.token)
         for vm in Resources.get_virtualmachines(r, target=self.target, token=self.token, parentid=self.uuid):
-            if vm['uuid'] in project_ids:
-                if os.environ['DEBUG'] >= '2':
-                    print(vm['name'] + ' has project id: ' + project_ids['project_id'])
-                self.vms.append(VirtualMachine(target=self.target, token=self.token, name=vm['name'], uuid=vm['uuid'],
-                                               project_id=project_ids['project_id']))
-            else:
-                self.vms.append(VirtualMachine(target=self.target, token=self.token, name=vm['name'], uuid=vm['uuid'],
-                                               project_id='default internal'))
+            self.vms.append(VirtualMachine(target=self.target, token=self.token, name=vm['name'], uuid=vm['uuid']))
