@@ -174,7 +174,7 @@ class InventoryBuilder:
             self.iteration += 1
             if os.environ['DEBUG'] >= '1':
                 print("inventory relaxing before going to work again")
-            time.sleep(100)
+            time.sleep(1800)
 
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
