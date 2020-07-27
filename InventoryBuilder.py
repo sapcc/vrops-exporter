@@ -131,12 +131,8 @@ class InventoryBuilder:
     def get_vrops(self):
         with open(self.json) as json_file:
             netbox_json = json.load(json_file)
-        vrops_list = list()
-        for target in netbox_json:
-            if target['labels']['job'] == "vrops":
-                vrops = target['labels']['server_name']
-                vrops_list.append(vrops)
-        self.vrops_list = vrops_list
+        self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
+                           target['labels']['job'] == "vrops"]
 
     def query_inventory_permanent(self):
         # first iteration to fill is 1. while this is not ready,
@@ -160,7 +156,8 @@ class InventoryBuilder:
                 print("real run " + str(self.iteration))
             for vrops in self.vrops_list:
                 if not self.query_vrops(vrops):
-                    print("retrying connection to", vrops, "in next iteration", str(self.iteration + 1))
+                    if os.environ['DEBUG'] >= '1':
+                        print("retrying connection to", vrops, "in next iteration", str(self.iteration + 1))
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
@@ -177,7 +174,7 @@ class InventoryBuilder:
             self.iteration += 1
             if os.environ['DEBUG'] >= '1':
                 print("inventory relaxing before going to work again")
-            time.sleep(1800)
+            time.sleep(100)
 
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
