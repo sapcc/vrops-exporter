@@ -442,8 +442,8 @@ class Resources:
             try:
                 for project in response.json()['resourcesRelations']:
                     p_ids = dict()
-                    for p in project["relatedResources"]:
-                        p_ids[p] = project["resource"]["resourceKey"]["name"][
+                    for vm_uuid in project["relatedResources"]:
+                        p_ids[vm_uuid] = project["resource"]["resourceKey"]["name"][
                                           project["resource"]["resourceKey"]["name"].find("(") + 1:
                                           project["resource"]["resourceKey"]["name"].find(")")]
                     q.put([p_ids])
