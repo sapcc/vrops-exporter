@@ -1,5 +1,4 @@
 import sys
-
 sys.path.append('.')
 import os
 import http.client
@@ -12,11 +11,10 @@ from InventoryBuilder import InventoryBuilder
 
 class TestNetboxTargets(unittest.TestCase):
 
-    # def test_enviroment(self):
-    #     self.assertTrue(os.getenv('ATLAS'), 'no ATLAS config file set')
+    def test_enviroment(self):
+         self.assertTrue(os.getenv('ATLAS'), 'no ATLAS config file set')
 
     def test_new_targets_from_netbox(self):
-        os.environ['ATLAS'] = "../netbox.json"
         print("chosen path to netbox file:", os.environ["ATLAS"])
         os.environ['PASSWORD'] = "Foo"
         os.environ['USER'] = "bar"
@@ -45,4 +43,4 @@ class TestNetboxTargets(unittest.TestCase):
             c.close()
             print("Targets:", data, "  ==  ", json.dumps(vrops_list))
             print("Test for targets OK! \nRelaxing together with inventory...")
-            time.sleep(120)
+            time.sleep(1810)
