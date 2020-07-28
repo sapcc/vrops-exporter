@@ -43,22 +43,31 @@ class TestCollectors(unittest.TestCase):
 
         Resources.get_datacenter = MagicMock(
             return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
-                          {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050815'}])
+                          {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050815'},
+                          {'name': 'datacenter3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
-                                                        {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050815'}])
+                                                        {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050815'},
+                                                        {'name': 'cluster3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                                      {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050815'}])
+                                                      {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050815'},
+                                                      {'name': 'hostsystem3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                          {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050815'}])
+                                                          {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050815'},
+                                                          {'name': 'vmfolder3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
-                                                                {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815'}])
+                                                                {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815'},
+                                                                {'name': 'vm3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_datastores = MagicMock(
             return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                          {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050815'}])
+                          {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050815'},
+                          {'name': 'datastore3', 'uuid': '7422-91h7-52s842060815'}])
         Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
                                                           {'name': 'resource2', 'uuid': '5628-9ba1-55e847050815'}])
         Resources.get_latest_stat = MagicMock(return_value=1)
         Resources.get_property = MagicMock(return_value="test_property")
+        Resources.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
+                                                            {"7422-91h7-52s842060815": "0815"},
+                                                            {"5628-9ba1-55e847050815": "internal"}])
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180))
         thread.daemon = True
         thread.start()
@@ -75,6 +84,8 @@ class TestCollectors(unittest.TestCase):
                         {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [88.0]}]}})
                     multiple_metrics_generated.append({"resourceId": "5628-9ba1-55e847050815", "stat-list": {"stat": [
                         {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [44.0]}]}})
+                    multiple_metrics_generated.append({"resourceId": "7422-91h7-52s842060815", "stat-list": {"stat": [
+                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [55.0]}]}})
                 Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
 
             if "Properties" in collector:
@@ -90,6 +101,10 @@ class TestCollectors(unittest.TestCase):
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 0,
                                                                    'latest_state': 'test_enum_property'})
+                        multiple_enum_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 0,
+                                                                   'latest_state': 'test_enum_property'})
                 Resources.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
@@ -102,6 +117,9 @@ class TestCollectors(unittest.TestCase):
                         multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
                                                                      'propkey': propkey_pair['property'],
                                                                      'data': '6.5'})
+                        multiple_number_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
+                                                                     'propkey': propkey_pair['property'],
+                                                                     'data': 33})
                 Resources.get_latest_number_properties_multiple = MagicMock(
                     return_value=multiple_number_properties_generated)
 
@@ -112,6 +130,9 @@ class TestCollectors(unittest.TestCase):
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 'test_info_property'})
                         multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
+                                                                   'propkey': propkey_pair['property'],
+                                                                   'data': 'test_info_property'})
+                        multiple_info_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 'test_info_property'})
                 Resources.get_latest_info_properties_multiple = MagicMock(

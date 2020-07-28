@@ -1,8 +1,8 @@
 urllib3
-prometheus_client
+prometheus-client
 requests
 six
-pyyaml
-flask
+PyYAML
+Flask==1.1.1
 gevent
 cffi
