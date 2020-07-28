@@ -27,13 +27,15 @@ class Resources:
                                      headers=headers,
                                      timeout=10)
         except Exception as e:
-            print("Problem connecting to " + target + ' Error: ' + str(e))
+            if os.environ['DEBUG'] >= '1':
+                print("Problem connecting to " + target + ' Error: ' + str(e))
             return False
 
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            print("problem getting token " + str(target) + ": " + response.text)
+            if os.environ['DEBUG'] >= '1':
+                print("problem getting token " + str(target) + ": " + response.text)
             return False
 
     def get_adapter(target, token):
