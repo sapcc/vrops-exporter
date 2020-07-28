@@ -12,9 +12,10 @@ import os
 
 
 class InventoryBuilder:
-    def __init__(self, json, port):
+    def __init__(self, json, port, sleep):
         self.json = json
         self.port = int(port)
+        self.sleep = sleep
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
@@ -174,7 +175,7 @@ class InventoryBuilder:
             self.iteration += 1
             if os.environ['DEBUG'] >= '1':
                 print("inventory relaxing before going to work again")
-            time.sleep(1800)
+            time.sleep(int(self.sleep))
 
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':

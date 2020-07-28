@@ -14,6 +14,7 @@ def parse_params():
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     parser.add_option("-l", "--loopback", help="use 127.0.0.1 address instead of listen to 0.0.0.0",
                       action="store_true", dest="loopback")
+    parser.add_option("-s", "--sleep", help="specifiy sleep time for inventory builder", action="store", dest="sleep")
     (options, args) = parser.parse_args()
 
     if options.user:
@@ -34,6 +35,10 @@ def parse_params():
         os.environ['PORT'] = options.port
     if options.atlas:
         os.environ['ATLAS'] = options.atlas
+    if options.sleep:
+        os.environ['SLEEP'] = options.sleep
+    else:
+        os.environ['SLEEP'] = "1800"
 
     if "PORT" not in os.environ and not options.port:
         print("Can't start, please specify port with ENV or -o")
@@ -53,4 +58,4 @@ def parse_params():
 
 if __name__ == '__main__':
     options = parse_params()
-    InventoryBuilder(options.atlas, os.environ['PORT'])
+    InventoryBuilder(options.atlas, os.environ['PORT'], os.environ['SLEEP'])
