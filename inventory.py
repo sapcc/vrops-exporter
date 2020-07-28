@@ -14,7 +14,8 @@ def parse_params():
     parser.add_option("-d", "--debug", help="enable debug", action="store_true", dest="debug", default=False)
     parser.add_option("-l", "--loopback", help="use 127.0.0.1 address instead of listen to 0.0.0.0",
                       action="store_true", dest="loopback")
-    parser.add_option("-s", "--sleep", help="specifiy sleep time for inventory builder", action="store", dest="sleep")
+    parser.add_option("-s", "--sleep", help="specifiy sleep time for inventory builder, default: 1800", action="store",
+                      dest="sleep")
     (options, args) = parser.parse_args()
 
     if options.user:
