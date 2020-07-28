@@ -36,13 +36,13 @@ class TestLaunchExporter(TestCase):
 
     def test_with_cli_and_env_params(self):
         sys.argv = ['prog', '--user', 'cli_testuser', '--password', 'testpw31!',
-                    '--port', '1234', "--debug", '-a', '/path/to/atlas.yaml', '-l']
+                    '--port', '1234', "--debug", '-a', '/path/to/atlas.yaml', '-l', '-s', '180']
         os.environ['USER'] = 'env_testuser'
         os.environ['PASSWORD'] = 'testps31!_2'
         os.environ['PORT'] = '1123'
         os.environ['ATLAS'] = '/wrong/path/to/atlas.yaml'
         os.environ['LOOPBACK'] = '0'
-        os.environ['SLEEP'] = '180'
+        os.environ['SLEEP'] = '199'
         parse_params()
         # cli params preferred
         self.assertEqual(os.getenv('USER'), 'cli_testuser', 'The user was not set correctly!')
