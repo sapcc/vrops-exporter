@@ -4,6 +4,7 @@ import time
 import os
 from tools.helper import yaml_read
 from tools.Resources import Resources
+from prometheus_client.core import GaugeMetricFamily
 
 class BaseCollector(ABC):
 
@@ -162,3 +163,17 @@ class BaseCollector(ABC):
                 print("waiting for initial iteration: " + type(self).__name__)
         print("done: initial query " + type(self).__name__)
         return
+
+    def generate_gauges(self, calling_class, custom_labels):
+        if not isinstance(custom_labels, list):
+            print("Can't generate Gauges without label list, called from", calling_class)
+            return False
+        statkey_yaml = self.read_collector_config()['statkeys']
+        gauges = dict()
+        for statkey_pair in statkey_yaml[calling_class]:
+            statkey_label = statkey_pair['label']
+            gauges[statkey_label] = {
+                    'gauge': GaugeMetricFamily('vrops_vcenter_'+ statkey_label, 'testtext', labels=custom_labels),
+                    'statkey': statkey_pair['statkey']
+                    }
+        return gauges

@@ -12,10 +12,17 @@ class VCenterStatsCollector(BaseCollector):
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def describe(self):
-        yield GaugeMetricFamily('vrops_vcenter_stats', 'testtext')
+        statkey_yaml = self.read_collector_config()['statkeys']
+        for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
+            statkey_label = statkey_pair['label']
+            # TODO: check if restart is needed in case of new metrics
+            yield GaugeMetricFamily('vrops_vcenter_' + statkey_label,'testtext')
 
     def collect(self):
-        g = GaugeMetricFamily('vrops_vcenter_stats', 'testtext', labels=['vcenter', 'statkey'])
+        gauges = self.generate_gauges(self.__class__.__name__, ['vcenter'])
+        if not gauges:
+            return
+
         if os.environ['DEBUG'] >= '1':
             print('VCenterStatsCollector starts with collecting the metrics')
 
@@ -23,15 +30,16 @@ class VCenterStatsCollector(BaseCollector):
         thread_list = list()
         for vc in self.get_vcenters():
             target = self.vcenters[vc]['target']
-            t = Thread(target=self.do_metrics, args=(target, g))
+            t = Thread(target=self.do_metrics, args=(target, gauges))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
 
-        yield g
+        for label in gauges:
+            yield gauges[label]['gauge']
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, gauges):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
@@ -40,16 +48,12 @@ class VCenterStatsCollector(BaseCollector):
         for vc in self.get_vcenters():
             uuid = self.vcenters[vc]['uuid']
 
-            statkey_yaml = self.read_collector_config()['statkeys']
-            for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
-
-                statkey_label = statkey_pair['label']
-                statkey = statkey_pair['statkey']
+            for label in gauges:
+                statkey = gauges[label]['statkey']
                 values = Resources.get_latest_stat(target, token, uuid, statkey)
                 if not values:
                     print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
                     continue
                 metric_value = int(values)
-                g.add_metric(labels=[self.vcenters[vc]['name'], statkey_label], value=metric_value)
-
+                gauges[label]['gauge'].add_metric(labels=[self.vcenters[vc]['name']], value=metric_value)
 
