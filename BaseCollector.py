@@ -177,3 +177,12 @@ class BaseCollector(ABC):
                     'statkey': statkey_pair['statkey']
                     }
         return gauges
+
+    def describe(self):
+        statkey_yaml = self.read_collector_config()['statkeys']
+        for statkey_pair in statkey_yaml[self.__class__.__name__]:
+            statkey_label = statkey_pair['label']
+            yield GaugeMetricFamily('vrops_vcenter_' + statkey_label,'testtext')
+
+        # prop_yaml = self.read_collector_config()['properties']
+        # for property_pair in prop_yaml[self.__class__.__name__]:

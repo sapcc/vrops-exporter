@@ -11,12 +11,12 @@ class VCenterStatsCollector(BaseCollector):
         self.wait_for_inventory_data()
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
-    def describe(self):
-        statkey_yaml = self.read_collector_config()['statkeys']
-        for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
-            statkey_label = statkey_pair['label']
-            # TODO: check if restart is needed in case of new metrics
-            yield GaugeMetricFamily('vrops_vcenter_' + statkey_label,'testtext')
+    # def describe(self):
+        # statkey_yaml = self.read_collector_config()['statkeys']
+        # for statkey_pair in statkey_yaml[self.__class__.__name__]:
+            # statkey_label = statkey_pair['label']
+            # # TODO: check if restart is needed in case of new metrics
+            # yield GaugeMetricFamily('vrops_vcenter_' + statkey_label,'testtext')
 
     def collect(self):
         gauges = self.generate_gauges(self.__class__.__name__, ['vcenter'])
