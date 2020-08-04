@@ -1,13 +1,13 @@
 default_collectors:
-  - 'ClusterStatsCollector'
-  - 'ClusterPropertiesCollector'
-  - 'HostSystemStatsCollector'
+#  - 'ClusterStatsCollector'
+#  - 'ClusterPropertiesCollector'
+#  - 'HostSystemStatsCollector'
   - 'HostSystemPropertiesCollector'
-  - 'DatastoreStatsCollector'
-  - 'VMStatsCollector'
-  - 'VMPropertiesCollector'
-  - 'VCenterStatsCollector'
-  - 'VCenterPropertiesCollector'
+#  - 'DatastoreStatsCollector'
+#  - 'VMStatsCollector'
+#  - 'VMPropertiesCollector'
+#  - 'VCenterStatsCollector'
+#  - 'VCenterPropertiesCollector'
 
 statkeys:
   VCenterStatsCollector:
@@ -149,13 +149,13 @@ properties:
   HostSystemPropertiesCollector:
     enum_metrics:
       - label: "runtime_powerState"
-        expected: "Powered On"
+        states: ["Powered On", "Powered Off"]
         property: "runtime|powerState"
       - label: "runtime_connectionState"
-        expected: "connected"
+        states: ["connected", "disconnected"]
         property: "runtime|connectionState"
       - label: "runtime_maintenanceState"
-        expected: "notInMaintenance"
+        states: ["notInMaintenance", "inMaintenance"]
         property: "runtime|maintenanceState"
     info_metrics:
       - label: "summary_version"

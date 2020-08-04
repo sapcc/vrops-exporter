@@ -1,46 +1,46 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
-from tools.helper import yaml_read
 from threading import Thread
 import os
 
 
 class HostSystemStatsCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
+        self.metric_name = 'hostsystem'
         self.wait_for_inventory_data()
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
-    def describe(self):
-        yield GaugeMetricFamily('vrops_hostsystem_stats', 'testtext')
-
     def collect(self):
-        g = GaugeMetricFamily('vrops_hostsystem_stats', 'testtext',
-                              labels=['datacenter', 'vccluster', 'hostsystem', 'statkey'])
+        gauges = self.generate_gauges('metric', self.__class__.__name__, [self.metric_name,
+                                      'datacenter', 'cluster', 'hostsystem'])
+        if not gauges:
+            return
+
         if os.environ['DEBUG'] >= '1':
-            print('HostSystemStatsCollector starts with collecting the metrics')
+            print(self.__class__.__name__, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_hosts_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g))
+            t = Thread(target=self.do_metrics, args=(target, gauges,))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
 
-        yield g
+        for label in gauges:
+            yield gauges[label]['gauge']
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, gauges):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
-            print("skipping " + target + " in HostSystemStatsCollector, no token")
+            print("skipping ", target, "in", self.__class__.__name__, ", no token")
 
         uuids = self.target_hosts[target]
-        statkey_yaml = self.read_collector_config()['statkeys']
-        for statkey_pair in statkey_yaml["HostSystemStatsCollector"]:
-            statkey_label = statkey_pair['label']
-            statkey = statkey_pair['statkey']
+        for label in gauges:
+            statkey = gauges[label]['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
             if not values:
                 print("skipping statkey " + str(statkey) + " in HostSystemStatsCollector, no return")
@@ -49,5 +49,6 @@ class HostSystemStatsCollector(BaseCollector):
                 # there is just one, because we are querying latest only
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
                 host_id = value_entry['resourceId']
-                g.add_metric(labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
-                             self.hosts[host_id]['name'], statkey_label], value=metric_value)
+                gauges[label]['gauge'].add_metric(
+                    labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
+                            self.hosts[host_id]['name']], value=metric_value)

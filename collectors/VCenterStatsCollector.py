@@ -7,7 +7,10 @@ from threading import Thread
 
 
 class VCenterStatsCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
+        self.metric_name = 'vcenter'
         self.wait_for_inventory_data()
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
@@ -15,22 +18,22 @@ class VCenterStatsCollector(BaseCollector):
         # statkey_yaml = self.read_collector_config()['statkeys']
         # for statkey_pair in statkey_yaml[self.__class__.__name__]:
             # statkey_label = statkey_pair['label']
-            # # TODO: check if restart is needed in case of new metrics
+            # TODO: check if restart is needed in case of new metrics
             # yield GaugeMetricFamily('vrops_vcenter_' + statkey_label,'testtext')
 
     def collect(self):
-        gauges = self.generate_gauges(self.__class__.__name__, ['vcenter'])
+        gauges = self.generate_gauges('metric', self.__class__.__name__, self.metric_name)
         if not gauges:
             return
 
         if os.environ['DEBUG'] >= '1':
-            print('VCenterStatsCollector starts with collecting the metrics')
+            print(self.__class__.__name__, 'starts with collecting the metrics')
 
         # make one big request per stat id with all resource id's in its belly
         thread_list = list()
         for vc in self.get_vcenters():
             target = self.vcenters[vc]['target']
-            t = Thread(target=self.do_metrics, args=(target, gauges))
+            t = Thread(target=self.do_metrics, args=(target, gauges, ))
             thread_list.append(t)
             t.start()
         for t in thread_list:
