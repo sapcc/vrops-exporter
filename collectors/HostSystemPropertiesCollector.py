@@ -1,8 +1,5 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
-from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
-from tools.helper import yaml_read
 from threading import Thread
 import os
 
@@ -11,15 +8,18 @@ class HostSystemPropertiesCollector(BaseCollector):
 
     def __init__(self):
         super().__init__()
-        self.metric_name = 'hostsystem'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
+        self.vrops_entity_name = 'hostsystem'
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def collect(self):
-        gauges = self.generate_gauges('property', self.name, [self.metric_name, 'datacenter', 'vccluster'])
-        infos = self.generate_infos(self.name, [self.metric_name, 'datacenter', 'vccluster'])
-        states = self.generate_states(self.name, [self.metric_name, 'datacenter', 'vccluster'])
+        gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'datacenter', 'vccluster'])
+        infos = self.generate_infos(self.name, self.vrops_entity_name,
+                                    [self.vrops_entity_name, 'datacenter', 'vccluster'])
+        states = self.generate_states(self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'state'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -34,12 +34,10 @@ class HostSystemPropertiesCollector(BaseCollector):
 
         # self.post_metrics(self.g.name)
         # self.post_metrics(self.i.name + '_info')
-        for label in gauges:
-            yield gauges[label]['gauge']
-        for label in infos:
-            yield infos[label]['info']
-        for label in states:
-            yield states[label]['state']
+        for g, i, s in zip(gauges, infos, states):
+            yield gauges[g]['gauge']
+            yield infos[i]['info']
+            yield states[s]['state']
 
     def do_metrics(self, target, gauges, infos, states):
         token = self.get_target_tokens()
@@ -72,14 +70,11 @@ class HostSystemPropertiesCollector(BaseCollector):
             for value_entry in values:
                 if 'value' not in value_entry:
                     continue
-                data = {state: False for state in states[label]['states']}
-                if value_entry['value'] in data:
-                    data[value_entry['value']] = True
-                print(data)
+                data = (1 if states[label]['expected'] == value_entry['value'] else 0)
                 host_id = value_entry['resourceId']
                 states[label]['state'].add_metric(
                     labels=[self.hosts[host_id]['name'], self.hosts[host_id]['datacenter'].lower(),
-                            self.hosts[host_id]['parent_cluster_name']],
+                            self.hosts[host_id]['parent_cluster_name'], value_entry['value']],
                     value=data)
 
         for label in infos:
@@ -95,4 +90,4 @@ class HostSystemPropertiesCollector(BaseCollector):
                 infos[label]['info'].add_metric(
                     labels=[self.hosts[host_id]['name'], self.hosts[host_id]['datacenter'].lower(),
                             self.hosts[host_id]['parent_cluster_name']],
-                    value={infos[label]['property']: info_value})
+                    value={label: info_value})

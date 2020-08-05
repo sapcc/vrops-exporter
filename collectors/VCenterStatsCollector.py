@@ -33,7 +33,7 @@ class VCenterStatsCollector(BaseCollector):
         thread_list = list()
         for vc in self.get_vcenters():
             target = self.vcenters[vc]['target']
-            t = Thread(target=self.do_metrics, args=(target, gauges, ))
+            t = Thread(target=self.do_metrics, args=(target, gauges))
             thread_list.append(t)
             t.start()
         for t in thread_list:
