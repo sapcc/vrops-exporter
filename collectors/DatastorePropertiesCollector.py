@@ -34,10 +34,12 @@ class DatastorePropertiesCollector(BaseCollector):
 
         # self.post_metrics(self.g.name)
         # self.post_metrics(self.i.name + '_info')
-        for g, i, s in zip(gauges, infos, states):
-            yield gauges[g]['gauge']
-            yield infos[i]['info']
-            yield states[s]['state']
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
+        for metric_suffix in infos:
+            yield infos[metric_suffix]['info']
+        for metric_suffix in states:
+            yield states[metric_suffix]['state']
 
     def do_metrics(self, target, gauges, infos, states):
         token = self.get_target_tokens()
@@ -55,13 +57,14 @@ class DatastorePropertiesCollector(BaseCollector):
             for value_entry in values:
                 if 'data' not in value_entry:
                     continue
-                data = value_entry['data']
+                metric_value = value_entry['data']
                 datastore_id = value_entry['resourceId']
                 gauges[label]['gauge'].add_metric(
-                    labels=[self.datastores[datastore_id]['name'], self.datastores[datastore_id]['datacenter'].lower(),
+                    labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name']],
-                    value=data)
+                    value=metric_value)
 
         for label in states:
             propkey = states[label]['property']
@@ -71,13 +74,14 @@ class DatastorePropertiesCollector(BaseCollector):
             for value_entry in values:
                 if 'value' not in value_entry:
                     continue
-                data = (1 if states[label]['expected'] == value_entry['value'] else 0)
+                metric_value = (1 if states[label]['expected'] == value_entry['value'] else 0)
                 datastore_id = value_entry['resourceId']
                 states[label]['state'].add_metric(
-                    labels=[self.datastores[datastore_id]['name'], self.datastores[datastore_id]['datacenter'].lower(),
+                    labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name'], value_entry['value']],
-                    value=data)
+                    value=metric_value)
 
         for label in infos:
             propkey = infos[label]['property']
@@ -90,7 +94,8 @@ class DatastorePropertiesCollector(BaseCollector):
                 datastore_id = value_entry['resourceId']
                 info_value = value_entry['data']
                 infos[label]['info'].add_metric(
-                    labels=[self.datastores[datastore_id]['name'], self.datastores[datastore_id]['datacenter'].lower(),
+                    labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name']],
                     value={label: info_value})

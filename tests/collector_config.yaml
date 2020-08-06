@@ -1,14 +1,14 @@
 default_collectors:
-#  - 'ClusterStatsCollector'
+  - 'ClusterStatsCollector'
   - 'ClusterPropertiesCollector'
-#  - 'HostSystemStatsCollector'
+  - 'HostSystemStatsCollector'
   - 'HostSystemPropertiesCollector'
-#  - 'DatastoreStatsCollector'
+  - 'DatastoreStatsCollector'
   - 'DatastorePropertiesCollector'
-#  - 'VMStatsCollector'
+  - 'VMStatsCollector'
   - 'VMPropertiesCollector'
-#  - 'VCenterStatsCollector'
-#  - 'VCenterPropertiesCollector'
+  - 'VCenterStatsCollector'
+  - 'VCenterPropertiesCollector'
 
 statkeys:
   VCenterStatsCollector:
@@ -22,6 +22,8 @@ statkeys:
       statkey: "diskspace|total_usage"
     - metric_suffix: "vcsa_certificate_remaining_days"
       statkey: "summary|CPO vCSA Certificate Remaining Days"
+    - metric_suffix: "cpu_sockets_number"
+      statkey: "cpu|numpackages"
   ClusterStatsCollector:
     - metric_suffix: "cluster_running_hosts"
       statkey: "summary|number_running_hosts"
@@ -44,7 +46,7 @@ statkeys:
       statkey: "configuration|dasConfig|admissionControlPolicy|failoverHost"
     - metric_suffix: "cpu_sockets_number"
       statkey: "cpu|numpackages"
-    - metric_suffix: "hardware_number_of_cpu_cores_info"
+    - metric_suffix: "cpu_cores_number"
       statkey: "hardware|cpuinfo|num_CpuCores"
     - metric_suffix:  "cpu_usage_megahertz"
       statkey: "cpu|usagemhz_average"

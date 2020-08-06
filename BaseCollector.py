@@ -177,10 +177,10 @@ class BaseCollector(ABC):
             statkey_yaml = self.read_collector_config()['statkeys']
             gauges = dict()
             for statkey_pair in statkey_yaml[calling_class]:
-                statkey_label = statkey_pair['metric_suffix']
-                gauges[statkey_label] = {
-                    'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + statkey_label, 'vrops-exporter',
-                                               labels=labelnames),
+                statkey_suffix = statkey_pair['metric_suffix']
+                gauges[statkey_suffix] = {
+                    'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + statkey_suffix.lower(),
+                                               'vrops-exporter', labels=labelnames),
                     'statkey': statkey_pair['statkey']
                 }
             return gauges
@@ -190,10 +190,10 @@ class BaseCollector(ABC):
             if 'number_metrics' in properties_yaml[calling_class]:
                 gauges = dict()
                 for property_pair in properties_yaml[calling_class]['number_metrics']:
-                    property_label = property_pair['metric_suffix']
-                    gauges[property_label] = {
-                        'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + property_label, 'vrops-exporter',
-                                                   labels=labelnames),
+                    property_suffix = property_pair['metric_suffix']
+                    gauges[property_suffix] = {
+                        'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                                   'vrops-exporter', labels=labelnames),
                         'property': property_pair['property']
                     }
                 return gauges
@@ -210,10 +210,10 @@ class BaseCollector(ABC):
         if 'info_metrics' in properties_yaml[calling_class]:
             infos = dict()
             for property_pair in properties_yaml[calling_class]['info_metrics']:
-                property_label = property_pair['metric_suffix']
-                infos[property_label] = {
-                    'info': InfoMetricFamily('vrops_' + vrops_entity_name + '_' + property_label, 'vrops-exporter',
-                                             labels=labelnames),
+                property_suffix = property_pair['metric_suffix']
+                infos[property_suffix] = {
+                    'info': InfoMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                             'vrops-exporter', labels=labelnames),
                     'property': property_pair['property']
                 }
             return infos
@@ -228,10 +228,10 @@ class BaseCollector(ABC):
         if 'enum_metrics' in properties_yaml[calling_class]:
             states = dict()
             for property_pair in properties_yaml[calling_class]['enum_metrics']:
-                property_label = property_pair['metric_suffix']
-                states[property_label] = {
-                    'state': UnknownMetricFamily('vrops_' + vrops_entity_name + '_' + property_label, 'vrops-exporter',
-                                                 labels=labelnames),
+                property_suffix = property_pair['metric_suffix']
+                states[property_suffix] = {
+                    'state': UnknownMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                                 'vrops-exporter', labels=labelnames),
                     'property': property_pair['property'],
                     'expected': property_pair['expected']
                 }
@@ -243,8 +243,9 @@ class BaseCollector(ABC):
         if 'Stats' in self.__class__.__name__:
             statkey_yaml = self.read_collector_config()['statkeys']
             for statkey_pair in statkey_yaml[self.__class__.__name__]:
-                statkey_label = statkey_pair['metric_suffix']
-                yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_label, 'vrops-exporter')
+                statkey_suffix = statkey_pair['metric_suffix']
+                yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
+                                        'vrops-exporter')
         if 'Properties' in self.__class__.__name__:
             properties_yaml = self.read_collector_config()['properties']
             if 'number_metrics' in properties_yaml[self.__class__.__name__]:
@@ -259,7 +260,3 @@ class BaseCollector(ABC):
                 for info in properties_yaml[self.__class__.__name__]['info_metrics']:
                     yield InfoMetricFamily('vrops_' + self.vrops_entity_name + '_' + info['metric_suffix'].lower(),
                                            'vrops-exporter')
-
-
-        # prop_yaml = self.read_collector_config()['properties']
-        # for property_pair in prop_yaml[self.__class__.__name__]:

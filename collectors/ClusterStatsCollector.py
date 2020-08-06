@@ -1,56 +1,57 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
-from tools.helper import yaml_read
 from threading import Thread
 import os
 
 
 class ClusterStatsCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
+        self.vrops_entity_name = 'vccluster'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, g.name)
 
-    def describe(self):
-        yield GaugeMetricFamily('vrops_cluster_stats', 'testtest')
-
     def collect(self):
-        g = GaugeMetricFamily('vrops_cluster_stats', 'testtest',
-                              labels=['datacenter', 'vccluster', 'statkey'])
+        gauges = self.generate_gauges('metric', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'datacenter'])
+        if not gauges:
+            return
+
         if os.environ['DEBUG'] >= '1':
-            print('ClusterStatsCollector starts with collecting the metrics')
+            print(self.name, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_clusters_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g))
+            t = Thread(target=self.do_metrics, args=(target, gauges))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
 
-        yield g
+        for metric_sufix in gauges:
+            yield gauges[metric_sufix]['gauge']
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, gauges):
         token = self.get_target_tokens()
         token = token[target]
-
         if not token:
             print("skipping " + target + " in " + self.name + ", no token")
-
         uuids = self.target_clusters[target]
-        statkey_yaml = self.read_collector_config()['statkeys']
-        for statkey_pair in statkey_yaml["ClusterStatsCollector"]:
-            statkey_label = statkey_pair['label']
-            statkey = statkey_pair['statkey']
+
+        for metric_suffix in gauges:
+            statkey = gauges[metric_suffix]['statkey']
             values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
             if not values:
-                print("skipping statkey " + str(statkey) + " in ClusterStatsCollector, no return")
+                print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                 continue
+
             for value_entry in values:
                 metric_value = value_entry['stat-list']['stat'][0]['data'][0]
-                cluster_id = value_entry['resourceId']
-                g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
-                                statkey_label],
-                        value=metric_value)
+                if metric_value:
+                    cluster_id = value_entry['resourceId']
+                    gauges[metric_suffix]['gauge'].add_metric(
+                            labels=[self.clusters[cluster_id]['name'],
+                                    self.clusters[cluster_id]['parent_dc_name'].lower()],
+                            value=metric_value)

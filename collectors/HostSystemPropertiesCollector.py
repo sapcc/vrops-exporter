@@ -34,10 +34,12 @@ class HostSystemPropertiesCollector(BaseCollector):
 
         # self.post_metrics(self.g.name)
         # self.post_metrics(self.i.name + '_info')
-        for g, i, s in zip(gauges, infos, states):
-            yield gauges[g]['gauge']
-            yield infos[i]['info']
-            yield states[s]['state']
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
+        for metric_suffix in infos:
+            yield infos[metric_suffix]['info']
+        for metric_suffix in states:
+            yield states[metric_suffix]['state']
 
     def do_metrics(self, target, gauges, infos, states):
         token = self.get_target_tokens()
@@ -47,38 +49,40 @@ class HostSystemPropertiesCollector(BaseCollector):
             print("skipping", target, "in", self.name, ", no token")
 
         uuids = self.target_hosts[target]
-        for label in gauges:
-            propkey = gauges[label]['property']
+        for metric_suffix in gauges:
+            propkey = gauges[metric_suffix]['property']
             values = Resources.get_latest_number_properties_multiple(target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
                 if 'data' not in value_entry:
                     continue
-                data = value_entry['data']
+                metric_value = value_entry['data']
                 host_id = value_entry['resourceId']
-                gauges[label]['gauge'].add_metric(
-                    labels=[self.hosts[host_id]['name'], self.hosts[host_id]['datacenter'].lower(),
+                gauges[metric_suffix]['gauge'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
                             self.hosts[host_id]['parent_cluster_name']],
-                    value=data)
+                    value=metric_value)
 
-        for label in states:
-            propkey = states[label]['property']
+        for metric_suffix in states:
+            propkey = states[metric_suffix]['property']
             values = Resources.get_latest_enum_properties_multiple(target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
                 if 'value' not in value_entry:
                     continue
-                data = (1 if states[label]['expected'] == value_entry['value'] else 0)
+                metric_value = (1 if states[metric_suffix]['expected'] == value_entry['value'] else 0)
                 host_id = value_entry['resourceId']
-                states[label]['state'].add_metric(
-                    labels=[self.hosts[host_id]['name'], self.hosts[host_id]['datacenter'].lower(),
+                states[metric_suffix]['state'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
                             self.hosts[host_id]['parent_cluster_name'], value_entry['value']],
-                    value=data)
+                    value=metric_value)
 
-        for label in infos:
-            propkey = infos[label]['property']
+        for metric_suffix in infos:
+            propkey = infos[metric_suffix]['property']
             values = Resources.get_latest_info_properties_multiple(target, token, uuids, propkey)
             if not values:
                 continue
@@ -87,7 +91,8 @@ class HostSystemPropertiesCollector(BaseCollector):
                     continue
                 host_id = value_entry['resourceId']
                 info_value = value_entry['data']
-                infos[label]['info'].add_metric(
-                    labels=[self.hosts[host_id]['name'], self.hosts[host_id]['datacenter'].lower(),
+                infos[metric_suffix]['info'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
                             self.hosts[host_id]['parent_cluster_name']],
-                    value={label: info_value})
+                    value={metric_suffix: info_value})
