@@ -1,52 +1,52 @@
-VCenterStatsCollector:
-  metrics:
-    - 'vrops_vcenter_cpu_used_percent{vcenter="vcenter1"}'
-    - 'vrops_vcenter_memory_used_percent{vcenter="vcenter1"}'
-    - 'vrops_vcenter_diskspace_total_gigabytes{vcenter="vcenter1"}'
-    - 'vrops_vcenter_diskspace_usage_gigabytes{vcenter="vcenter1"}'
-    - 'vrops_vcenter_vcsa_certificate_remaining_days{vcenter="vcenter1"}'
-    - 'vrops_vcenter_cpu_sockets_number{vcenter="vcenter1"}'
-
-VCenterPropertiesCollector:
-  metrics:
-    - 'vrops_vcenter_summary_version_info{summary_version="test_property",vcenter="vcenter1"}'
-    - 'vrops_vcenter_vc_fullname_info{vc_fullname="test_property",vcenter="vcenter1"}'
-
-ClusterStatsCollector:
-  metrics:
-    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster2"}'
-    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster1"}'
-
-ClusterPropertiesCollector:
-  metrics:
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster1"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster3"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster2"}'
+#VCenterStatsCollector:
+#  metrics:
+#    - 'vrops_vcenter_cpu_used_percent{vcenter="vcenter1"}'
+#    - 'vrops_vcenter_memory_used_percent{vcenter="vcenter1"}'
+#    - 'vrops_vcenter_diskspace_total_gigabytes{vcenter="vcenter1"}'
+#    - 'vrops_vcenter_diskspace_usage_gigabytes{vcenter="vcenter1"}'
+#    - 'vrops_vcenter_vcsa_certificate_remaining_days{vcenter="vcenter1"}'
+#    - 'vrops_vcenter_cpu_sockets_number{vcenter="vcenter1"}'
+#
+#VCenterPropertiesCollector:
+#  metrics:
+#    - 'vrops_vcenter_summary_version_info{summary_version="test_property",vcenter="vcenter1"}'
+#    - 'vrops_vcenter_vc_fullname_info{vc_fullname="test_property",vcenter="vcenter1"}'
+#
+#ClusterStatsCollector:
+#  metrics:
+#    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_cpu_capacity_mhz{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_memory_usage_percentage{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster2"}'
+#    - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_cpu_usage_mhz{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_cluster_running_hosts{datacenter="datacenter3",vccluster="cluster1"}'
+#
+#ClusterPropertiesCollector:
+#  metrics:
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster1"}'
+#    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster3"}'
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
+#    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
+#    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
+#    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster2"}'
 
 HostSystemStatsCollector:
   metrics:
@@ -60,14 +60,12 @@ HostSystemStatsCollector:
     - 'vrops_hostsystem_memory_capacity_available_to_vms_kilobytes{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_useable_kilobytes{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_network_packets_dropped_rx_number{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
-    - 'vrops_hostsystem_cpu_cores_number{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_useable_kilobytes{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
     - 'vrops_hostsystem_configuration_dasconfig_admissioncontrolpolicy_failoverhost{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_useable_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_ballooning_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_usage_percentage{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
     - 'vrops_hostsystem_configuration_dasconfig_admissioncontrolpolicy_failoverhost{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
-    - 'vrops_hostsystem_cpu_cores_number{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
     - 'vrops_hostsystem_cpu_usage_megahertz{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_network_packets_dropped_percentage{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_cpu_sockets_number{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
@@ -100,7 +98,6 @@ HostSystemStatsCollector:
     - 'vrops_hostsystem_summary_running_vms_number{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_contention_percentage{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_activly_used_by_vms_kilobytes{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
-    - 'vrops_hostsystem_cpu_cores_number{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_activly_used_by_vms_kilobytes{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
     - 'vrops_hostsystem_memory_utilization{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_configuration_dasconfig_admissioncontrolpolicy_failoverhost{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
