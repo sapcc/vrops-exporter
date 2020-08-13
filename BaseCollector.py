@@ -223,7 +223,7 @@ class BaseCollector(ABC):
     def generate_states(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
             print("Can't generate Gauges without label list, called from", calling_class)
-            return False
+            return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'enum_metrics' in properties_yaml[calling_class]:
             states = dict()
