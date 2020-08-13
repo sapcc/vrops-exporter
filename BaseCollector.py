@@ -171,9 +171,9 @@ class BaseCollector(ABC):
     def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
             print("Can't generate Gauges without label list, called from", calling_class)
-            return False
+            return {}
         # switching between metric and property types
-        if metric_type == 'metric':
+        if metric_type == 'stats':
             statkey_yaml = self.read_collector_config()['statkeys']
             gauges = dict()
             for statkey_pair in statkey_yaml[calling_class]:
@@ -200,12 +200,12 @@ class BaseCollector(ABC):
             else:
                 return {}
         else:
-            return False
+            return {}
 
     def generate_infos(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
             print("Can't generate Gauges without label list, called from", calling_class)
-            return False
+            return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'info_metrics' in properties_yaml[calling_class]:
             infos = dict()

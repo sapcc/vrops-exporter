@@ -14,10 +14,8 @@ class VMStatsCollector(BaseCollector):
         # self.post_registered_collector(self.name, g.name)
 
     def collect(self):
-        gauges = self.generate_gauges('metric', self.name, self.vrops_entity_name,
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'project'])
-        if not gauges:
-            return
         project_ids = self.get_project_ids_by_target()
 
         if os.environ['DEBUG'] >= '1':

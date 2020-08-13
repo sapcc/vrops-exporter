@@ -42,12 +42,8 @@ statkeys:
   HostSystemStatsCollector:
     - metric_suffix: "configuration_dasConfig_admissionControlPolicy_failoverHost"
       statkey: "configuration|dasConfig|admissionControlPolicy|failoverHost"
-    - metric_suffix: "configuration_dasConfig_admissionControlPolicy_failoverHost"
-      statkey: "configuration|dasConfig|admissionControlPolicy|failoverHost"
     - metric_suffix: "cpu_sockets_number"
       statkey: "cpu|numpackages"
-    - metric_suffix: "cpu_cores_number"
-      statkey: "hardware|cpuinfo|num_CpuCores"
     - metric_suffix:  "cpu_usage_megahertz"
       statkey: "cpu|usagemhz_average"
     - metric_suffix: "cpu_demand_percentage"
@@ -152,7 +148,7 @@ properties:
   HostSystemPropertiesCollector:
     enum_metrics:
       - metric_suffix: "runtime_powerState"
-        expected: "Powered On"
+        expected: "PoweredOn"
         property: "runtime|powerState"
       - metric_suffix: "runtime_connectionState"
         expected: "connected"

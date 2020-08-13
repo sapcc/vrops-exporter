@@ -21,8 +21,6 @@ class VMPropertiesCollector(BaseCollector):
         states = self.generate_states(self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'state'
                                        'project'])
-        if not gauges:
-            return
 
         project_ids = self.get_project_ids_by_target()
 

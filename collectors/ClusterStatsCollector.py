@@ -8,13 +8,13 @@ class ClusterStatsCollector(BaseCollector):
 
     def __init__(self):
         super().__init__()
-        self.vrops_entity_name = 'vccluster'
+        self.vrops_entity_name = 'cluster'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
         # self.post_registered_collector(self.name, g.name)
 
     def collect(self):
-        gauges = self.generate_gauges('metric', self.name, self.vrops_entity_name,
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'datacenter'])
         if not gauges:
             return

@@ -80,7 +80,8 @@ class DatastorePropertiesCollector(BaseCollector):
                     labels=[self.datastores[datastore_id]['name'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
-                            self.datastores[datastore_id]['parent_host_name'], value_entry['value']],
+                            self.datastores[datastore_id]['parent_host_name'],
+                            value_entry['value']],
                     value=metric_value)
 
         for label in infos:

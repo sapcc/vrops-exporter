@@ -14,10 +14,8 @@ class VCenterStatsCollector(BaseCollector):
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def collect(self):
-        gauges = self.generate_gauges('metric', self.name, self.vrops_entity_name,
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name])
-        if not gauges:
-            return
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')

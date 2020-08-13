@@ -95,16 +95,13 @@ class TestCollectors(unittest.TestCase):
                     for propkey_pair in propkey_yaml[collector]['enum_metrics']:
                         multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
                                                                    'propkey': propkey_pair['property'],
-                                                                   'data': 0,
-                                                                   'latest_state': 'test_enum_property'})
+                                                                   'value': "test_enum_property"})
                         multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
                                                                    'propkey': propkey_pair['property'],
-                                                                   'data': 0,
-                                                                   'latest_state': 'test_enum_property'})
+                                                                   'value': "test_enum_property"})
                         multiple_enum_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
                                                                    'propkey': propkey_pair['property'],
-                                                                   'data': 0,
-                                                                   'latest_state': 'test_enum_property'})
+                                                                   'value': "test_enum_property"})
                 Resources.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
@@ -153,13 +150,12 @@ class TestCollectors(unittest.TestCase):
             c = http.client.HTTPConnection("localhost:" + str(random_prometheus_port))
             c.request("GET", "/")
             r = c.getresponse()
-
             self.assertEqual(r.status, 200, "HTTP server return code should be 200")
             self.assertEqual(r.reason, "OK", "HTTP status should be OK")
 
             data = r.read().decode()
             data_array = data.split('\n')
-            metrics = list()
+            metrics = set()
             for entry in data_array:
                 if entry.startswith('#'):
                     continue
@@ -172,15 +168,15 @@ class TestCollectors(unittest.TestCase):
                 split_entry = entry.split("}")
                 if len(split_entry) != 2:
                     continue
-                metrics.append(split_entry[0] + "}")
+                metrics.add(split_entry[0] + "}")
 
             metrics_yaml_list = metrics_yaml[collector]['metrics']
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
             self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
 
             # check if there are more metrics being produced and they are not listed in metrics.yaml?!
-            issubsetdifference = set(metrics).difference(metrics_yaml_list)
-            self.assertTrue(set(metrics).issubset(metrics_yaml_list),
+            issubsetdifference = metrics.difference(metrics_yaml_list)
+            self.assertTrue(metrics.issubset(metrics_yaml_list),
                             msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
                                 issubsetdifference))
             # check if all metrics from yaml are here

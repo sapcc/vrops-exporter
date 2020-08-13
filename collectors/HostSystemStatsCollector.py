@@ -14,7 +14,7 @@ class HostSystemStatsCollector(BaseCollector):
         # self.post_registered_collector(self.name, g.name)
 
     def collect(self):
-        gauges = self.generate_gauges('metric', self.name, self.vrops_entity_name,
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'datacenter', 'vccluster'])
         if not gauges:
             return
