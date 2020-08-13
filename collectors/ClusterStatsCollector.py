@@ -15,7 +15,7 @@ class ClusterStatsCollector(BaseCollector):
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter'])
+                                      ['vccluster', 'datacenter'])
         if not gauges:
             return
 

@@ -38,15 +38,15 @@ ClusterStatsCollector:
 
 ClusterPropertiesCollector:
   metrics:
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{cluster="cluster2",datacenter="datacenter3"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{cluster="cluster2",datacenter="datacenter3",state="test_enum_property"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{cluster="cluster1",datacenter="datacenter3",state="test_enum_property"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{cluster="cluster2",datacenter="datacenter3",state="test_enum_property"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{cluster="cluster1",datacenter="datacenter3"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{cluster="cluster1",datacenter="datacenter3",state="test_enum_property"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{cluster="cluster3",datacenter="datacenter3"}'
-    - 'vrops_cluster_configuration_dasconfig_enabled{cluster="cluster3",datacenter="datacenter3",state="test_enum_property"}'
-    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{cluster="cluster3",datacenter="datacenter3",state="test_enum_property"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster1"}'
+    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster3"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster3"}'
+    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1"}'
+    - 'vrops_cluster_configuration_dasconfig_enabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2"}'
+    - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster2"}'
 
 HostSystemStatsCollector:
   metrics:

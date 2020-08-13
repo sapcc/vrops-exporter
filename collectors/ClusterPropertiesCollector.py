@@ -15,11 +15,11 @@ class ClusterPropertiesCollector(BaseCollector):
 
     def collect(self):
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter'])
+                                      ['vccluster', 'datacenter'])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
                                     [self.vrops_entity_name, 'datacenter'])
         states = self.generate_states(self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter', 'state'])
+                                      ['vccluster', 'datacenter', 'state'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
