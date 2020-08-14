@@ -19,7 +19,7 @@ class VMPropertiesCollector(BaseCollector):
         infos = self.generate_infos(self.name, self.vrops_entity_name,
                                     [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'project'])
         states = self.generate_states(self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'state'
+                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'state',
                                        'project'])
 
         project_ids = self.get_project_ids_by_target()
