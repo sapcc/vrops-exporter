@@ -197,10 +197,10 @@ class BaseCollector(ABC):
                         'property': property_pair['property']
                     }
                 return gauges
-            else:
-                return {}
-        else:
-            return {}
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Gauge metric type generated, from", calling_class)
+        return {}
 
     def generate_infos(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
@@ -217,8 +217,10 @@ class BaseCollector(ABC):
                     'property': property_pair['property']
                 }
             return infos
-        else:
-            return {}
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Info metric type generated, from", calling_class)
+        return {}
 
     def generate_states(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
@@ -236,8 +238,10 @@ class BaseCollector(ABC):
                     'expected': property_pair['expected']
                 }
             return states
-        else:
-            return {}
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Enum metric type generated, from", calling_class)
+        return {}
 
     def describe(self):
         if 'Stats' in self.__class__.__name__:
