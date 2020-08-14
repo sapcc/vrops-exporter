@@ -216,25 +216,25 @@ VMStatsCollector:
 
 VMPropertiesCollector:
   metrics:
-    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm3"}'
+
     - 'vrops_virtualmachine_summary_ethernetcards{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",virtualmachine="vm2"}'
     - 'vrops_virtualmachine_config_hardware_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualmachine="vm1"}'
     - 'vrops_virtualmachine_config_hardware_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualmachine="vm3"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_0_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm2"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_0_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm3"}'
-    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm2"}'
     - 'vrops_virtualmachine_config_hardware_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",virtualmachine="vm2"}'
-    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm3"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_0_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualdisk_scsi0_0_datastore="test_info_property",virtualmachine="vm1"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_1_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm3"}'
-    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm2"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_1_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm2"}'
-    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm1"}'
     - 'vrops_virtualmachine_summary_ethernetcards{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualmachine="vm1"}'
-    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",stateproject="test_enum_property",vccluster="cluster3",virtualmachine="vm1"}'
     - 'vrops_virtualmachine_summary_ethernetcards{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualmachine="vm3"}'
     - 'vrops_virtualmachine_virtualdisk_scsi0_1_datastore_info{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",virtualdisk_scsi0_1_datastore="test_info_property",virtualmachine="vm1"}'
-
+    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test_enum_property",vccluster="cluster3",virtualmachine="vm1"}'
+    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",state="test_enum_property",vccluster="cluster3",virtualmachine="vm2"}'
+    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test_enum_property",vccluster="cluster3",virtualmachine="vm1"}'
+    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test_enum_property",vccluster="cluster3",virtualmachine="vm3"}'
+    - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",state="test_enum_property",vccluster="cluster3",virtualmachine="vm2"}'
+    - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test_enum_property",vccluster="cluster3",virtualmachine="vm3"}'
 
 
 
