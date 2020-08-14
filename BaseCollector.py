@@ -4,8 +4,13 @@ import time
 import os
 from tools.helper import yaml_read
 from tools.Resources import Resources
+from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, UnknownMetricFamily
+
 
 class BaseCollector(ABC):
+
+    def __init__(self):
+        self.vrops_entity_name = 'base'
 
     @abstractmethod
     def collect(self):
@@ -162,3 +167,100 @@ class BaseCollector(ABC):
                 print("waiting for initial iteration: " + type(self).__name__)
         print("done: initial query " + type(self).__name__)
         return
+
+    def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames):
+        if not isinstance(labelnames, list):
+            print("Can't generate Gauges without label list, called from", calling_class)
+            return {}
+        # switching between metric and property types
+        if metric_type == 'stats':
+            statkey_yaml = self.read_collector_config()['statkeys']
+            gauges = dict()
+            for statkey_pair in statkey_yaml[calling_class]:
+                statkey_suffix = statkey_pair['metric_suffix']
+                gauges[statkey_suffix] = {
+                    'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + statkey_suffix.lower(),
+                                               'vrops-exporter', labels=labelnames),
+                    'statkey': statkey_pair['statkey']
+                }
+            return gauges
+
+        if metric_type == 'property':
+            properties_yaml = self.read_collector_config()['properties']
+            if 'number_metrics' in properties_yaml[calling_class]:
+                gauges = dict()
+                for property_pair in properties_yaml[calling_class]['number_metrics']:
+                    property_suffix = property_pair['metric_suffix']
+                    gauges[property_suffix] = {
+                        'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                                   'vrops-exporter', labels=labelnames),
+                        'property': property_pair['property']
+                    }
+                return gauges
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Gauge metric type generated, from", calling_class)
+        return {}
+
+    def generate_infos(self, calling_class, vrops_entity_name, labelnames):
+        if not isinstance(labelnames, list):
+            print("Can't generate Gauges without label list, called from", calling_class)
+            return {}
+        properties_yaml = self.read_collector_config()['properties']
+        if 'info_metrics' in properties_yaml[calling_class]:
+            infos = dict()
+            for property_pair in properties_yaml[calling_class]['info_metrics']:
+                property_suffix = property_pair['metric_suffix']
+                infos[property_suffix] = {
+                    'info': InfoMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                             'vrops-exporter', labels=labelnames),
+                    'property': property_pair['property']
+                }
+            return infos
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Info metric type generated, from", calling_class)
+        return {}
+
+    def generate_states(self, calling_class, vrops_entity_name, labelnames):
+        if not isinstance(labelnames, list):
+            print("Can't generate Gauges without label list, called from", calling_class)
+            return {}
+        properties_yaml = self.read_collector_config()['properties']
+        if 'enum_metrics' in properties_yaml[calling_class]:
+            states = dict()
+            for property_pair in properties_yaml[calling_class]['enum_metrics']:
+                property_suffix = property_pair['metric_suffix']
+                states[property_suffix] = {
+                    'state': UnknownMetricFamily('vrops_' + vrops_entity_name + '_' + property_suffix.lower(),
+                                                 'vrops-exporter', labels=labelnames),
+                    'property': property_pair['property'],
+                    'expected': property_pair['expected']
+                }
+            return states
+
+        if os.environ['DEBUG'] >= '1':
+            print("No Enum metric type generated, from", calling_class)
+        return {}
+
+    def describe(self):
+        if 'Stats' in self.__class__.__name__:
+            statkey_yaml = self.read_collector_config()['statkeys']
+            for statkey_pair in statkey_yaml[self.__class__.__name__]:
+                statkey_suffix = statkey_pair['metric_suffix']
+                yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
+                                        'vrops-exporter')
+        if 'Properties' in self.__class__.__name__:
+            properties_yaml = self.read_collector_config()['properties']
+            if 'number_metrics' in properties_yaml[self.__class__.__name__]:
+                for num in properties_yaml[self.__class__.__name__]['number_metrics']:
+                    yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + num['metric_suffix'].lower(),
+                                            'vrops-exporter')
+            if 'enum_metrics' in properties_yaml[self.__class__.__name__]:
+                for enum in properties_yaml[self.__class__.__name__]['enum_metrics']:
+                    yield UnknownMetricFamily('vrops_' + self.vrops_entity_name + '_' + enum['metric_suffix'].lower(),
+                                              'vrops-exporter')
+            if 'info_metrics' in properties_yaml[self.__class__.__name__]:
+                for info in properties_yaml[self.__class__.__name__]['info_metrics']:
+                    yield InfoMetricFamily('vrops_' + self.vrops_entity_name + '_' + info['metric_suffix'].lower(),
+                                           'vrops-exporter')

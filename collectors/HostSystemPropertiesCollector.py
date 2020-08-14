@@ -1,33 +1,32 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
-from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
-from tools.helper import yaml_read
 from threading import Thread
 import os
 
 
 class HostSystemPropertiesCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
+        self.vrops_entity_name = 'hostsystem'
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
-    def describe(self):
-        yield GaugeMetricFamily('vrops_hostsystem_properties', 'testtest')
-        yield InfoMetricFamily("vrops_hostsystem", 'testtest')
-
     def collect(self):
-        g = GaugeMetricFamily('vrops_hostsystem_properties', 'testtest',
-                              labels=['datacenter', 'vccluster', 'hostsystem', 'propkey'])
-        i = InfoMetricFamily("vrops_hostsystem", 'testtest',
-                             labels=['datacenter', 'vccluster', 'hostsystem'])
+        gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'datacenter', 'vccluster'])
+        infos = self.generate_infos(self.name, self.vrops_entity_name,
+                                    [self.vrops_entity_name, 'datacenter', 'vccluster'])
+        states = self.generate_states(self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'state'])
+
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_hosts_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g, i))
+            t = Thread(target=self.do_metrics, args=(target, gauges, infos, states))
             thread_list.append(t)
             t.start()
         for t in thread_list:
@@ -35,10 +34,14 @@ class HostSystemPropertiesCollector(BaseCollector):
 
         # self.post_metrics(self.g.name)
         # self.post_metrics(self.i.name + '_info')
-        yield g
-        yield i
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
+        for metric_suffix in infos:
+            yield infos[metric_suffix]['info']
+        for metric_suffix in states:
+            yield states[metric_suffix]['state']
 
-    def do_metrics(self, target, g, i):
+    def do_metrics(self, target, gauges, infos, states):
         token = self.get_target_tokens()
         token = token[target]
 
@@ -46,56 +49,50 @@ class HostSystemPropertiesCollector(BaseCollector):
             print("skipping", target, "in", self.name, ", no token")
 
         uuids = self.target_hosts[target]
-        property_yaml = self.read_collector_config()['properties']
-        if 'number_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['number_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                values = Resources.get_latest_number_properties_multiple(target, token, uuids, propkey)
-                if not values:
+        for metric_suffix in gauges:
+            propkey = gauges[metric_suffix]['property']
+            values = Resources.get_latest_number_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'data' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    data = value_entry['data']
-                    host_id = value_entry['resourceId']
-                    g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
-                                self.hosts[host_id]['name'], property_label],
-                        value=data)
+                metric_value = value_entry['data']
+                host_id = value_entry['resourceId']
+                gauges[metric_suffix]['gauge'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
+                            self.hosts[host_id]['parent_cluster_name']],
+                    value=metric_value)
 
-        if 'enum_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['enum_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                expected_state = property_pair['expected']
-                values = Resources.get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state)
-                if not values:
+        for metric_suffix in states:
+            propkey = states[metric_suffix]['property']
+            values = Resources.get_latest_enum_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'value' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    data = value_entry['data']
-                    host_id = value_entry['resourceId']
-                    latest_state = value_entry['latest_state']
-                    g.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
-                                self.hosts[host_id]['name'], property_label + ": " + latest_state],
-                        value=data)
+                metric_value = (1 if states[metric_suffix]['expected'] == value_entry['value'] else 0)
+                host_id = value_entry['resourceId']
+                states[metric_suffix]['state'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
+                            self.hosts[host_id]['parent_cluster_name'], value_entry['value']],
+                    value=metric_value)
 
-        if 'info_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['info_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                values = Resources.get_latest_info_properties_multiple(target, token, uuids, propkey)
-                if not values:
+        for metric_suffix in infos:
+            propkey = infos[metric_suffix]['property']
+            values = Resources.get_latest_info_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'data' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    host_id = value_entry['resourceId']
-                    info_value = value_entry['data']
-                    i.add_metric(
-                        labels=[self.hosts[host_id]['datacenter'].lower(), self.hosts[host_id]['parent_cluster_name'],
-                                self.hosts[host_id]['name']],
-                        value={property_label: info_value})
+                host_id = value_entry['resourceId']
+                info_value = value_entry['data']
+                infos[metric_suffix]['info'].add_metric(
+                    labels=[self.hosts[host_id]['name'],
+                            self.hosts[host_id]['datacenter'].lower(),
+                            self.hosts[host_id]['parent_cluster_name']],
+                    value={metric_suffix: info_value})

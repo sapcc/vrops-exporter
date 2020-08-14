@@ -1,98 +1,96 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
-from prometheus_client.core import InfoMetricFamily
 from tools.Resources import Resources
-from tools.helper import yaml_read
 from threading import Thread
 import os
 
 
 class ClusterPropertiesCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
+        self.vrops_entity_name = 'cluster'
         # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
-    def describe(self):
-        yield GaugeMetricFamily('vrops_cluster_properties', 'testtest')
-        yield InfoMetricFamily('vrops_cluster', 'testtest')
-
     def collect(self):
-        g = GaugeMetricFamily('vrops_cluster_properties', 'testtest',
-                              labels=['datacenter', 'vccluster', 'propkey'])
-        i = InfoMetricFamily('vrops_cluster', 'testtest',
-                             labels=['datacenter', 'vccluster'])
+        gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
+                                      ['vccluster', 'datacenter'])
+        infos = self.generate_infos(self.name, self.vrops_entity_name,
+                                    [self.vrops_entity_name, 'datacenter'])
+        states = self.generate_states(self.name, self.vrops_entity_name,
+                                      ['vccluster', 'datacenter', 'state'])
+
         if os.environ['DEBUG'] >= '1':
-            print('ClusterPropertiesCollector starts with collecting the metrics')
+            print(self.name, 'starts with collecting the metrics')
 
         thread_list = list()
         for target in self.get_clusters_by_target():
-            t = Thread(target=self.do_metrics, args=(target, g, i))
+            t = Thread(target=self.do_metrics, args=(target, gauges, infos, states))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
 
-        yield g
-        yield i
+        # self.post_metrics(self.g.name)
+        # self.post_metrics(self.i.name + '_info')
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
+        for metric_suffix in infos:
+            yield infos[metric_suffix]['info']
+        for metric_suffix in states:
+            yield states[metric_suffix]['state']
 
-    def do_metrics(self, target, g, i):
+    def do_metrics(self, target, gauges, infos, states):
         token = self.get_target_tokens()
         token = token[target]
 
         if not token:
-            print("skipping " + target + " in " + self.name + ", no token")
+            print("skipping", target, "in", self.name, ", no token")
 
         uuids = self.target_clusters[target]
-        property_yaml = self.read_collector_config()['properties']
-        if 'number_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['number_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                values = Resources.get_latest_number_properties_multiple(target, token, uuids, propkey)
-                if not values:
+        for metric_suffix in gauges:
+            propkey = gauges[metric_suffix]['property']
+            values = Resources.get_latest_number_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'data' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    data = value_entry['data']
-                    cluster_id = value_entry['resourceId']
-                    g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
-                                property_label],
-                        value=data)
+                metric_value = value_entry['data']
+                cluster_id = value_entry['resourceId']
+                gauges[metric_suffix]['gauge'].add_metric(
+                    labels=[self.clusters[cluster_id]['name'],
+                            self.clusters[cluster_id]['parent_dc_name'].lower()],
+                    value=metric_value)
 
-        if 'enum_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['enum_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                expected_state = property_pair['expected']
-                values = Resources.get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state)
-                if not values:
+        for metric_suffix in states:
+            propkey = states[metric_suffix]['property']
+            values = Resources.get_latest_enum_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'value' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    data = value_entry['data']
-                    cluster_id = value_entry['resourceId']
-                    latest_state = value_entry['latest_state']
-                    g.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name'],
-                                property_label + ": " + latest_state],
-                        value=data)
+                metric_value = (1 if states[metric_suffix]['expected'] == value_entry['value'] else 0)
+                cluster_id = value_entry['resourceId']
+                states[metric_suffix]['state'].add_metric(
+                    labels=[self.clusters[cluster_id]['name'],
+                            self.clusters[cluster_id]['parent_dc_name'].lower(),
+                            value_entry['value']],
+                    value=metric_value)
 
-        if 'info_metrics' in property_yaml[self.name]:
-            for property_pair in property_yaml[self.name]['info_metrics']:
-                property_label = property_pair['label']
-                propkey = property_pair['property']
-                values = Resources.get_latest_info_properties_multiple(target, token, uuids, propkey)
-                if not values:
+        for metric_suffix in infos:
+            propkey = infos[metric_suffix]['property']
+            values = Resources.get_latest_info_properties_multiple(target, token, uuids, propkey)
+            if not values:
+                continue
+            for value_entry in values:
+                if 'data' not in value_entry:
                     continue
-                for value_entry in values:
-                    if 'data' not in value_entry:
-                        continue
-                    cluster_id = value_entry['resourceId']
-                    info_value = value_entry['data']
-                    i.add_metric(
-                        labels=[self.clusters[cluster_id]['parent_dc_name'].lower(), self.clusters[cluster_id]['name']],
-                        value={property_label: info_value})
+                cluster_id = value_entry['resourceId']
+                info_value = value_entry['data']
+                infos[metric_suffix]['info'].add_metric(
+                    labels=[self.clusters[cluster_id]['name'],
+                            self.clusters[cluster_id]['parent_dc_name'].lower()],
+                    value={metric_suffix: info_value})

@@ -266,7 +266,7 @@ class Resources:
 
     # if the property describes a status that has several states
     # the expected status returns a 0, all others become 1
-    def get_latest_enum_properties_multiple(target, token, uuids, propkey, expected_state):
+    def get_latest_enum_properties_multiple(target, token, uuids, propkey):
 
         if not isinstance(uuids, list):
             print("Error in get multiple: uuids must be a list with multiple entries")
@@ -310,14 +310,7 @@ class Resources:
                 content = resource['property-contents']['property-content']
                 if content:
                     if 'values' in content[0]:
-                        latest_state = content[0]['values'][0]
-                    else:
-                        latest_state = "unknown"
-                    if latest_state == expected_state:
-                        d['data'] = 1
-                    else:
-                        d['data'] = 0
-                    d['latest_state'] = latest_state
+                        d['value'] = content[0]['values'][0]
                 else:
                     # resources can go away, so None is returned
                     print("skipping resource for get", str(propkey))

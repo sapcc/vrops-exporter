@@ -1,55 +1,54 @@
 from BaseCollector import BaseCollector
 import os
-from prometheus_client.core import GaugeMetricFamily
 from tools.Resources import Resources
-from tools.YamlRead import YamlRead
 from threading import Thread
 
 
 class VCenterStatsCollector(BaseCollector):
+
     def __init__(self):
+        super().__init__()
+        self.vrops_entity_name = 'vcenter'
+        self.name = self.__class__.__name__
         self.wait_for_inventory_data()
         # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
-    def describe(self):
-        yield GaugeMetricFamily('vrops_vcenter_stats', 'testtext')
-
     def collect(self):
-        g = GaugeMetricFamily('vrops_vcenter_stats', 'testtext', labels=['vcenter', 'statkey'])
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name])
+
         if os.environ['DEBUG'] >= '1':
-            print('VCenterStatsCollector starts with collecting the metrics')
+            print(self.name, 'starts with collecting the metrics')
 
         # make one big request per stat id with all resource id's in its belly
         thread_list = list()
         for vc in self.get_vcenters():
             target = self.vcenters[vc]['target']
-            t = Thread(target=self.do_metrics, args=(target, g))
+            t = Thread(target=self.do_metrics, args=(target, gauges))
             thread_list.append(t)
             t.start()
         for t in thread_list:
             t.join()
 
-        yield g
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
 
-    def do_metrics(self, target, g):
+    def do_metrics(self, target, gauges):
         token = self.get_target_tokens()
         token = token[target]
         if not token:
-            print("skipping " + target + " in , no token")
+            print("skipping " + target + " in", self.name, ", no token")
 
         for vc in self.get_vcenters():
             uuid = self.vcenters[vc]['uuid']
 
-            statkey_yaml = self.read_collector_config()['statkeys']
-            for statkey_pair in statkey_yaml["VCenterStatsCollector"]:
-
-                statkey_label = statkey_pair['label']
-                statkey = statkey_pair['statkey']
+            for metric_suffix in gauges:
+                statkey = gauges[metric_suffix]['statkey']
                 values = Resources.get_latest_stat(target, token, uuid, statkey)
                 if not values:
-                    print("skipping statkey " + str(statkey) + " in VCenterStatsCollector, no return")
+                    print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                     continue
-                metric_value = int(values)
-                g.add_metric(labels=[self.vcenters[vc]['name'], statkey_label], value=metric_value)
-
+                metric_value = float(values)
+                gauges[metric_suffix]['gauge'].add_metric(labels=[self.vcenters[vc]['name']],
+                                                          value=metric_value)
 
