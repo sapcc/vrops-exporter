@@ -171,9 +171,10 @@ class Resources:
         try:
             response = requests.get(url,
                                     verify=False,
-                                    headers=headers)
+                                    headers=headers,
+                                    timeout=10)
         except Exception as e:
-            print("Problem getting stats Error: " + str(e))
+            print("Problem getting stats error for", key, str(e))
             return False
 
         if response.status_code == 200:
@@ -463,9 +464,10 @@ class Resources:
             response = requests.post(url,
                                      data=json.dumps(payload),
                                      verify=False,
-                                     headers=headers)
+                                     headers=headers,
+                                     timeout=10)
         except Exception as e:
-            print("Problem getting stats Error: " + str(e))
+            print("Problem getting stats Error for", key, str(e))
             return False
 
         if response.status_code == 200:
