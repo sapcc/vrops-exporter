@@ -46,8 +46,9 @@ class DatastoreStatsCollector(BaseCollector):
                 continue
 
             for value_entry in values:
-                metric_value = value_entry['stat-list']['stat'][0]['data'][0]
+                metric_value = value_entry['stat-list']['stat'][0]['data']
                 if metric_value:
+                    metric_value = metric_value[0]
                     datastore_id = value_entry['resourceId']
                     gauges[metric_suffix]['gauge'].add_metric(
                         labels=[self.datastores[datastore_id]['name'],

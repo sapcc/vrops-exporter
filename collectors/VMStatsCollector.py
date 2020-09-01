@@ -52,8 +52,9 @@ class VMStatsCollector(BaseCollector):
                 continue
 
             for value_entry in values:
-                metric_value = value_entry['stat-list']['stat'][0]['data'][0]
+                metric_value = value_entry['stat-list']['stat'][0]['data']
                 if metric_value:
+                    metric_value = metric_value[0]
                     vm_id = value_entry['resourceId']
                     project_id = "internal"
                     if project_ids:
