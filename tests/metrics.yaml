@@ -113,6 +113,10 @@ HostSystemStatsCollector:
     - 'vrops_hostsystem_summary_running_vms_number{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
     - 'vrops_hostsystem_network_packets_dropped_percentage{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
     - 'vrops_hostsystem_cpu_demand_percentage{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
+    - 'vrops_hostsystem_memory_sawp_in_rate_kbps{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_memory_sawp_out_rate_kbps{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_io_wait_miliseconds{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_contention_percentage{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
 
 
 HostSystemPropertiesCollector:
