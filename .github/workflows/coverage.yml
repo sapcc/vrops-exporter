@@ -27,6 +27,7 @@ jobs:
     - name: Create and upload coverage data
       env:
          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
          for i in $(ls tests/Test*)
          do 
