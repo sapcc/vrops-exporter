@@ -125,6 +125,15 @@ HostSystemStatsCollector:
     - 'vrops_hostsystem_memory_swap_out_rate_kbps{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_cpu_io_wait_miliseconds{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
     - 'vrops_hostsystem_cpu_contention_percentage{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_ready_miliseconds{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_swap_wait_miliseconds{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
+    - 'vrops_hostsystem_summary_number_running_vcpus_total{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_ready_miliseconds{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_swap_wait_miliseconds{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_summary_number_running_vcpus_total{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_ready_miliseconds{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
+    - 'vrops_hostsystem_cpu_swap_wait_miliseconds{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
+    - 'vrops_hostsystem_summary_number_running_vcpus_total{datacenter="datacenter3",hostsystem="hostsystem1",vccluster="cluster3"}'
 
 
 HostSystemPropertiesCollector:
@@ -150,6 +159,7 @@ HostSystemPropertiesCollector:
      - 'vrops_hostsystem_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem2",state="test_enum_property",vccluster="cluster3"}'
      - 'vrops_hostsystem_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem1",state="test_enum_property",vccluster="cluster3"}'
      - 'vrops_hostsystem_runtime_maintenancestate{datacenter="datacenter3",hostsystem="hostsystem2",state="test_enum_property",vccluster="cluster3"}'
+     -
 
 DatastoreStatsCollector:
   metrics:
