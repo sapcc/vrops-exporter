@@ -12,7 +12,11 @@ The exporter consists of two main components:
 
 In the past, these have been in one launch script (exporter.py) but this was not really working out, since a restart of the exporter would always need to wait for a whole inventory rebuild. That's why one part is building the inventory permanently and exposing it to the exporter. The exporter fetches the data (http) and uses this to run the actual vROps queries.
 
-1. CLI
+1. Build
+
+    To build the container simply run `make` and get the locally created docker container.
+
+2. CLI
 
     Either specify the vars via environment or cli params. Because the inventory and the exporter are running seperately,
     you need to enter the Docker container at least twice. Start the container:
@@ -45,7 +49,7 @@ In the past, these have been in one launch script (exporter.py) but this was not
      { ... }
    ]
 
-2. Enviroment variables
+3. Enviroment variables
 
     ```
     USER
