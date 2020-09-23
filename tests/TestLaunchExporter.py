@@ -12,7 +12,7 @@ class TestLaunchExporter(TestCase):
 
     # test with debug option on
     def test_with_cli_params_1(self):
-        sys.argv = ['prog', '-o', '1234', '-d', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-l',
+        sys.argv = ['prog', '-o', '1234', '-d', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-t',
                     'testhost.test']
         parse_params()
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
@@ -24,7 +24,7 @@ class TestLaunchExporter(TestCase):
     # test with debug option off
     def test_with_cli_params_2(self):
         os.environ.clear()
-        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-l',
+        sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-t',
                     'testhost.test']
         parse_params()
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
@@ -35,7 +35,7 @@ class TestLaunchExporter(TestCase):
 
     def test_with_cli_and_env_params(self):
         sys.argv = ['prog', '--port', '1234', "--debug", '-i', 'inventory.some.url', '-m',
-                    'tests/collector_config.yaml', '-l', 'testhost.test']
+                    'tests/collector_config.yaml', '-t', 'testhost.test']
         os.environ['PORT'] = '1123'
         os.environ['INVENTORY'] = 'inventory.wedontwantthis.url'
         os.environ['CONFIG'] = 'tests/other_config.yaml'
@@ -50,7 +50,7 @@ class TestLaunchExporter(TestCase):
     # test use default collectors when nothing is specified
     def test_with_no_collector(self):
         sys.argv = ['prog', '--port', '1234', "--debug", '-i', 'inventory.some.url', '-m',
-                    'tests/collector_config.yaml', '-l', 'testhost.test']
+                    'tests/collector_config.yaml', '-t', 'testhost.test']
         options = parse_params()
         self.assertEqual(options.collectors, default_collectors(), 'Default collector list does not match the default')
 
