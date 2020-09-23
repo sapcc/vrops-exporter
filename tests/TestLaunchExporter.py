@@ -57,7 +57,7 @@ class TestLaunchExporter(TestCase):
     # test with only one collector enabled
     def test_with_one_collector(self):
         sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector', '-m',
-                    'collector_config.yaml']
+                    'collector_config.yaml', '-t', 'testhost.test']
         options = parse_params()
         self.assertEqual(options.collectors, ['VMStatsCollector'],
                          'Collector list does not match given single collector')
@@ -65,8 +65,7 @@ class TestLaunchExporter(TestCase):
     # test multiple enabled collectors
     def test_with_multiple_collector(self):
         sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-c', 'VMStatsCollector', '-m',
-                    'tests/collector_config.yaml',
-                    '-c', 'VMPropertiesCollector']
+                    'tests/collector_config.yaml', '-c', 'VMPropertiesCollector', '-t', 'testhost.test']
         options = parse_params()
         self.assertEqual(options.collectors, ['VMStatsCollector', 'VMPropertiesCollector'],
                          'Collector list does not match given multiple collectors')
