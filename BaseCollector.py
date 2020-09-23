@@ -11,6 +11,7 @@ class BaseCollector(ABC):
 
     def __init__(self):
         self.vrops_entity_name = 'base'
+        self.target = os.environ['TARGET']
 
     @abstractmethod
     def collect(self):
@@ -20,44 +21,44 @@ class BaseCollector(ABC):
         config_file = yaml_read(os.environ['CONFIG'])
         return config_file
 
-    def get_vcenters(self):
+    def get_vcenters(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/vcenters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcenters/{}".format(current_iteration)
         request = requests.get(url)
         self.vcenters = request.json()
         return self.vcenters
 
-    def get_datacenters(self):
+    def get_datacenters(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/datacenters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datacenters/{}".format(current_iteration)
         request = requests.get(url)
         self.datacenters = request.json()
         return self.datacenters
 
-    def get_clusters(self):
+    def get_clusters(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/clusters/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/clusters/{}".format(current_iteration)
         request = requests.get(url)
         self.clusters = request.json()
         return self.clusters
 
-    def get_hosts(self):
+    def get_hosts(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/hosts/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/hosts/{}".format(current_iteration)
         request = requests.get(url)
         self.hosts = request.json()
         return self.hosts
 
-    def get_datastores(self):
+    def get_datastores(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/datastores/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datastores/{}".format(current_iteration)
         request = requests.get(url)
         self.datastores = request.json()
         return self.datastores
 
-    def get_vms(self):
+    def get_vms(self, target):
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/vms/{}".format(current_iteration)
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vms/{}".format(current_iteration)
         request = requests.get(url)
         self.vms = request.json()
         return self.vms
@@ -66,11 +67,6 @@ class BaseCollector(ABC):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
         self.iteration = request.json()
         return self.iteration
-
-    def get_targets(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-        self.target = request.json()
-        return self.target
 
     def get_target_tokens(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
@@ -110,52 +106,31 @@ class BaseCollector(ABC):
             print("request failed with status: {}".format(request.status_code))
 
     def get_clusters_by_target(self):
-        self.target_clusters = dict()
-        cluster_dict = self.get_clusters()
-        for uuid in cluster_dict:
-            cluster = cluster_dict[uuid]
-            if cluster['target'] not in self.target_clusters:
-                self.target_clusters[cluster['target']] = list()
-            self.target_clusters[cluster['target']].append(uuid)
+        cluster_dict = self.get_clusters(self.target)
+        self.target_clusters = [cluster_dict[uuid]['uuid'] for uuid in cluster_dict]
         return self.target_clusters
 
     def get_hosts_by_target(self):
-        self.target_hosts = dict()
-        host_dict = self.get_hosts()
-        for uuid in host_dict:
-            host = host_dict[uuid]
-            if host['target'] not in self.target_hosts:
-                self.target_hosts[host['target']] = list()
-            self.target_hosts[host['target']].append(uuid)
+        host_dict = self.get_hosts(self.target)
+        self.target_hosts = [host_dict[uuid]['uuid'] for uuid in host_dict]
         return self.target_hosts
 
     def get_datastores_by_target(self):
-        self.target_datastores = dict()
-        datastore_dict = self.get_datastores()
-        for uuid in datastore_dict:
-            host = datastore_dict[uuid]
-            if host['target'] not in self.target_datastores:
-                self.target_datastores[host['target']] = list()
-            self.target_datastores[host['target']].append(uuid)
+        datastore_dict = self.get_datastores(self.target)
+        self.target_datastores = [datastore_dict[uuid]['uuid'] for uuid in datastore_dict]
         return self.target_datastores
 
     def get_vms_by_target(self):
-        self.target_vms = dict()
-        vms_dict = self.get_vms()
-        for uuid in vms_dict:
-            vm = vms_dict[uuid]
-            if vm['target'] not in self.target_vms:
-                self.target_vms[vm['target']] = list()
-            self.target_vms[vm['target']].append(uuid)
+        vms_dict = self.get_vms(self.target)
+        self.target_vms = [vms_dict[uuid]['uuid'] for uuid in vms_dict]
         return self.target_vms
 
     def get_project_ids_by_target(self):
         project_ids = dict()
-        for target in self.get_vms_by_target():
-            token = self.get_target_tokens()
-            token = token[target]
-            uuids = self.target_vms[target]
-            project_ids[target] = Resources.get_project_ids(target, token, uuids)
+        token = self.get_target_tokens()
+        token = token[self.target]
+        uuids = self.get_vms_by_target()
+        project_ids[self.target] = Resources.get_project_ids(self.target, token, uuids)
         return project_ids
 
     def wait_for_inventory_data(self):

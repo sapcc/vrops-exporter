@@ -20,35 +20,23 @@ class VCenterStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
-        # make one big request per stat id with all resource id's in its belly
-        thread_list = list()
-        for vc in self.get_vcenters():
-            target = self.vcenters[vc]['target']
-            t = Thread(target=self.do_metrics, args=(target, gauges))
-            thread_list.append(t)
-            t.start()
-        for t in thread_list:
-            t.join()
+        token = self.get_target_tokens()
+        token = token[self.target]
+        if not token:
+            print("skipping " + self.target + " in", self.name, ", no token")
+
+        vc = self.get_vcenters(self.target)
+        uuid = [vc[uuid]['uuid'] for uuid in vc][0]
+        for metric_suffix in gauges:
+            statkey = gauges[metric_suffix]['statkey']
+            values = Resources.get_latest_stat(self.target, token, uuid, statkey)
+            if not values:
+                print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
+                continue
+            metric_value = float(values)
+            gauges[metric_suffix]['gauge'].add_metric(labels=[self.vcenters[uuid]['name']],
+                                                      value=metric_value)
 
         for metric_suffix in gauges:
             yield gauges[metric_suffix]['gauge']
-
-    def do_metrics(self, target, gauges):
-        token = self.get_target_tokens()
-        token = token[target]
-        if not token:
-            print("skipping " + target + " in", self.name, ", no token")
-
-        for vc in self.get_vcenters():
-            uuid = self.vcenters[vc]['uuid']
-
-            for metric_suffix in gauges:
-                statkey = gauges[metric_suffix]['statkey']
-                values = Resources.get_latest_stat(target, token, uuid, statkey)
-                if not values:
-                    print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
-                    continue
-                metric_value = float(values)
-                gauges[metric_suffix]['gauge'].add_metric(labels=[self.vcenters[vc]['name']],
-                                                          value=metric_value)
 

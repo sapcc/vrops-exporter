@@ -20,27 +20,15 @@ class DatastoreStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
-        thread_list = list()
-        for target in self.get_datastores_by_target():
-            t = Thread(target=self.do_metrics, args=(target, gauges))
-            thread_list.append(t)
-            t.start()
-        for t in thread_list:
-            t.join()
-
-        for metric_suffix in gauges:
-            yield gauges[metric_suffix]['gauge']
-
-    def do_metrics(self, target, gauges):
         token = self.get_target_tokens()
-        token = token[target]
+        token = token[self.target]
         if not token:
-            print("skipping " + target + " in " + self.name + ", no token")
-        uuids = self.target_datastores[target]
+            print("skipping " + self.target + " in " + self.name + ", no token")
 
+        uuids = self.get_datastores_by_target()
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
+            values = Resources.get_latest_stat_multiple(self.target, token, uuids, statkey)
             if not values:
                 print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                 continue
@@ -56,3 +44,6 @@ class DatastoreStatsCollector(BaseCollector):
                                 self.datastores[datastore_id]['cluster'],
                                 self.datastores[datastore_id]['parent_host_name']],
                         value=metric_value)
+
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']

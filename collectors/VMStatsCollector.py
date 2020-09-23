@@ -21,30 +21,18 @@ class VMStatsCollector(BaseCollector):
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
 
-        thread_list = list()
-        for target in self.get_vms_by_target():
-            project_ids_target = project_ids[target]
-            t = Thread(target=self.do_metrics, args=(target, gauges, project_ids_target))
-            thread_list.append(t)
-            t.start()
-        for t in thread_list:
-            t.join()
-
-        for metric_suffix in gauges:
-            yield gauges[metric_suffix]['gauge']
-
-    def do_metrics(self, target, gauges, project_ids):
         token = self.get_target_tokens()
-        token = token[target]
-        if not token:
-            print("skipping " + target + " in " + self.name + ", no token")
-        uuids = self.target_vms[target]
+        token = token[self.target]
 
+        if not token:
+            print("skipping " + self.target + " in " + self.name + ", no token")
+
+        uuids = self.get_vms_by_target()
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Resources.get_latest_stat_multiple(target, token, uuids, statkey)
+            values = Resources.get_latest_stat_multiple(self.target, token, uuids, statkey)
             if os.environ['DEBUG'] >= '1':
-                print(target, statkey)
+                print(self.target, statkey)
                 print("amount uuids", str(len(uuids)))
                 print("fetched     ", str(len(values)))
             if not values:
@@ -68,3 +56,6 @@ class VMStatsCollector(BaseCollector):
                                 self.vms[vm_id]['parent_host_name'],
                                 project_id],
                         value=metric_value)
+
+        for metric_suffix in gauges:
+            yield gauges[metric_suffix]['gauge']
