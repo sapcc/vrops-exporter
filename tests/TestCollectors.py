@@ -32,7 +32,7 @@ class TestCollectors(unittest.TestCase):
 
     def test_collector_metrics(self):
         metrics_yaml = yaml_read('tests/metrics.yaml')
-
+        os.environ['TARGET'] = 'testhost.test'
         # every collector got to be tested in here
         random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(random_prometheus_port))
