@@ -126,11 +126,10 @@ class BaseCollector(ABC):
         return self.target_vms
 
     def get_project_ids_by_target(self):
-        project_ids = dict()
         token = self.get_target_tokens()
         token = token[self.target]
         uuids = self.get_vms_by_target()
-        project_ids[self.target] = Resources.get_project_ids(self.target, token, uuids)
+        project_ids = Resources.get_project_ids(self.target, token, uuids)
         return project_ids
 
     def wait_for_inventory_data(self):
