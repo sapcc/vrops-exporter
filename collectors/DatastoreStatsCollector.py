@@ -1,6 +1,5 @@
 from BaseCollector import BaseCollector
-from tools.Resources import Resources
-from threading import Thread
+from tools.vrops import Vrops
 import os
 
 
@@ -11,11 +10,10 @@ class DatastoreStatsCollector(BaseCollector):
         self.vrops_entity_name = 'datastore'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
-        # self.post_registered_collector(self.name, g.name)
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem'])
+                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -28,7 +26,7 @@ class DatastoreStatsCollector(BaseCollector):
         uuids = self.get_datastores_by_target()
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Resources.get_latest_stat_multiple(self.target, token, uuids, statkey)
+            values = Vrops.get_latest_stat_multiple(self.target, token, uuids, statkey)
             if not values:
                 print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                 continue
@@ -40,6 +38,7 @@ class DatastoreStatsCollector(BaseCollector):
                     datastore_id = value_entry['resourceId']
                     gauges[metric_suffix]['gauge'].add_metric(
                         labels=[self.datastores[datastore_id]['name'],
+                                self.datastores[datastore_id]['vcenter'],
                                 self.datastores[datastore_id]['datacenter'].lower(),
                                 self.datastores[datastore_id]['cluster'],
                                 self.datastores[datastore_id]['parent_host_name']],

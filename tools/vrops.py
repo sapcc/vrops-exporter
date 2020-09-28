@@ -7,7 +7,7 @@ import json
 import os
 
 
-class Resources:
+class Vrops:
     def get_token(target):
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
         headers = {
@@ -130,7 +130,7 @@ class Resources:
         chunk_iteration = 0
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
-            t = Thread(target=Resources.get_project_id_chunk,
+            t = Thread(target=Vrops.get_project_id_chunk,
                        args=(q, uuid_list, url, headers, target, chunk_iteration))
             thread_list.append(t)
             t.start()
@@ -400,7 +400,7 @@ class Resources:
         chunk_iteration = 0
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
-            t = Thread(target=Resources.get_stat_chunk,
+            t = Thread(target=Vrops.get_stat_chunk,
                        args=(q, uuid_list, url, headers, key, target, chunk_iteration))
             thread_list.append(t)
             t.start()

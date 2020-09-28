@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from threading import Thread
 from exporter import run_prometheus_server
 from tools.helper import yaml_read
-from tools.Resources import Resources
+from tools.vrops import Vrops
 from InventoryBuilder import InventoryBuilder
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
@@ -37,37 +37,37 @@ class TestCollectors(unittest.TestCase):
         random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(random_prometheus_port))
 
-        Resources.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
-        Resources.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
+        Vrops.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
+        Vrops.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
         # test tool get_resources to create resource objects
 
-        Resources.get_datacenter = MagicMock(
+        Vrops.get_datacenter = MagicMock(
             return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
                           {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050815'},
                           {'name': 'datacenter3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
-                                                        {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050815'},
-                                                        {'name': 'cluster3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
-                                                      {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050815'},
-                                                      {'name': 'hostsystem3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
-                                                          {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050815'},
-                                                          {'name': 'vmfolder3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
-                                                                {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815'},
-                                                                {'name': 'vm3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_datastores = MagicMock(
+        Vrops.get_cluster = MagicMock(return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814'},
+                                                    {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050815'},
+                                                    {'name': 'cluster3', 'uuid': '7422-91h7-52s842060815'}])
+        Vrops.get_hosts = MagicMock(return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814'},
+                                                  {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050815'},
+                                                  {'name': 'hostsystem3', 'uuid': '7422-91h7-52s842060815'}])
+        Vrops.get_vmfolders = MagicMock(return_value=[{'name': 'vmfolder1', 'uuid': '3628-93a1-56e84634050814'},
+                                                      {'name': 'vmfolder2', 'uuid': '5628-9ba1-55e847050815'},
+                                                      {'name': 'vmfolder3', 'uuid': '7422-91h7-52s842060815'}])
+        Vrops.get_virtualmachines = MagicMock(return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814'},
+                                                            {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815'},
+                                                            {'name': 'vm3', 'uuid': '7422-91h7-52s842060815'}])
+        Vrops.get_datastores = MagicMock(
             return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
                           {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050815'},
                           {'name': 'datastore3', 'uuid': '7422-91h7-52s842060815'}])
-        Resources.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
-                                                          {'name': 'resource2', 'uuid': '5628-9ba1-55e847050815'}])
-        Resources.get_latest_stat = MagicMock(return_value=1)
-        Resources.get_property = MagicMock(return_value="test_property")
-        Resources.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
-                                                            {"7422-91h7-52s842060815": "0815"},
-                                                            {"5628-9ba1-55e847050815": "internal"}])
+        Vrops.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
+                                                      {'name': 'resource2', 'uuid': '5628-9ba1-55e847050815'}])
+        Vrops.get_latest_stat = MagicMock(return_value=1)
+        Vrops.get_property = MagicMock(return_value="test_property")
+        Vrops.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
+                                                        {"7422-91h7-52s842060815": "0815"},
+                                                        {"5628-9ba1-55e847050815": "internal"}])
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180))
         thread.daemon = True
         thread.start()
@@ -86,7 +86,7 @@ class TestCollectors(unittest.TestCase):
                         {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [44.0]}]}})
                     multiple_metrics_generated.append({"resourceId": "7422-91h7-52s842060815", "stat-list": {"stat": [
                         {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [55.0]}]}})
-                Resources.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
+                Vrops.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
 
             if "Properties" in collector:
                 propkey_yaml = yaml_read(os.environ['CONFIG'])['properties']
@@ -102,7 +102,7 @@ class TestCollectors(unittest.TestCase):
                         multiple_enum_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
                                                                    'propkey': propkey_pair['property'],
                                                                    'value': "test_enum_property"})
-                Resources.get_latest_enum_properties_multiple = MagicMock(
+                Vrops.get_latest_enum_properties_multiple = MagicMock(
                     return_value=multiple_enum_properties_generated)
 
                 multiple_number_properties_generated = list()
@@ -117,7 +117,7 @@ class TestCollectors(unittest.TestCase):
                         multiple_number_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
                                                                      'propkey': propkey_pair['property'],
                                                                      'data': 33})
-                Resources.get_latest_number_properties_multiple = MagicMock(
+                Vrops.get_latest_number_properties_multiple = MagicMock(
                     return_value=multiple_number_properties_generated)
 
                 multiple_info_properties_generated = list()
@@ -132,7 +132,7 @@ class TestCollectors(unittest.TestCase):
                         multiple_info_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
                                                                    'propkey': propkey_pair['property'],
                                                                    'data': 'test_info_property'})
-                Resources.get_latest_info_properties_multiple = MagicMock(
+                Vrops.get_latest_info_properties_multiple = MagicMock(
                     return_value=multiple_info_properties_generated)
 
             thread_list = list()

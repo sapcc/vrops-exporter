@@ -1,5 +1,5 @@
 from BaseCollector import BaseCollector
-from tools.Resources import Resources
+from tools.vrops import Vrops
 import os
 
 
@@ -10,15 +10,15 @@ class DatastorePropertiesCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
         self.vrops_entity_name = 'datastore'
-        # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def collect(self):
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem'])
+                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
-                                    [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem'])
+                                    [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
         states = self.generate_states(self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'datacenter', 'vccluster', 'hostsystem', 'state'])
+                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
+                                       'state'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -32,7 +32,7 @@ class DatastorePropertiesCollector(BaseCollector):
         uuids = self.get_datastores_by_target()
         for label in gauges:
             propkey = gauges[label]['property']
-            values = Resources.get_latest_number_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_number_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -42,6 +42,7 @@ class DatastorePropertiesCollector(BaseCollector):
                 datastore_id = value_entry['resourceId']
                 gauges[label]['gauge'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name']],
@@ -49,7 +50,7 @@ class DatastorePropertiesCollector(BaseCollector):
 
         for label in states:
             propkey = states[label]['property']
-            values = Resources.get_latest_enum_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_enum_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -59,6 +60,7 @@ class DatastorePropertiesCollector(BaseCollector):
                 datastore_id = value_entry['resourceId']
                 states[label]['state'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name'],
@@ -67,7 +69,7 @@ class DatastorePropertiesCollector(BaseCollector):
 
         for label in infos:
             propkey = infos[label]['property']
-            values = Resources.get_latest_info_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_info_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -77,13 +79,12 @@ class DatastorePropertiesCollector(BaseCollector):
                 info_value = value_entry['data']
                 infos[label]['info'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
                             self.datastores[datastore_id]['parent_host_name']],
                     value={label: info_value})
 
-        # self.post_metrics(self.g.name)
-        # self.post_metrics(self.i.name + '_info')
         for metric_suffix in gauges:
             yield gauges[metric_suffix]['gauge']
         for metric_suffix in infos:

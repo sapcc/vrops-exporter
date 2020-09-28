@@ -1,7 +1,7 @@
 from BaseCollector import BaseCollector
 import os
-from tools.Resources import Resources
-from threading import Thread
+from tools.vrops import Vrops
+
 
 
 class VCenterStatsCollector(BaseCollector):
@@ -11,7 +11,6 @@ class VCenterStatsCollector(BaseCollector):
         self.vrops_entity_name = 'vcenter'
         self.name = self.__class__.__name__
         self.wait_for_inventory_data()
-        # self.post_registered_collector(self.__class__.__name__, self.g.name)
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
@@ -29,7 +28,7 @@ class VCenterStatsCollector(BaseCollector):
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Resources.get_latest_stat(self.target, token, uuid, statkey)
+            values = Vrops.get_latest_stat(self.target, token, uuid, statkey)
             if not values:
                 print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                 continue

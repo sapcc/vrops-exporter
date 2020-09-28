@@ -1,5 +1,5 @@
 from BaseCollector import BaseCollector
-from tools.Resources import Resources
+from tools.vrops import Vrops
 import os
 
 
@@ -10,15 +10,14 @@ class ClusterPropertiesCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
         self.vrops_entity_name = 'cluster'
-        # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def collect(self):
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
-                                      ['vccluster', 'datacenter'])
+                                      ['vcenter', 'vccluster', 'datacenter'])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
-                                    [self.vrops_entity_name, 'datacenter'])
+                                    [self.vrops_entity_name, 'vcenter', 'datacenter'])
         states = self.generate_states(self.name, self.vrops_entity_name,
-                                      ['vccluster', 'datacenter', 'state'])
+                                      ['vcenter', 'vccluster', 'datacenter', 'state'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -32,7 +31,7 @@ class ClusterPropertiesCollector(BaseCollector):
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:
             propkey = gauges[metric_suffix]['property']
-            values = Resources.get_latest_number_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_number_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -41,13 +40,14 @@ class ClusterPropertiesCollector(BaseCollector):
                 metric_value = value_entry['data']
                 cluster_id = value_entry['resourceId']
                 gauges[metric_suffix]['gauge'].add_metric(
-                    labels=[self.clusters[cluster_id]['name'],
+                    labels=[self.clusters[cluster_id]['vcenter'],
+                            self.clusters[cluster_id]['name'],
                             self.clusters[cluster_id]['parent_dc_name'].lower()],
                     value=metric_value)
 
         for metric_suffix in states:
             propkey = states[metric_suffix]['property']
-            values = Resources.get_latest_enum_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_enum_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -56,14 +56,15 @@ class ClusterPropertiesCollector(BaseCollector):
                 metric_value = (1 if states[metric_suffix]['expected'] == value_entry['value'] else 0)
                 cluster_id = value_entry['resourceId']
                 states[metric_suffix]['state'].add_metric(
-                    labels=[self.clusters[cluster_id]['name'],
+                    labels=[self.clusters[cluster_id]['vcenter'],
+                            self.clusters[cluster_id]['name'],
                             self.clusters[cluster_id]['parent_dc_name'].lower(),
                             value_entry['value']],
                     value=metric_value)
 
         for metric_suffix in infos:
             propkey = infos[metric_suffix]['property']
-            values = Resources.get_latest_info_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_info_properties_multiple(self.target, token, uuids, propkey)
             if not values:
                 continue
             for value_entry in values:
@@ -72,12 +73,11 @@ class ClusterPropertiesCollector(BaseCollector):
                 cluster_id = value_entry['resourceId']
                 info_value = value_entry['data']
                 infos[metric_suffix]['info'].add_metric(
-                    labels=[self.clusters[cluster_id]['name'],
+                    labels=[self.clusters[cluster_id]['vcenter'],
+                            self.clusters[cluster_id]['name'],
                             self.clusters[cluster_id]['parent_dc_name'].lower()],
                     value={metric_suffix: info_value})
 
-        # self.post_metrics(self.g.name)
-        # self.post_metrics(self.i.name + '_info')
         for metric_suffix in gauges:
             yield gauges[metric_suffix]['gauge']
         for metric_suffix in infos:

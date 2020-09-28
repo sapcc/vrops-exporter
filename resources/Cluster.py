@@ -1,4 +1,4 @@
-from tools.Resources import Resources
+from tools.vrops import Vrops
 from resources.Host import Host
 
 
@@ -12,7 +12,7 @@ class Cluster:
         self.hosts = list()
 
     def add_host(self):
-        r = Resources()
-        for hosts in Resources.get_hosts(r, target=self.target, token=self.token, parentid=self.uuid):
+        vrops = Vrops()
+        for hosts in vrops.get_hosts(target=self.target, token=self.token, parentid=self.uuid):
             self.hosts.append(Host(target=self.target, token=self.token, name=hosts['name'],
                                    uuid=hosts['uuid']))

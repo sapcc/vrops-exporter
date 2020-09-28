@@ -5,7 +5,7 @@ from flask import jsonify
 from gevent.pywsgi import WSGIServer
 from threading import Thread
 from resources.Vcenter import Vcenter
-from tools.Resources import Resources
+from tools.vrops import Vrops
 import time
 import json
 import os
@@ -80,40 +80,6 @@ class InventoryBuilder:
             return_iteration = self.successful_iteration_list
             return(json.dumps(return_iteration))
 
-        @app.route('/register', methods=['POST'])
-        def post_registered_collectors():
-            if not request.json:
-                abort(400)
-            collector = {
-                'collector': request.json["collector"],
-                'metrics': request.json["metric_names"]
-            }
-            collectors.append(collector)
-            return jsonify({"collectors registered": collectors})
-
-        @app.route('/register', methods=['GET'])
-        def get_registered_collectors():
-            return jsonify({"collectors registered": collectors})
-
-        @app.route('/metrics', methods=['POST'])
-        def collect_metric_names():
-            if not request.json:
-                abort(400)
-            metric = {
-                'metric_name': request.json['metric_name']
-            }
-            metrics.append(metric)
-            return jsonify({"collector metrics names ": metrics})
-
-        @app.route('/metrics', methods=['GET'])
-        def get_metric_names():
-            return jsonify({"metrics": metrics})
-
-        @app.route('/metrics', methods=['DELETE'])
-        def delete_metric_names():
-            metrics.clear()
-            return jsonify({"metrics": metrics})
-
         # FIXME: this could basically be the always active token list. no active token? refresh!
         @app.route('/target_tokens', methods=['GET'])
         def token():
@@ -180,7 +146,7 @@ class InventoryBuilder:
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
             print("querying " + vrops)
-        token = Resources.get_token(target=vrops)
+        token = Vrops.get_token(target=vrops)
         if not token:
             return False
         self.target_tokens[vrops] = token
@@ -189,7 +155,7 @@ class InventoryBuilder:
         return True
 
     def create_resource_objects(self, vrops, token):
-        for adapter in Resources.get_adapter(target=vrops, token=token):
+        for adapter in Vrops.get_adapter(target=vrops, token=token):
             if os.environ['DEBUG'] >= '2':
                 print("Collecting vcenter: " + adapter['name'])
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
@@ -240,6 +206,7 @@ class InventoryBuilder:
                         'name': dc.name,
                         'parent_vcenter_uuid': vcenter.uuid,
                         'parent_vcenter_name': vcenter.name,
+                        'vcenter': vcenter.name,
                         'target': dc.target,
                         'token': dc.token,
                         }
@@ -279,6 +246,7 @@ class InventoryBuilder:
                                 'parent_cluster_uuid': cluster.uuid,
                                 'parent_cluster_name': cluster.name,
                                 'datacenter': dc.name,
+                                'vcenter': vcenter.name,
                                 'target': host.target,
                                 'token': host.token,
                                 }
@@ -301,6 +269,7 @@ class InventoryBuilder:
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
                                     'datacenter': dc.name,
+                                    'vcenter': vcenter.name,
                                     'target': ds.target,
                                     'token': ds.token,
                                     }
@@ -323,6 +292,7 @@ class InventoryBuilder:
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
                                     'datacenter': dc.name,
+                                    'vcenter': vcenter.name,
                                     'target': vm.target,
                                     'token': vm.token,
                                     }

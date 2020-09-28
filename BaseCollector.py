@@ -3,7 +3,7 @@ import requests
 import time
 import os
 from tools.helper import yaml_read
-from tools.Resources import Resources
+from tools.vrops import Vrops
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, UnknownMetricFamily
 
 
@@ -73,38 +73,6 @@ class BaseCollector(ABC):
         self.target_tokens = request.json()
         return self.target_tokens
 
-    def post_registered_collector(self, collector, *metric_names):
-        payload = {
-            'collector': collector,
-            'metric_names': list(metric_names)
-        }
-        request = requests.post(json=payload, url="http://" + os.environ['INVENTORY'] + "/register")
-        if request.status_code != 200:
-            print("request failed with status: {}".format(request.status_code))
-
-    def get_registered_collectors(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/register")
-        self.collectors_up = request.json()
-        return self.collectors_up
-
-    def post_metrics(self, metric):
-        payload = {
-            'metric_name': metric
-        }
-        r = requests.post(json=payload, url="http://" + os.environ['INVENTORY'] + "/metrics")
-        if r.status_code != 200:
-            print("request failed with status: {}".format(r.status_code))
-
-    def get_metrics(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/metrics")
-        self.metrics = request.json()
-        return self.metrics
-
-    def delete_metrics(self):
-        request = requests.delete(url="http://" + os.environ['INVENTORY'] + "/metrics")
-        if request.status_code != 200:
-            print("request failed with status: {}".format(request.status_code))
-
     def get_clusters_by_target(self):
         cluster_dict = self.get_clusters(self.target)
         self.target_clusters = [cluster_dict[uuid]['uuid'] for uuid in cluster_dict]
@@ -129,7 +97,7 @@ class BaseCollector(ABC):
         token = self.get_target_tokens()
         token = token[self.target]
         uuids = self.get_vms_by_target()
-        project_ids = Resources.get_project_ids(self.target, token, uuids)
+        project_ids = Vrops.get_project_ids(self.target, token, uuids)
         return project_ids
 
     def wait_for_inventory_data(self):

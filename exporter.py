@@ -22,7 +22,7 @@ def parse_params():
                       dest="collectors")
     parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
                                              "collectors", action="store", dest="config")
-    parser.add_option("-t", "--target", help="define target vcenter", action="store", dest="target")
+    parser.add_option("-t", "--target", help="define target vrops", action="store", dest="target")
     (options, args) = parser.parse_args()
 
 

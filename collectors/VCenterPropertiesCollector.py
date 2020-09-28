@@ -1,6 +1,5 @@
 from BaseCollector import BaseCollector
-from tools.Resources import Resources
-from threading import Thread
+from tools.vrops import Vrops
 import os
 
 
@@ -11,7 +10,6 @@ class VCenterPropertiesCollector(BaseCollector):
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
         self.vrops_entity_name = 'vcenter'
-        # self.post_registered_collector(self.name, self.g.name, self.i.name + '_info')
 
     def collect(self):
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
@@ -33,7 +31,7 @@ class VCenterPropertiesCollector(BaseCollector):
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]
         for metric_suffix in gauges:
             propkey = gauges[metric_suffix]['property']
-            metric_value = Resources.get_property(self.target, token, uuid, propkey)
+            metric_value = Vrops.get_property(self.target, token, uuid, propkey)
             if not metric_value:
                 continue
             gauges[metric_suffix]['gauge'].add_metric(
@@ -42,7 +40,7 @@ class VCenterPropertiesCollector(BaseCollector):
 
         for metric_suffix in states:
             propkey = states[metric_suffix]['property']
-            value = Resources.get_property(self.target, token, uuid, propkey)
+            value = Vrops.get_property(self.target, token, uuid, propkey)
             if not value:
                 continue
             metric_value = (1 if states[metric_suffix]['expected'] == value else 0)
@@ -53,15 +51,13 @@ class VCenterPropertiesCollector(BaseCollector):
 
         for metric_suffix in infos:
             propkey = infos[metric_suffix]['property']
-            info_value = Resources.get_property(self.target, token, uuid, propkey)
+            info_value = Vrops.get_property(self.target, token, uuid, propkey)
             if not info_value:
                 continue
             infos[metric_suffix]['info'].add_metric(
                 labels=[self.vcenters[uuid]['name']],
                 value={metric_suffix: info_value})
 
-        # self.post_metrics(self.g.name)
-        # self.post_metrics(self.i.name + '_info')
         for metric_suffix in gauges:
             yield gauges[metric_suffix]['gauge']
         for metric_suffix in infos:

@@ -1,5 +1,5 @@
 from BaseCollector import BaseCollector
-from tools.Resources import Resources
+from tools.vrops import Vrops
 import os
 
 
@@ -10,11 +10,10 @@ class ClusterStatsCollector(BaseCollector):
         self.vrops_entity_name = 'cluster'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
-        # self.post_registered_collector(self.name, g.name)
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      ['vccluster', 'datacenter'])
+                                      ['vcenter', 'vccluster', 'datacenter'])
         if not gauges:
             return
 
@@ -29,7 +28,7 @@ class ClusterStatsCollector(BaseCollector):
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Resources.get_latest_stat_multiple(self.target, token, uuids, statkey)
+            values = Vrops.get_latest_stat_multiple(self.target, token, uuids, statkey)
             if not values:
                 print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
                 continue
@@ -40,7 +39,8 @@ class ClusterStatsCollector(BaseCollector):
                     metric_value = metric_value[0]
                     cluster_id = value_entry['resourceId']
                     gauges[metric_suffix]['gauge'].add_metric(
-                            labels=[self.clusters[cluster_id]['name'],
+                            labels=[self.clusters[cluster_id]['vcenter'],
+                                    self.clusters[cluster_id]['name'],
                                     self.clusters[cluster_id]['parent_dc_name'].lower()],
                             value=metric_value)
 
