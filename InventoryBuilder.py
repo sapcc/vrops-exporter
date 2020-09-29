@@ -5,7 +5,7 @@ from flask import jsonify
 from gevent.pywsgi import WSGIServer
 from threading import Thread
 from resources.Vcenter import Vcenter
-from tools.Resources import Resources
+from tools.Vrops import Vrops
 import time
 import json
 import os
@@ -45,29 +45,29 @@ class InventoryBuilder:
 
         print('serving /inventory on', str(self.port))
 
-        @app.route('/vcenters/<int:iteration>', methods=['GET'])
-        def vcenters(iteration):
-            return self.iterated_inventory[str(iteration)]['vcenters']
+        @app.route('/<target>/vcenters/<int:iteration>', methods=['GET'])
+        def vcenters(target, iteration):
+            return self.iterated_inventory[str(iteration)]['vcenters'][target]
 
-        @app.route('/datacenters/<int:iteration>', methods=['GET'])
-        def datacenters(iteration):
-            return self.iterated_inventory[str(iteration)]['datacenters']
+        @app.route('/<target>/datacenters/<int:iteration>', methods=['GET'])
+        def datacenters(target, iteration):
+            return self.iterated_inventory[str(iteration)]['datacenters'][target]
 
-        @app.route('/clusters/<int:iteration>', methods=['GET'])
-        def clusters(iteration):
-            return self.iterated_inventory[str(iteration)]['clusters']
+        @app.route('/<target>/clusters/<int:iteration>', methods=['GET'])
+        def clusters(target, iteration):
+            return self.iterated_inventory[str(iteration)]['clusters'][target]
 
-        @app.route('/hosts/<int:iteration>', methods=['GET'])
-        def hosts(iteration):
-            return self.iterated_inventory[str(iteration)]['hosts']
+        @app.route('/<target>/hosts/<int:iteration>', methods=['GET'])
+        def hosts(target, iteration):
+            return self.iterated_inventory[str(iteration)]['hosts'][target]
 
-        @app.route('/datastores/<int:iteration>', methods=['GET'])
-        def datastores(iteration):
-            return self.iterated_inventory[str(iteration)]['datastores']
+        @app.route('/<target>/datastores/<int:iteration>', methods=['GET'])
+        def datastores(target, iteration):
+            return self.iterated_inventory[str(iteration)]['datastores'][target]
 
-        @app.route('/vms/<int:iteration>', methods=['GET'])
-        def vms(iteration):
-            return self.iterated_inventory[str(iteration)]['vms']
+        @app.route('/<target>/vms/<int:iteration>', methods=['GET'])
+        def vms(target, iteration):
+            return self.iterated_inventory[str(iteration)]['vms'][target]
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
@@ -79,40 +79,6 @@ class InventoryBuilder:
         def iteration_store():
             return_iteration = self.successful_iteration_list
             return(json.dumps(return_iteration))
-
-        @app.route('/register', methods=['POST'])
-        def post_registered_collectors():
-            if not request.json:
-                abort(400)
-            collector = {
-                'collector': request.json["collector"],
-                'metrics': request.json["metric_names"]
-            }
-            collectors.append(collector)
-            return jsonify({"collectors registered": collectors})
-
-        @app.route('/register', methods=['GET'])
-        def get_registered_collectors():
-            return jsonify({"collectors registered": collectors})
-
-        @app.route('/metrics', methods=['POST'])
-        def collect_metric_names():
-            if not request.json:
-                abort(400)
-            metric = {
-                'metric_name': request.json['metric_name']
-            }
-            metrics.append(metric)
-            return jsonify({"collector metrics names ": metrics})
-
-        @app.route('/metrics', methods=['GET'])
-        def get_metric_names():
-            return jsonify({"metrics": metrics})
-
-        @app.route('/metrics', methods=['DELETE'])
-        def delete_metric_names():
-            metrics.clear()
-            return jsonify({"metrics": metrics})
 
         # FIXME: this could basically be the always active token list. no active token? refresh!
         @app.route('/target_tokens', methods=['GET'])
@@ -180,7 +146,7 @@ class InventoryBuilder:
     def query_vrops(self, vrops):
         if os.environ['DEBUG'] >= '1':
             print("querying " + vrops)
-        token = Resources.get_token(target=vrops)
+        token = Vrops.get_token(target=vrops)
         if not token:
             return False
         self.target_tokens[vrops] = token
@@ -189,7 +155,7 @@ class InventoryBuilder:
         return True
 
     def create_resource_objects(self, vrops, token):
-        for adapter in Resources.get_adapter(target=vrops, token=token):
+        for adapter in Vrops.get_adapter(target=vrops, token=token):
             if os.environ['DEBUG'] >= '2':
                 print("Collecting vcenter: " + adapter['name'])
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
@@ -219,7 +185,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
-            tree[vcenter.uuid] = {
+            tree[vcenter.target] = dict()
+            tree[vcenter.target][vcenter.uuid] = {
                     'uuid': vcenter.uuid,
                     'name': vcenter.name,
                     'target': vcenter.target,
@@ -232,12 +199,14 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
-                tree[dc.name] = {
+                tree[vcenter.target][dc.uuid] = {
                         'uuid': dc.uuid,
                         'name': dc.name,
                         'parent_vcenter_uuid': vcenter.uuid,
                         'parent_vcenter_name': vcenter.name,
+                        'vcenter': vcenter.name,
                         'target': dc.target,
                         'token': dc.token,
                         }
@@ -248,9 +217,10 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
-                    tree[cluster.uuid] = {
+                    tree[vcenter.target][cluster.uuid] = {
                             'uuid': cluster.uuid,
                             'name': cluster.name,
                             'parent_dc_uuid': dc.uuid,
@@ -266,15 +236,17 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
-                        tree[host.uuid] = {
+                        tree[vcenter.target][host.uuid] = {
                                 'uuid': host.uuid,
                                 'name': host.name,
                                 'parent_cluster_uuid': cluster.uuid,
                                 'parent_cluster_name': cluster.name,
                                 'datacenter': dc.name,
+                                'vcenter': vcenter.name,
                                 'target': host.target,
                                 'token': host.token,
                                 }
@@ -285,17 +257,19 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
                         for ds in host.datastores:
-                            tree[ds.uuid] = {
+                            tree[vcenter.target][ds.uuid] = {
                                     'uuid': ds.uuid,
                                     'name': ds.name,
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
                                     'datacenter': dc.name,
+                                    'vcenter': vcenter.name,
                                     'target': ds.target,
                                     'token': ds.token,
                                     }
@@ -306,17 +280,19 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
                     for host in cluster.hosts:
                         for vm in host.vms:
-                            tree[vm.uuid] = {
+                            tree[vcenter.target][vm.uuid] = {
                                     'uuid': vm.uuid,
                                     'name': vm.name,
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
                                     'datacenter': dc.name,
+                                    'vcenter': vcenter.name,
                                     'target': vm.target,
                                     'token': vm.token,
                                     }

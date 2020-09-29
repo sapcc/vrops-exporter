@@ -1,4 +1,4 @@
-from tools.Resources import Resources
+from tools.Vrops import Vrops
 from resources.Datacenter import Datacenter
 
 
@@ -12,6 +12,6 @@ class Vcenter:
         self.datacenter = list()
 
     def add_datacenter(self):
-        r = Resources()
-        for dc in Resources.get_datacenter(r, target=self.target, token=self.token, parentid=self.uuid):
+        vrops = Vrops()
+        for dc in Vrops.get_datacenter(vrops, target=self.target, token=self.token, parentid=self.uuid):
             self.datacenter.append(Datacenter(target=self.target, token=self.token, name=dc['name'], uuid=dc['uuid']))

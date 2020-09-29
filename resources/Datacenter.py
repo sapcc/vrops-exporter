@@ -1,4 +1,4 @@
-from tools.Resources import Resources
+from tools.Vrops import Vrops
 from resources.Cluster import Cluster
 
 
@@ -12,6 +12,7 @@ class Datacenter:
         self.clusters = list()
 
     def add_cluster(self):
-        r = Resources()
-        for cluster in Resources.get_cluster(r, target=self.target, token=self.token, parentid=self.uuid):
-            self.clusters.append(Cluster(target=self.target, token=self.token, name=cluster['name'], uuid=cluster['uuid']))
+        vrops = Vrops()
+        for cluster in Vrops.get_cluster(vrops, target=self.target, token=self.token, parentid=self.uuid):
+            self.clusters.append(Cluster(target=self.target, token=self.token, name=cluster['name'],
+                                         uuid=cluster['uuid']))
