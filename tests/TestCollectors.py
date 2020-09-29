@@ -25,6 +25,7 @@ import time
 
 
 class TestCollectors(unittest.TestCase):
+    os.environ.setdefault('TARGET', 'testhost.test')
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
