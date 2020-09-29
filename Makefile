@@ -1,6 +1,6 @@
 SHELL       := /bin/sh
-IMAGE       := hub.global.cloud.sap/monsoon/vrops-exporter
-VERSION     := 0.1
+IMAGE       := keppel.eu-de-1.cloud.sap/ccloud/vrops-exporter
+VERSION     := 0.2
 
 ### Executables
 DOCKER := docker
