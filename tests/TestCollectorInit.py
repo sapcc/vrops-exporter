@@ -1,5 +1,6 @@
 import sys
 sys.path.append('.')
+import os
 import unittest
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
@@ -11,6 +12,7 @@ from exporter import initialize_collector_by_name
 
 
 class TestCollectorInitialization(TestCase):
+    os.environ['TARGET'] = 'testhost.test'
     @patch('BaseCollector.BaseCollector.wait_for_inventory_data')
     def test_valid_collector2(self, mocked_wait):
         mocked_wait.return_value = None

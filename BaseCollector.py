@@ -3,7 +3,7 @@ import requests
 import time
 import os
 from tools.helper import yaml_read
-from tools.vrops import Vrops
+from tools.Vrops import Vrops
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, UnknownMetricFamily
 
 

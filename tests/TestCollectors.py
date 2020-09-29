@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from threading import Thread
 from exporter import run_prometheus_server
 from tools.helper import yaml_read
-from tools.vrops import Vrops
+from tools.Vrops import Vrops
 from InventoryBuilder import InventoryBuilder
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector

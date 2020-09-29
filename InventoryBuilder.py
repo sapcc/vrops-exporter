@@ -5,7 +5,7 @@ from flask import jsonify
 from gevent.pywsgi import WSGIServer
 from threading import Thread
 from resources.Vcenter import Vcenter
-from tools.vrops import Vrops
+from tools.Vrops import Vrops
 import time
 import json
 import os
