@@ -33,8 +33,6 @@ class InventoryBuilder:
         self.query_inventory_permanent()
 
     def run_rest_server(self):
-        collectors = []
-        metrics = []
 
         app = Flask(__name__)
         print('serving /vrops_list on', str(self.port))

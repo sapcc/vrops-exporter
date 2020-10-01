@@ -11,7 +11,7 @@ class BaseCollector(ABC):
 
     def __init__(self):
         self.vrops_entity_name = 'base'
-        if os.environ['TARGET'] in self.get_targets():
+        if os.environ['TARGET'] in self.get_target_tokens():
             self.target = os.environ['TARGET']
         else:
             print(os.environ['TARGET'], "has no resources in inventory")
@@ -19,11 +19,6 @@ class BaseCollector(ABC):
     @abstractmethod
     def collect(self):
         pass
-
-    def get_targets(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-        target_list = request.json()
-        return target_list
 
     def read_collector_config(self):
         config_file = yaml_read(os.environ['CONFIG'])
