@@ -42,7 +42,7 @@ def parse_params():
         os.environ['CONFIG'] = options.config
     if not options.collectors:
         options.collectors = default_collectors()
-    if options.port:
+    if options.target:
         os.environ['TARGET'] = options.target
 
 
