@@ -13,6 +13,7 @@ from exporter import initialize_collector_by_name
 
 class TestCollectorInitialization(TestCase):
     os.environ.setdefault('TARGET', 'testhost.test')
+    collectors.VMStatsCollector.BaseCollector.get_target_tokens = MagicMock(return_value={'testhost.test': '2ed214d52'})
     @patch('BaseCollector.BaseCollector.wait_for_inventory_data')
     def test_valid_collector2(self, mocked_wait):
         mocked_wait.return_value = None
