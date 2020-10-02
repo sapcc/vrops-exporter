@@ -11,10 +11,10 @@ class BaseCollector(ABC):
 
     def __init__(self):
         self.vrops_entity_name = 'base'
-        if os.environ['TARGET'] in self.get_target_tokens():
-            self.target = os.environ['TARGET']
-        else:
+        while os.environ['TARGET'] not in self.get_target_tokens():
             print(os.environ['TARGET'], "has no resources in inventory")
+            time.sleep(1800)
+        self.target = os.environ['TARGET']
 
     @abstractmethod
     def collect(self):
