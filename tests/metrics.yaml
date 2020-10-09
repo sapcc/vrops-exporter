@@ -161,21 +161,21 @@ HostSystemPropertiesCollector:
 
 DatastoreStatsCollector:
   metrics:
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="B121_Management_DS03",hostsystem="hostsystem3",type="Management",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="B121_Management_DS03",hostsystem="hostsystem3",type="Management",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="B121_Management_DS03",hostsystem="hostsystem3",type="Management",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
 
 DatastorePropertiesCollector:
   metrics:
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",state="test_enum_property",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",state="test_enum_property",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
+     - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="B121_Management_DS03",hostsystem="hostsystem3",state="test_enum_property",type="Management",vccluster="cluster3",vcenter="vcenter1"}'
 
 VMStatsCollector:
   metrics:

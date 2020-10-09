@@ -13,7 +13,8 @@ class DatastoreStatsCollector(BaseCollector):
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
+                                      [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
+                                       'hostsystem'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -38,6 +39,7 @@ class DatastoreStatsCollector(BaseCollector):
                     datastore_id = value_entry['resourceId']
                     gauges[metric_suffix]['gauge'].add_metric(
                         labels=[self.datastores[datastore_id]['name'],
+                                self.datastores[datastore_id]['type'],
                                 self.datastores[datastore_id]['vcenter'],
                                 self.datastores[datastore_id]['datacenter'].lower(),
                                 self.datastores[datastore_id]['cluster'],

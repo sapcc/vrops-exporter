@@ -263,6 +263,7 @@ class InventoryBuilder:
                             tree[vcenter.target][ds.uuid] = {
                                     'uuid': ds.uuid,
                                     'name': ds.name,
+                                    'type': ds.type,
                                     'parent_host_uuid': host.uuid,
                                     'parent_host_name': host.name,
                                     'cluster': cluster.name,
