@@ -161,21 +161,21 @@ HostSystemPropertiesCollector:
 
 DatastoreStatsCollector:
   metrics:
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_diskspace_total_usage_gigabytes{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",type="None",vccluster="cluster3",vcenter="vcenter1"}'
 
 DatastorePropertiesCollector:
   metrics:
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
-      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",state="test_enum_property",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore2",hostsystem="hostsystem3",state="test_enum_property",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore3",hostsystem="hostsystem3",state="test_enum_property",type="None",vccluster="cluster3",vcenter="vcenter1"}'
+      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="datastore1",hostsystem="hostsystem3",state="test_enum_property",type="None",vccluster="cluster3",vcenter="vcenter1"}'
 
 VMStatsCollector:
   metrics:

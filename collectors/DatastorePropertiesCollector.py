@@ -13,12 +13,14 @@ class DatastorePropertiesCollector(BaseCollector):
 
     def collect(self):
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
+                                      [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
+                                       'hostsystem'])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
-                                    [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem'])
+                                    [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
+                                     'hostsystem'])
         states = self.generate_states(self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
-                                       'state'])
+                                      [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
+                                       'hostsystem', 'state'])
 
         if os.environ['DEBUG'] >= '1':
             print(self.name, 'starts with collecting the metrics')
@@ -42,6 +44,7 @@ class DatastorePropertiesCollector(BaseCollector):
                 datastore_id = value_entry['resourceId']
                 gauges[label]['gauge'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['type'],
                             self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
@@ -60,6 +63,7 @@ class DatastorePropertiesCollector(BaseCollector):
                 datastore_id = value_entry['resourceId']
                 states[label]['state'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['type'],
                             self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
@@ -79,6 +83,7 @@ class DatastorePropertiesCollector(BaseCollector):
                 info_value = value_entry['data']
                 infos[label]['info'].add_metric(
                     labels=[self.datastores[datastore_id]['name'],
+                            self.datastores[datastore_id]['type'],
                             self.datastores[datastore_id]['vcenter'],
                             self.datastores[datastore_id]['datacenter'].lower(),
                             self.datastores[datastore_id]['cluster'],
