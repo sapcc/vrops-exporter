@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append('.')
 from unittest.mock import MagicMock
 from threading import Thread
@@ -26,6 +27,7 @@ import time
 
 class TestCollectors(unittest.TestCase):
     os.environ.setdefault('TARGET', 'testhost.test')
+
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
@@ -59,9 +61,9 @@ class TestCollectors(unittest.TestCase):
                                                             {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815'},
                                                             {'name': 'vm3', 'uuid': '7422-91h7-52s842060815'}])
         Vrops.get_datastores = MagicMock(
-            return_value=[{'name': 'datastore1', 'uuid': '3628-93a1-56e84634050814'},
-                          {'name': 'datastore2', 'uuid': '5628-9ba1-55e847050815'},
-                          {'name': 'datastore3', 'uuid': '7422-91h7-52s842060815'}])
+            return_value=[{'name': 'vmfs_vc-w-0_p_ssd_bb091_001', 'uuid': '3628-93a1-56e84634050814'},
+                          {'name': 'eph-bb112-1', 'uuid': '5628-9ba1-55e847050815'},
+                          {'name': 'B121_Management_DS03', 'uuid': '7422-91h7-52s842060815'}])
         Vrops.get_resources = MagicMock(return_value=[{'name': 'resource1', 'uuid': '5628-9ba1-55e847050814'},
                                                       {'name': 'resource2', 'uuid': '5628-9ba1-55e847050815'}])
         Vrops.get_latest_stat = MagicMock(return_value=1)
