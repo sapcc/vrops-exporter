@@ -35,7 +35,7 @@ class TestCollectors(unittest.TestCase):
         self.assertTrue(os.getenv('TARGET'), 'no target set')
 
     def test_collector_metrics(self):
-        metrics_yaml = yaml_read('tests/metrics.yaml')
+        self.metrics_yaml = yaml_read('tests/metrics.yaml')
         # every collector got to be tested in here
         self.random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(self.random_prometheus_port))
@@ -75,143 +75,143 @@ class TestCollectors(unittest.TestCase):
         thread.daemon = True
         thread.start()
 
-        def collector_testrun(rubric=None):
-            if 'Stats' in collector:
-                # mocking all values from yaml
-                statkey_yaml = yaml_read(os.environ['CONFIG'])['statkeys']
-                multiple_metrics_generated = list()
-
-                def append_metrics(statkey_pair):
-                    multiple_metrics_generated.append({"resourceId": "3628-93a1-56e84634050814", "stat-list": {"stat": [
-                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [88.0]}]}})
-                    multiple_metrics_generated.append({"resourceId": "5628-9ba1-55e847050815", "stat-list": {"stat": [
-                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [44.0]}]}})
-                    multiple_metrics_generated.append({"resourceId": "7422-91h7-52s842060815", "stat-list": {"stat": [
-                        {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [55.0]}]}})
-
-                if collector == 'VMStatsCollector':
-                    for statkey_pair in statkey_yaml[collector][rubric]:
-                        append_metrics(statkey_pair)
-                else:
-                    for statkey_pair in statkey_yaml[collector]:
-                        append_metrics(statkey_pair)
-                Vrops.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
-
-            if "Properties" in collector:
-                propkey_yaml = yaml_read(os.environ['CONFIG'])['properties']
-                multiple_enum_properties_generated = list()
-                if 'enum_metrics' in propkey_yaml[collector]:
-                    for propkey_pair in propkey_yaml[collector]['enum_metrics']:
-                        multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'value': "test_enum_property"})
-                        multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'value': "test_enum_property"})
-                        multiple_enum_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'value': "test_enum_property"})
-                Vrops.get_latest_enum_properties_multiple = MagicMock(
-                    return_value=multiple_enum_properties_generated)
-
-                multiple_number_properties_generated = list()
-                if 'number_metrics' in propkey_yaml[collector]:
-                    for propkey_pair in propkey_yaml[collector]['number_metrics']:
-                        multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                                     'propkey': propkey_pair['property'],
-                                                                     'data': 19.54})
-                        multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
-                                                                     'propkey': propkey_pair['property'],
-                                                                     'data': '6.5'})
-                        multiple_number_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
-                                                                     'propkey': propkey_pair['property'],
-                                                                     'data': 33})
-                Vrops.get_latest_number_properties_multiple = MagicMock(
-                    return_value=multiple_number_properties_generated)
-
-                multiple_info_properties_generated = list()
-                if 'info_metrics' in propkey_yaml[collector]:
-                    for propkey_pair in propkey_yaml[collector]['info_metrics']:
-                        multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'data': 'test_info_property'})
-                        multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'data': 'test_info_property'})
-                        multiple_info_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
-                                                                   'propkey': propkey_pair['property'],
-                                                                   'data': 'test_info_property'})
-                Vrops.get_latest_info_properties_multiple = MagicMock(
-                    return_value=multiple_info_properties_generated)
-
-            thread_list = list()
-
-            # start prometheus server to provide metrics later on
-            collector_instance = globals()[collector]()
-            thread1 = Thread(target=run_prometheus_server, args=(self.random_prometheus_port, [collector_instance]))
-            thread1.daemon = True
-            thread1.start()
-            thread_list.append(thread1)
-            # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
-            time.sleep(10)
-
-            print("prometheus query port " + str(self.random_prometheus_port))
-            c = http.client.HTTPConnection("localhost:" + str(self.random_prometheus_port))
-            c.request("GET", "/")
-            r = c.getresponse()
-            self.assertEqual(r.status, 200, "HTTP server return code should be 200")
-            self.assertEqual(r.reason, "OK", "HTTP status should be OK")
-
-            data = r.read().decode()
-            data_array = data.split('\n')
-            metrics = set()
-            for entry in data_array:
-                if entry.startswith('#'):
-                    continue
-                if entry.startswith('python_gc'):
-                    continue
-                if entry.startswith('process_'):
-                    continue
-                if entry.startswith('python_info'):
-                    continue
-                split_entry = entry.split("}")
-                if len(split_entry) != 2:
-                    continue
-                metrics.add(split_entry[0] + "}")
-
-            if collector == 'VMStatsCollector':
-                metrics_yaml_list = metrics_yaml[collector]['metrics'][rubric]
-            else:
-                metrics_yaml_list = metrics_yaml[collector]['metrics']
-            self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
-            self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
-
-            # check if there are more metrics being produced and they are not listed in metrics.yaml?!
-            issubsetdifference = metrics.difference(metrics_yaml_list)
-            self.assertTrue(metrics.issubset(metrics_yaml_list),
-                            msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
-                                issubsetdifference))
-            # check if all metrics from yaml are here
-            supersetdifference = set(metrics_yaml_list).difference(metrics)
-            self.assertTrue(set(metrics).issuperset(metrics_yaml_list),
-                            msg=collector + ": missing metrics from yaml:\n" + "\n".join(supersetdifference))
-
-            for t in thread_list:
-                t.join(timeout=5)
-
-            # we don't want to have any port locks if prometheus server thread is not shutting down
-            self.random_prometheus_port += 1
-            REGISTRY.unregister(collector_instance)
-
-        for collector in metrics_yaml.keys():
+        for collector in self.metrics_yaml.keys():
             print("\nTesting " + collector)
-            if collector == 'VMStatsCollector':
-                for rubric in metrics_yaml[collector]['metrics']:
+            if self.metrics_yaml[collector]['rubrics']:
+                for rubric in self.metrics_yaml[collector]['metrics']:
                     os.environ['RUBRIC'] = rubric
                     print("Testing rubric:", rubric)
-                    collector_testrun(rubric)
+                    self.collector_testrun(collector, rubric)
             else:
-                collector_testrun()
+                self.collector_testrun(collector)
+
+    def collector_testrun(self, collector, rubric=None):
+        if 'Stats' in collector:
+            # mocking all values from yaml
+            statkey_yaml = yaml_read(os.environ['CONFIG'])['statkeys']
+            multiple_metrics_generated = list()
+
+            def append_metrics(statkey_pair):
+                multiple_metrics_generated.append({"resourceId": "3628-93a1-56e84634050814", "stat-list": {"stat": [
+                    {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [88.0]}]}})
+                multiple_metrics_generated.append({"resourceId": "5628-9ba1-55e847050815", "stat-list": {"stat": [
+                    {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [44.0]}]}})
+                multiple_metrics_generated.append({"resourceId": "7422-91h7-52s842060815", "stat-list": {"stat": [
+                    {"timestamps": [1582797716394], "statKey": {"key": statkey_pair['statkey']}, "data": [55.0]}]}})
+
+            if rubric:
+                for statkey_pair in statkey_yaml[collector][rubric]:
+                    append_metrics(statkey_pair)
+            else:
+                for statkey_pair in statkey_yaml[collector]:
+                    append_metrics(statkey_pair)
+            Vrops.get_latest_stat_multiple = MagicMock(return_value=multiple_metrics_generated)
+
+        if "Properties" in collector:
+            propkey_yaml = yaml_read(os.environ['CONFIG'])['properties']
+            multiple_enum_properties_generated = list()
+            if 'enum_metrics' in propkey_yaml[collector]:
+                for propkey_pair in propkey_yaml[collector]['enum_metrics']:
+                    multiple_enum_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                               'propkey': propkey_pair['property'],
+                                                               'value': "test_enum_property"})
+                    multiple_enum_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
+                                                               'propkey': propkey_pair['property'],
+                                                               'value': "test_enum_property"})
+                    multiple_enum_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
+                                                               'propkey': propkey_pair['property'],
+                                                               'value': "test_enum_property"})
+            Vrops.get_latest_enum_properties_multiple = MagicMock(
+                return_value=multiple_enum_properties_generated)
+
+            multiple_number_properties_generated = list()
+            if 'number_metrics' in propkey_yaml[collector]:
+                for propkey_pair in propkey_yaml[collector]['number_metrics']:
+                    multiple_number_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                                 'propkey': propkey_pair['property'],
+                                                                 'data': 19.54})
+                    multiple_number_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
+                                                                 'propkey': propkey_pair['property'],
+                                                                 'data': '6.5'})
+                    multiple_number_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
+                                                                 'propkey': propkey_pair['property'],
+                                                                 'data': 33})
+            Vrops.get_latest_number_properties_multiple = MagicMock(
+                return_value=multiple_number_properties_generated)
+
+            multiple_info_properties_generated = list()
+            if 'info_metrics' in propkey_yaml[collector]:
+                for propkey_pair in propkey_yaml[collector]['info_metrics']:
+                    multiple_info_properties_generated.append({'resourceId': '3628-93a1-56e84634050814',
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 'test_info_property'})
+                    multiple_info_properties_generated.append({'resourceId': "5628-9ba1-55e847050815",
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 'test_info_property'})
+                    multiple_info_properties_generated.append({'resourceId': "7422-91h7-52s842060815",
+                                                               'propkey': propkey_pair['property'],
+                                                               'data': 'test_info_property'})
+            Vrops.get_latest_info_properties_multiple = MagicMock(
+                return_value=multiple_info_properties_generated)
+
+        thread_list = list()
+
+        # start prometheus server to provide metrics later on
+        collector_instance = globals()[collector]()
+        thread1 = Thread(target=run_prometheus_server, args=(self.random_prometheus_port, [collector_instance]))
+        thread1.daemon = True
+        thread1.start()
+        thread_list.append(thread1)
+        # give grandpa thread some time to get prometheus started and run a couple intervals of InventoryBuilder
+        time.sleep(10)
+
+        print("prometheus query port " + str(self.random_prometheus_port))
+        c = http.client.HTTPConnection("localhost:" + str(self.random_prometheus_port))
+        c.request("GET", "/")
+        r = c.getresponse()
+        self.assertEqual(r.status, 200, "HTTP server return code should be 200")
+        self.assertEqual(r.reason, "OK", "HTTP status should be OK")
+
+        data = r.read().decode()
+        data_array = data.split('\n')
+        metrics = set()
+        for entry in data_array:
+            if entry.startswith('#'):
+                continue
+            if entry.startswith('python_gc'):
+                continue
+            if entry.startswith('process_'):
+                continue
+            if entry.startswith('python_info'):
+                continue
+            split_entry = entry.split("}")
+            if len(split_entry) != 2:
+                continue
+            metrics.add(split_entry[0] + "}")
+
+        if rubric:
+            metrics_yaml_list = self.metrics_yaml[collector]['metrics'][rubric]
+        else:
+            metrics_yaml_list = self.metrics_yaml[collector]['metrics']
+        self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
+        self.assertTrue(metrics, msg=collector + " is not producing any metrics at all, how should I continue?")
+
+        # check if there are more metrics being produced and they are not listed in metrics.yaml?!
+        issubsetdifference = metrics.difference(metrics_yaml_list)
+        self.assertTrue(metrics.issubset(metrics_yaml_list),
+                        msg=collector + ": metric not covered by testcase, probably missing in yaml\n" + "\n".join(
+                            issubsetdifference))
+        # check if all metrics from yaml are here
+        supersetdifference = set(metrics_yaml_list).difference(metrics)
+        self.assertTrue(set(metrics).issuperset(metrics_yaml_list),
+                        msg=collector + ": missing metrics from yaml:\n" + "\n".join(supersetdifference))
+
+        for t in thread_list:
+            t.join(timeout=5)
+
+        # we don't want to have any port locks if prometheus server thread is not shutting down
+        self.random_prometheus_port += 1
+        REGISTRY.unregister(collector_instance)
 
 
 if __name__ == '__main__':

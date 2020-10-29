@@ -8,7 +8,6 @@ class VMStatsCollector(BaseCollector):
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'virtualmachine'
-        self.rubric = os.environ['RUBRIC']
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
 
