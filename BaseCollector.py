@@ -16,6 +16,7 @@ class BaseCollector(ABC):
             time.sleep(1800)
         self.target = os.environ['TARGET']
         # If metrics in collector-config are divided into rubrics
+        self.rubricated = False
         self.rubric = os.environ.get('RUBRIC', None)
 
     @abstractmethod
@@ -131,7 +132,8 @@ class BaseCollector(ABC):
                                                'vrops-exporter', labels=labelnames),
                     'statkey': statkey_pair['statkey']
                 }
-            if rubric:
+
+            if self.rubricated:
                 for statkey_pair in statkey_yaml[calling_class][rubric]:
                     iterate()
             else:
@@ -201,7 +203,11 @@ class BaseCollector(ABC):
         collector = self.__class__.__name__
         if 'Stats' in collector:
             statkey_yaml = self.read_collector_config()['statkeys']
-            if self.rubric:
+            if self.rubricated:
+                if not self.rubric:
+                    if os.environ['DEBUG'] >= '1':
+                        print(collector, "cannot work. There is no rubric given.\nSet a rubric as start parameter")
+                    return
                 for statkey_pair in statkey_yaml[collector][self.rubric]:
                     statkey_suffix = statkey_pair['metric_suffix']
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
