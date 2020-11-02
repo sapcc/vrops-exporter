@@ -10,10 +10,17 @@ class VMStatsCollector(BaseCollector):
         self.vrops_entity_name = 'virtualmachine'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
+        self.rubricated = True
 
     def collect(self):
+        if self.rubricated and not self.rubric:
+            if os.environ['DEBUG'] >= '1':
+                print(self.name, "cannot work. There is no rubric given.\nSet a rubric as start parameter.")
+            return
+
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem', 'project'])
+                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
+                                       'project'], rubric=self.rubric)
         project_ids = self.get_project_ids_by_target()
 
         if os.environ['DEBUG'] >= '1':

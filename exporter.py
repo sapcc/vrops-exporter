@@ -23,6 +23,7 @@ def parse_params():
     parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
                                              "collectors", action="store", dest="config")
     parser.add_option("-t", "--target", help="define target vrops", action="store", dest="target")
+    parser.add_option("-r", "--rubric", help="metric rubric only for VMStatsCollector", action="store", dest="rubric")
     (options, args) = parser.parse_args()
 
 
@@ -44,6 +45,8 @@ def parse_params():
         options.collectors = default_collectors()
     if options.target:
         os.environ['TARGET'] = options.target
+    if options.rubric:
+        os.environ['RUBRIC'] = options.rubric
 
 
     if "PORT" not in os.environ and not options.port:

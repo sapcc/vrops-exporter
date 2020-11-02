@@ -15,6 +15,9 @@ class BaseCollector(ABC):
             print(os.environ['TARGET'], "has no resources in inventory")
             time.sleep(1800)
         self.target = os.environ['TARGET']
+        # If metrics in collector-config are divided into rubrics
+        self.rubricated = False
+        self.rubric = os.environ.get('RUBRIC', None)
 
     @abstractmethod
     def collect(self):
@@ -113,7 +116,7 @@ class BaseCollector(ABC):
         print("done: initial query " + type(self).__name__)
         return
 
-    def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames):
+    def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames, rubric=None):
         if not isinstance(labelnames, list):
             print("Can't generate Gauges without label list, called from", calling_class)
             return {}
@@ -121,13 +124,21 @@ class BaseCollector(ABC):
         if metric_type == 'stats':
             statkey_yaml = self.read_collector_config()['statkeys']
             gauges = dict()
-            for statkey_pair in statkey_yaml[calling_class]:
+
+            def iterate():
                 statkey_suffix = statkey_pair['metric_suffix']
                 gauges[statkey_suffix] = {
                     'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + statkey_suffix.lower(),
                                                'vrops-exporter', labels=labelnames),
                     'statkey': statkey_pair['statkey']
                 }
+
+            if self.rubricated:
+                for statkey_pair in statkey_yaml[calling_class][rubric]:
+                    iterate()
+            else:
+                for statkey_pair in statkey_yaml[calling_class]:
+                    iterate()
             return gauges
 
         if metric_type == 'property':
@@ -189,23 +200,35 @@ class BaseCollector(ABC):
         return {}
 
     def describe(self):
-        if 'Stats' in self.__class__.__name__:
+        collector = self.__class__.__name__
+        if 'Stats' in collector:
             statkey_yaml = self.read_collector_config()['statkeys']
-            for statkey_pair in statkey_yaml[self.__class__.__name__]:
-                statkey_suffix = statkey_pair['metric_suffix']
-                yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
-                                        'vrops-exporter')
-        if 'Properties' in self.__class__.__name__:
+            if self.rubricated:
+                if not self.rubric:
+                    if os.environ['DEBUG'] >= '1':
+                        print(collector, "cannot work. There is no rubric given.\nSet a rubric as start parameter")
+                    return
+                for statkey_pair in statkey_yaml[collector][self.rubric]:
+                    statkey_suffix = statkey_pair['metric_suffix']
+                    yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
+                                            'vrops-exporter')
+            else:
+                for statkey_pair in statkey_yaml[collector]:
+                    statkey_suffix = statkey_pair['metric_suffix']
+                    yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
+                                            'vrops-exporter')
+
+        if 'Properties' in collector:
             properties_yaml = self.read_collector_config()['properties']
-            if 'number_metrics' in properties_yaml[self.__class__.__name__]:
-                for num in properties_yaml[self.__class__.__name__]['number_metrics']:
+            if 'number_metrics' in properties_yaml[collector]:
+                for num in properties_yaml[collector]['number_metrics']:
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + num['metric_suffix'].lower(),
                                             'vrops-exporter')
-            if 'enum_metrics' in properties_yaml[self.__class__.__name__]:
-                for enum in properties_yaml[self.__class__.__name__]['enum_metrics']:
+            if 'enum_metrics' in properties_yaml[collector]:
+                for enum in properties_yaml[collector]['enum_metrics']:
                     yield UnknownMetricFamily('vrops_' + self.vrops_entity_name + '_' + enum['metric_suffix'].lower(),
                                               'vrops-exporter')
-            if 'info_metrics' in properties_yaml[self.__class__.__name__]:
-                for info in properties_yaml[self.__class__.__name__]['info_metrics']:
+            if 'info_metrics' in properties_yaml[collector]:
+                for info in properties_yaml[collector]['info_metrics']:
                     yield InfoMetricFamily('vrops_' + self.vrops_entity_name + '_' + info['metric_suffix'].lower(),
                                            'vrops-exporter')
