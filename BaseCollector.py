@@ -16,8 +16,8 @@ class BaseCollector(ABC):
         self.vrops_entity_name = 'base'
         while os.environ['TARGET'] not in self.get_target_tokens():
             logger.critical(f'Cannot start exporter without valid target!')
-            logger.critical(f'{ os.environ["TARGET"] } is not in vrops_list from inventory')
-            logger.critical(f'The following vrops are known from inventory: { [t for t in self.target_tokens] }')
+            logger.critical(f'{os.environ["TARGET"]} is not in vrops_list from inventory')
+            logger.critical(f'The following vrops are known from inventory: {[t for t in self.target_tokens]}')
             time.sleep(1800)
         self.target = os.environ.get('TARGET')
         self.collector = self.__class__.__name__
@@ -214,14 +214,14 @@ class BaseCollector(ABC):
             rubrics = [r for r in statkey_yaml[self.collector]]
             if self.rubricated and not self.rubric:
                 logger.warning(f'{self.collector} is rubricated and has no rubric given. Considering all')
-                logger.info(f'Rubrics to be considered: { rubrics }')
+                logger.info(f'Rubrics to be considered: {rubrics}')
                 for r in rubrics:
                     for statkey_pair in statkey_yaml[self.collector][r]:
                         statkey_suffix = statkey_pair.get('metric_suffix')
                         yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
                                                 'vrops-exporter')
             if self.rubricated and self.rubric:
-                logger.info(f'Rubric to be considered: { self.rubric }')
+                logger.info(f'Rubric to be considered: {self.rubric}')
                 for statkey_pair in statkey_yaml[self.collector][self.rubric]:
                     statkey_suffix = statkey_pair.get('metric_suffix')
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),

@@ -26,20 +26,20 @@ class VMPropertiesCollector(BaseCollector):
 
         project_ids = self.get_project_ids_by_target()
 
-        logger.info(f' { self.name } starts with collecting the metrics')
+        logger.info(f' {self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
         token = token[self.target]
 
         if not token:
-            logger.warning(f'skipping { self.target } in { self.name }, no token')
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_vms_by_target()
         for metric_suffix in gauges:
             propkey = gauges[metric_suffix]['property']
             values = Vrops.get_latest_number_properties_multiple(self.target, token, uuids, propkey, self.name)
             if not values:
-                logging.warning(f'Skipping { propkey }, no values in respond')
+                logging.warning(f'Skipping {propkey}, no values in respond')
                 continue
             for value_entry in values:
                 if 'data' not in value_entry:

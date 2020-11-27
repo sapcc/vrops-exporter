@@ -31,7 +31,7 @@ class ClusterStatsCollector(BaseCollector):
             statkey = gauges[metric_suffix]['statkey']
             values = Vrops.get_latest_stat_multiple(self.target, token, uuids, statkey, self.name)
             if not values:
-                logger.warning(f'Skipping statkey: { statkey } in { self.name } , no return')
+                logger.warning(f'Skipping statkey: {statkey} in {self.name} , no return')
                 continue
 
             for value_entry in values:

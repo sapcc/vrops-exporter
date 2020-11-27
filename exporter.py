@@ -63,7 +63,7 @@ def parse_params(logger):
         os.environ['TARGET'] = options.target
     if not options.target:
         target = get_targets()[0]
-        logger.warning(f'No target specified. Running exporter with { target } from inventory')
+        logger.warning(f'No target specified. Running exporter with {target} from inventory')
         os.environ['TARGET'] = target
     if options.rubric:
         os.environ['RUBRIC'] = options.rubric

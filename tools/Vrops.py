@@ -30,13 +30,13 @@ class Vrops:
                                      headers=headers,
                                      timeout=10)
         except Exception as e:
-            logger.error(f'Problem connecting to { target }. Error: { e }')
+            logger.error(f'Problem connecting to {target}. Error: {e}')
             return False
 
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            logger.error(f'Problem getting token from { target } : { response.text }')
+            logger.error(f'Problem getting token from {target} : {response.text}')
             return False
 
     def get_adapter(target, token):
@@ -57,7 +57,7 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            logger.error(f'Problem connecting to { target } - Error: { e }')
+            logger.error(f'Problem connecting to {target} - Error: {e}')
             return False
 
         if response.status_code == 200:
@@ -68,7 +68,7 @@ class Vrops:
                 res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                 adapters.append(res)
         else:
-            logger.error(f'Problem getting adapter { target } : { response.text }')
+            logger.error(f'Problem getting adapter {target} : {response.text}')
             return False
 
         return adapters
@@ -94,8 +94,8 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            logger.error(f'Problem connecting to { target } ')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem connecting to {target} ')
+            logger.error(f'Error msg: {e}')
             return resources
 
         if response.status_code == 200:
@@ -107,16 +107,16 @@ class Vrops:
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target { target } and resourcekind: { resourcekind }')
-                logger.error(f'Error msg: { e }')
+                logger.error(f'Catching JSONDecodeError for target {target} and resourcekind: {resourcekind}')
+                logger.error(f'Error msg: {e}')
         else:
-            logger.error(f'Problem getting adapter { target } : { response.text }')
+            logger.error(f'Problem getting adapter {target} : {response.text}')
         return resources
 
     def get_project_ids(target, token, uuids, collector):
         logger.debug(f'>---------------------------------- get_project_ids')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         if not isinstance(uuids, list):
             logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
@@ -174,9 +174,9 @@ class Vrops:
     # only recommended for a small number of statkeys and resources.
     def get_latest_stat(target, token, uuid, key, collector):
         logger.debug(f'>---------------------------------- get_latest_stat')
-        logger.debug(f'key      : { key }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {key}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
         headers = {
@@ -192,7 +192,7 @@ class Vrops:
                                     headers=headers,
                                     timeout=10)
         except Exception as e:
-            logger.error(f'Problem getting stats error for { key }. Error: { e }')
+            logger.error(f'Problem getting stats error for {key}. Error: {e}')
             return False
 
         if response.status_code == 200:
@@ -201,15 +201,15 @@ class Vrops:
                     logger.debug(f'<--------------------------------------------------')
                     return statkey["data"][0]
         else:
-            logger.error(f'Return code not 200 for { key } : { response.json() }')
+            logger.error(f'Return code not 200 for {key} : {response.json()}')
             return False
 
     # this is for a single query of a property and returns the value only
     def get_property(target, token, uuid, key, collector):
         logger.debug(f'>---------------------------------- get_latest_stat')
-        logger.debug(f'key      : { key }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {key}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
@@ -223,8 +223,8 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            logger.error(f'Problem getting stats error for { key }')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem getting stats error for {key}')
+            logger.error(f'Error msg: {e}')
             return False
 
         if response.status_code == 200:
@@ -233,7 +233,7 @@ class Vrops:
                     logger.debug(f'<--------------------------------------------------')
                     return propkey["value"]
         else:
-            logger.error(f'Return code not 200 for { key } : { response.json() }')
+            logger.error(f'Return code not 200 for {key} : {response.json()}')
             return False
 
     # if we expect a number without special characters
@@ -243,9 +243,9 @@ class Vrops:
             return False
 
         logger.debug(f'>------------ get_latest_number_properties_multiple')
-        logger.debug(f'key      : { propkey }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {propkey}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         return_list = list()
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
@@ -265,18 +265,18 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            logger.error(f'Problem getting property error for { propkey }')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem getting property error for {propkey}')
+            logger.error(f'Error msg: {e}')
             return False
 
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    logger.warning(f'skipping property key: { propkey }, no return')
+                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
-                logger.error(f'Error msg: { e }')
+                logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}')
+                logger.error(f'Error msg: {e}')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -290,16 +290,16 @@ class Vrops:
                         d['data'] = content[0]['data'][0]
                 else:
                     # resources can go away, so None is returned
-                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
+                    logger.warning(f'skipping resource for get property: {propkey}, no property-content')
                 return_list.append(d)
 
-            logger.debug(f'Amount uuids: { len(uuids) }')
-            logger.debug(f'Fetched     : { len(return_list) }')
+            logger.debug(f'Amount uuids: {len(uuids)}')
+            logger.debug(f'Fetched     : {len(return_list)}')
             logger.debug(f'<--------------------------------------------------')
 
             return return_list
         else:
-            logger.error(f'Return code not 200 for { propkey } : { response.text }')
+            logger.error(f'Return code not 200 for {propkey} : {response.text}')
             return False
 
     # if the property describes a status that has several states
@@ -311,9 +311,9 @@ class Vrops:
             return False
 
         logger.debug(f'>------------ get_latest_number_properties_multiple')
-        logger.debug(f'key      : { propkey }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {propkey}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -332,8 +332,8 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            logger.error(f'Problem getting property error for { propkey }')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem getting property error for {propkey}')
+            logger.error(f'Error msg: {e}')
             return False
 
         properties_list = list()
@@ -344,8 +344,8 @@ class Vrops:
                     logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
-                logger.error(f'Error msg: { e }')
+                logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}')
+                logger.error(f'Error msg: {e}')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -357,16 +357,16 @@ class Vrops:
                         d['value'] = content[0]['values'][0]
                 else:
                     # resources can go away, so None is returned
-                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
+                    logger.warning(f'skipping resource for get property: {propkey}, no property-content')
                 properties_list.append(d)
 
-            logger.debug(f'Amount uuids: { len(uuids) }')
-            logger.debug(f'Fetched     : { len(properties_list) }')
+            logger.debug(f'Amount uuids: {len(uuids)}')
+            logger.debug(f'Fetched     : {len(properties_list)}')
             logger.debug(f'<--------------------------------------------------')
 
             return properties_list
         else:
-            logger.error(f'Return code not 200 for { propkey } : { response.text }')
+            logger.error(f'Return code not 200 for {propkey} : {response.text}')
             return False
 
     # for all other properties that return a string or numbers with special characters
@@ -377,9 +377,9 @@ class Vrops:
             return False
 
         logger.debug(f'>------------ get_latest_number_properties_multiple')
-        logger.debug(f'key      : { propkey }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {propkey}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -398,8 +398,8 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            logger.error(f'Problem getting property error for { propkey }')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem getting property error for {propkey}')
+            logger.error(f'Error msg: {e}')
             return False
 
         properties_list = list()
@@ -410,8 +410,8 @@ class Vrops:
                     logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
-                logger.error(f'Error msg: { e }')
+                logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}')
+                logger.error(f'Error msg: {e}')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -426,16 +426,16 @@ class Vrops:
                     d['data'] = info
                 else:
                     # resources can go away, so None is returned
-                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
+                    logger.warning(f'skipping resource for get property: {propkey}, no property-content')
                 properties_list.append(d)
 
-            logger.debug(f'Amount uuids: { len(uuids) }')
-            logger.debug(f'Fetched     : { len(properties_list) }')
+            logger.debug(f'Amount uuids: {len(uuids)}')
+            logger.debug(f'Fetched     : {len(properties_list)}')
             logger.debug(f'<--------------------------------------------------')
 
             return properties_list
         else:
-            logger.error(f'Return code not 200 for { propkey } : { response.text }')
+            logger.error(f'Return code not 200 for {propkey} : {response.text}')
             return False
 
     def get_latest_stat_multiple(target, token, uuids, key, collector):
@@ -459,9 +459,9 @@ class Vrops:
         chunk_iteration = 0
 
         logger.debug(f'>------------------------ get_latest_stats_multiple')
-        logger.debug(f'key      : { key }')
-        logger.debug(f'target   : { target }')
-        logger.debug(f'collector: { collector }')
+        logger.debug(f'key      : {key}')
+        logger.debug(f'target   : {target}')
+        logger.debug(f'collector: {collector}')
 
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
@@ -482,7 +482,7 @@ class Vrops:
         return return_list
 
     def get_project_id_chunk(q, uuid_list, url, headers, target, chunk_iteration):
-        logger.debug(f'chunk: { chunk_iteration }')
+        logger.debug(f'chunk: {chunk_iteration}')
 
         payload = {
             "relationshipType": "ANCESTOR",
@@ -502,7 +502,7 @@ class Vrops:
                                      headers=headers)
         except Exception as e:
             logger.error(f'Problem getting project folder')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Error msg: {e}')
             return False
         if response.status_code == 200:
             try:
@@ -510,19 +510,19 @@ class Vrops:
                     p_ids = dict()
                     for vm_uuid in project["relatedResources"]:
                         p_ids[vm_uuid] = project["resource"]["resourceKey"]["name"][
-                                          project["resource"]["resourceKey"]["name"].find("(") + 1:
-                                          project["resource"]["resourceKey"]["name"].find(")")]
+                                         project["resource"]["resourceKey"]["name"].find("(") + 1:
+                                         project["resource"]["resourceKey"]["name"].find(")")]
                     q.put([p_ids])
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target: { target }, chunk iteration: { chunk_iteration }'
-                             f'Error: { e }')
+                logger.error(f'Catching JSONDecodeError for target: {target}, chunk iteration: {chunk_iteration}'
+                             f'Error: {e}')
                 return False
         else:
-            logger.error(f'Return code not 200, Msg: { response.text }')
+            logger.error(f'Return code not 200, Msg: {response.text}')
             return False
 
     def get_stat_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
-        logger.debug(f'chunk: { chunk_iteration }')
+        logger.debug(f'chunk: {chunk_iteration}')
 
         payload = {
             "resourceId": uuid_list,
@@ -536,18 +536,18 @@ class Vrops:
                                      headers=headers,
                                      timeout=10)
         except Exception as e:
-            logger.error(f'Problem getting statkey error for { key }, target: { target }')
-            logger.error(f'Error msg: { e }')
+            logger.error(f'Problem getting statkey error for {key}, target: {target}')
+            logger.error(f'Error msg: {e}')
             return False
 
         if response.status_code == 200:
             try:
                 q.put(response.json()['values'])
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target  { target } and key { key } chunk_iteration: '
-                             f'{ chunk_iteration}')
-                logger.error(f'Error msg: { e }')
+                logger.error(f'Catching JSONDecodeError for target  {target} and key {key} chunk_iteration: '
+                             f'{chunk_iteration}')
+                logger.error(f'Error msg: {e}')
                 return False
         else:
-            logger.error(f'Return code not 200 for key { key }, Msg: { response.text }')
+            logger.error(f'Return code not 200 for key {key}, Msg: {response.text}')
             return False
