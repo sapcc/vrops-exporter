@@ -5,6 +5,9 @@ from threading import Thread
 import requests
 import json
 import os
+import logging
+
+logger = logging.getLogger('vrops-exporter')
 
 
 class Vrops:
@@ -27,15 +30,13 @@ class Vrops:
                                      headers=headers,
                                      timeout=10)
         except Exception as e:
-            if os.environ['DEBUG'] >= '1':
-                print("Problem connecting to " + target + ' Error: ' + str(e))
+            logger.error(f'Problem connecting to { target }. Error: { e }')
             return False
 
         if response.status_code == 200:
             return response.json()["token"]
         else:
-            if os.environ['DEBUG'] >= '1':
-                print("problem getting token " + str(target) + ": " + response.text)
+            logger.error(f'Problem getting token from { target } : { response.text }')
             return False
 
     def get_adapter(target, token):
@@ -56,7 +57,7 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            print("Problem connecting to " + target + ' Error: ' + str(e))
+            logger.error(f'Problem connecting to { target } - Error: { e }')
             return False
 
         if response.status_code == 200:
@@ -67,7 +68,7 @@ class Vrops:
                 res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
                 adapters.append(res)
         else:
-            print("problem getting adapter " + str(target))
+            logger.error(f'Problem getting adapter { target } : { response.text }')
             return False
 
         return adapters
@@ -93,7 +94,8 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            print("Problem connecting to " + target + "Error: " + str(e))
+            logger.error(f'Problem connecting to { target } ')
+            logger.error(f'Error msg: { e }')
             return resources
 
         if response.status_code == 200:
@@ -105,15 +107,19 @@ class Vrops:
                     res['uuid'] = resource["identifier"]
                     resources.append(res)
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and resourcekind:", str(resourcekind),
-                      "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target { target } and resourcekind: { resourcekind }')
+                logger.error(f'Error msg: { e }')
         else:
-            print("problem getting resource " + str(response.json()))
+            logger.error(f'Problem getting adapter { target } : { response.text }')
         return resources
 
-    def get_project_ids(target, token, uuids):
+    def get_project_ids(target, token, uuids, collector):
+        logger.debug(f'>---------------------------------- get_project_ids')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
+
         if not isinstance(uuids, list):
-            print("Error in get project_ids: uuids must be a list with multiple entries")
+            logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
         # vrops can not handle more than 1000 uuids
         uuids_chunked = list(chunk_list(uuids, 1000))
@@ -128,6 +134,7 @@ class Vrops:
         q = queue.Queue()
         thread_list = list()
         chunk_iteration = 0
+
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
             t = Thread(target=Vrops.get_project_id_chunk,
@@ -139,6 +146,11 @@ class Vrops:
 
         while not q.empty():
             project_ids += q.get()
+
+        logger.debug(f'Amount uuids: {len(uuids)}')
+        logger.debug(f'Fetched     : {len(project_ids)}')
+        logger.debug(f'<--------------------------------------------------')
+
         return project_ids
 
     def get_datacenter(self, target, token, parentid):
@@ -159,8 +171,13 @@ class Vrops:
     def get_project_folders(self, target, token):
         return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
-    # not recommended
-    def get_latest_stat(target, token, uuid, key):
+    # only recommended for a small number of statkeys and resources.
+    def get_latest_stat(target, token, uuid, key, collector):
+        logger.debug(f'>---------------------------------- get_latest_stat')
+        logger.debug(f'key      : { key }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
+
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/stats/latest"
         headers = {
             'Content-Type': "application/json",
@@ -168,25 +185,32 @@ class Vrops:
             'Authorization': "vRealizeOpsToken " + token
         }
         disable_warnings(exceptions.InsecureRequestWarning)
+
         try:
             response = requests.get(url,
                                     verify=False,
                                     headers=headers,
                                     timeout=10)
         except Exception as e:
-            print("Problem getting stats error for", key, str(e))
+            logger.error(f'Problem getting stats error for { key }. Error: { e }')
             return False
 
         if response.status_code == 200:
             for statkey in response.json()["values"][0]["stat-list"]["stat"]:
                 if statkey["statKey"]["key"] is not None and statkey["statKey"]["key"] == key:
+                    logger.debug(f'<--------------------------------------------------')
                     return statkey["data"][0]
         else:
-            print("Return code not 200 for " + str(key) + ": " + str(response.json()))
+            logger.error(f'Return code not 200 for { key } : { response.json() }')
             return False
 
     # this is for a single query of a property and returns the value only
-    def get_property(target, token, uuid, key):
+    def get_property(target, token, uuid, key, collector):
+        logger.debug(f'>---------------------------------- get_latest_stat')
+        logger.debug(f'key      : { key }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
+
         url = "https://" + target + "/suite-api/api/resources/" + uuid + "/properties"
         headers = {
             'Content-Type': "application/json",
@@ -199,22 +223,29 @@ class Vrops:
                                     verify=False,
                                     headers=headers)
         except Exception as e:
-            print("Problem getting stats Error: " + str(e))
+            logger.error(f'Problem getting stats error for { key }')
+            logger.error(f'Error msg: { e }')
             return False
 
         if response.status_code == 200:
             for propkey in response.json()["property"]:
                 if propkey["name"] is not None and propkey["name"] == key:
+                    logger.debug(f'<--------------------------------------------------')
                     return propkey["value"]
         else:
-            print("Return code not 200 for " + str(key) + ": " + str(response.json()))
+            logger.error(f'Return code not 200 for { key } : { response.json() }')
             return False
 
     # if we expect a number without special characters
-    def get_latest_number_properties_multiple(target, token, uuids, propkey):
+    def get_latest_number_properties_multiple(target, token, uuids, propkey, collector):
         if not isinstance(uuids, list):
-            print("Error in get multiple: uuids must be a list with multiple entries")
+            logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
+
+        logger.debug(f'>------------ get_latest_number_properties_multiple')
+        logger.debug(f'key      : { propkey }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
 
         return_list = list()
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
@@ -234,17 +265,18 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            print("Problem getting property Error: " + str(e))
+            logger.error(f'Problem getting property error for { propkey }')
+            logger.error(f'Error msg: { e }')
             return False
 
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    print("skipping propkey " + str(propkey) + ", no return")
+                    logger.warning(f'skipping property key: { propkey }, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
-                      "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
+                logger.error(f'Error msg: { e }')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -258,20 +290,30 @@ class Vrops:
                         d['data'] = content[0]['data'][0]
                 else:
                     # resources can go away, so None is returned
-                    print("skipping resource for get", str(propkey))
+                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
                 return_list.append(d)
+
+            logger.debug(f'Amount uuids: { len(uuids) }')
+            logger.debug(f'Fetched     : { len(return_list) }')
+            logger.debug(f'<--------------------------------------------------')
+
             return return_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + response.text)
+            logger.error(f'Return code not 200 for { propkey } : { response.text }')
             return False
 
     # if the property describes a status that has several states
     # the expected status returns a 0, all others become 1
-    def get_latest_enum_properties_multiple(target, token, uuids, propkey):
+    def get_latest_enum_properties_multiple(target, token, uuids, propkey, collector):
 
         if not isinstance(uuids, list):
-            print("Error in get multiple: uuids must be a list with multiple entries")
+            logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
+
+        logger.debug(f'>------------ get_latest_number_properties_multiple')
+        logger.debug(f'key      : { propkey }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -290,7 +332,8 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            print("Problem getting property Error: " + str(e))
+            logger.error(f'Problem getting property error for { propkey }')
+            logger.error(f'Error msg: { e }')
             return False
 
         properties_list = list()
@@ -298,11 +341,11 @@ class Vrops:
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    print("skipping propkey " + str(propkey) + ", no return")
+                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
-                      "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
+                logger.error(f'Error msg: { e }')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -314,19 +357,29 @@ class Vrops:
                         d['value'] = content[0]['values'][0]
                 else:
                     # resources can go away, so None is returned
-                    print("skipping resource for get", str(propkey))
+                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
                 properties_list.append(d)
+
+            logger.debug(f'Amount uuids: { len(uuids) }')
+            logger.debug(f'Fetched     : { len(properties_list) }')
+            logger.debug(f'<--------------------------------------------------')
+
             return properties_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + response.text)
+            logger.error(f'Return code not 200 for { propkey } : { response.text }')
             return False
 
     # for all other properties that return a string or numbers with special characters
-    def get_latest_info_properties_multiple(target, token, uuids, propkey):
+    def get_latest_info_properties_multiple(target, token, uuids, propkey, collector):
 
         if not isinstance(uuids, list):
-            print("Error in get multiple: uuids must be a list with multiple entries")
+            logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
+
+        logger.debug(f'>------------ get_latest_number_properties_multiple')
+        logger.debug(f'key      : { propkey }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
 
         url = "https://" + target + "/suite-api/api/resources/properties/latest/query"
         headers = {
@@ -345,7 +398,8 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            print("Problem getting property Error: " + str(e))
+            logger.error(f'Problem getting property error for { propkey }')
+            logger.error(f'Error msg: { e }')
             return False
 
         properties_list = list()
@@ -353,11 +407,11 @@ class Vrops:
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    print("skipping propkey " + str(propkey) + ", no return")
+                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(propkey),
-                      "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target { target } and property key: { propkey }')
+                logger.error(f'Error msg: { e }')
                 return False
             for resource in response.json()['values']:
                 d = dict()
@@ -372,16 +426,21 @@ class Vrops:
                     d['data'] = info
                 else:
                     # resources can go away, so None is returned
-                    print("skipping resource for get", str(propkey))
+                    logger.warning(f'skipping resource for get property: { propkey }, no property-content')
                 properties_list.append(d)
+
+            logger.debug(f'Amount uuids: { len(uuids) }')
+            logger.debug(f'Fetched     : { len(properties_list) }')
+            logger.debug(f'<--------------------------------------------------')
+
             return properties_list
         else:
-            print("Return code not 200 for " + str(propkey) + ": " + response.text)
+            logger.error(f'Return code not 200 for { propkey } : { response.text }')
             return False
 
-    def get_latest_stat_multiple(target, token, uuids, key):
+    def get_latest_stat_multiple(target, token, uuids, key, collector):
         if not isinstance(uuids, list):
-            print("Error in get multiple: uuids must be a list with multiple entries")
+            logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
 
         # vrops can not handle more than 1000 uuids
@@ -398,6 +457,12 @@ class Vrops:
         q = queue.Queue()
         thread_list = list()
         chunk_iteration = 0
+
+        logger.debug(f'>------------------------ get_latest_stats_multiple')
+        logger.debug(f'key      : { key }')
+        logger.debug(f'target   : { target }')
+        logger.debug(f'collector: { collector }')
+
         for uuid_list in uuids_chunked:
             chunk_iteration += 1
             t = Thread(target=Vrops.get_stat_chunk,
@@ -409,11 +474,15 @@ class Vrops:
 
         while not q.empty():
             return_list += q.get()
+
+        logger.debug(f'Amount uuids: {len(uuids)}')
+        logger.debug(f'Fetched     : {len(return_list)}')
+        logger.debug(f'<--------------------------------------------------')
+
         return return_list
 
     def get_project_id_chunk(q, uuid_list, url, headers, target, chunk_iteration):
-        if os.environ['DEBUG'] >= '2':
-            print(target, 'chunk:', chunk_iteration)
+        logger.debug(f'chunk: { chunk_iteration }')
 
         payload = {
             "relationshipType": "ANCESTOR",
@@ -432,7 +501,8 @@ class Vrops:
                                      verify=False,
                                      headers=headers)
         except Exception as e:
-            print("Problem getting project folder Error: " + str(e))
+            logger.error(f'Problem getting project folder')
+            logger.error(f'Error msg: { e }')
             return False
         if response.status_code == 200:
             try:
@@ -444,16 +514,15 @@ class Vrops:
                                           project["resource"]["resourceKey"]["name"].find(")")]
                     q.put([p_ids])
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target),
-                      "chunk_iteration:", str(chunk_iteration), "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target: { target }, chunk iteration: { chunk_iteration }'
+                             f'Error: { e }')
                 return False
         else:
-            print("Return code not 200 for: " + response.text)
+            logger.error(f'Return code not 200, Msg: { response.text }')
             return False
 
     def get_stat_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
-        if os.environ['DEBUG'] >= '2':
-            print(target, key, 'chunk:', chunk_iteration)
+        logger.debug(f'chunk: { chunk_iteration }')
 
         payload = {
             "resourceId": uuid_list,
@@ -467,16 +536,18 @@ class Vrops:
                                      headers=headers,
                                      timeout=10)
         except Exception as e:
-            print("Problem getting stats Error for", key, str(e))
+            logger.error(f'Problem getting statkey error for { key }, target: { target }')
+            logger.error(f'Error msg: { e }')
             return False
 
         if response.status_code == 200:
             try:
                 q.put(response.json()['values'])
             except json.decoder.JSONDecodeError as e:
-                print("Catching JSONDecodeError for target:", str(target), "and key:", str(key),
-                      "chunk_iteration:", str(chunk_iteration), "\nerror msg:", str(e))
+                logger.error(f'Catching JSONDecodeError for target  { target } and key { key } chunk_iteration: '
+                             f'{ chunk_iteration}')
+                logger.error(f'Error msg: { e }')
                 return False
         else:
-            print("Return code not 200 for " + str(key) + ": " + response.text)
+            logger.error(f'Return code not 200 for key { key }, Msg: { response.text }')
             return False

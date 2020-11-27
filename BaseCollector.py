@@ -2,9 +2,12 @@ from abc import ABC, abstractmethod
 import requests
 import time
 import os
+import logging
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, UnknownMetricFamily
+
+logger = logging.getLogger('vrops-exporter')
 
 
 class BaseCollector(ABC):
@@ -12,9 +15,13 @@ class BaseCollector(ABC):
     def __init__(self):
         self.vrops_entity_name = 'base'
         while os.environ['TARGET'] not in self.get_target_tokens():
-            print(os.environ['TARGET'], "has no resources in inventory")
+            logger.critical(f'Cannot start exporter without valid target!')
+            logger.critical(f'{ os.environ["TARGET"] } is not in vrops_list from inventory')
+            logger.critical(f'The following vrops are known from inventory: { [t for t in self.target_tokens] }')
             time.sleep(1800)
-        self.target = os.environ['TARGET']
+        self.target = os.environ.get('TARGET')
+        self.collector = self.__class__.__name__
+
         # If metrics in collector-config are divided into rubrics
         self.rubricated = False
         self.rubric = os.environ.get('RUBRIC', None)
@@ -103,7 +110,7 @@ class BaseCollector(ABC):
         token = self.get_target_tokens()
         token = token[self.target]
         uuids = self.get_vms_by_target()
-        project_ids = Vrops.get_project_ids(self.target, token, uuids)
+        project_ids = Vrops.get_project_ids(self.target, token, uuids, self.collector)
         return project_ids
 
     def wait_for_inventory_data(self):
@@ -111,21 +118,22 @@ class BaseCollector(ABC):
         while not iteration:
             time.sleep(5)
             iteration = self.get_iteration()
-            if os.environ['DEBUG'] >= '1':
-                print("waiting for initial iteration: " + type(self).__name__)
-        print("done: initial query " + type(self).__name__)
+            logger.info(f'Waiting for initial iteration: {self.collector}')
+
+        logger.info(f'-----Initial query done------: {self.collector}')
         return
 
     def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames, rubric=None):
         if not isinstance(labelnames, list):
-            print("Can't generate Gauges without label list, called from", calling_class)
+            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
             return {}
         # switching between metric and property types
         if metric_type == 'stats':
             statkey_yaml = self.read_collector_config()['statkeys']
+            rubrics = [r for r in statkey_yaml[calling_class]]
             gauges = dict()
 
-            def iterate():
+            def iterate_over_metric_suffixes():
                 statkey_suffix = statkey_pair['metric_suffix']
                 gauges[statkey_suffix] = {
                     'gauge': GaugeMetricFamily('vrops_' + vrops_entity_name + '_' + statkey_suffix.lower(),
@@ -133,12 +141,16 @@ class BaseCollector(ABC):
                     'statkey': statkey_pair['statkey']
                 }
 
-            if self.rubricated:
+            if self.rubricated and self.rubric:
                 for statkey_pair in statkey_yaml[calling_class][rubric]:
-                    iterate()
-            else:
+                    iterate_over_metric_suffixes()
+            if self.rubricated and not self.rubric:
+                for r in rubrics:
+                    for statkey_pair in statkey_yaml[calling_class][r]:
+                        iterate_over_metric_suffixes()
+            if not self.rubricated:
                 for statkey_pair in statkey_yaml[calling_class]:
-                    iterate()
+                    iterate_over_metric_suffixes()
             return gauges
 
         if metric_type == 'property':
@@ -154,13 +166,12 @@ class BaseCollector(ABC):
                     }
                 return gauges
 
-        if os.environ['DEBUG'] >= '1':
-            print("No Gauge metric type generated, from", calling_class)
+        logger.info(f'No gauge metric type generated, from {calling_class}')
         return {}
 
     def generate_infos(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
-            print("Can't generate Gauges without label list, called from", calling_class)
+            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
             return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'info_metrics' in properties_yaml[calling_class]:
@@ -174,13 +185,12 @@ class BaseCollector(ABC):
                 }
             return infos
 
-        if os.environ['DEBUG'] >= '1':
-            print("No Info metric type generated, from", calling_class)
+        logger.info(f'No info metric type generated, from {calling_class}')
         return {}
 
     def generate_states(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
-            print("Can't generate Gauges without label list, called from", calling_class)
+            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
             return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'enum_metrics' in properties_yaml[calling_class]:
@@ -195,40 +205,44 @@ class BaseCollector(ABC):
                 }
             return states
 
-        if os.environ['DEBUG'] >= '1':
-            print("No Enum metric type generated, from", calling_class)
+        logger.info(f'No enum metric type generated, from {calling_class}')
         return {}
 
     def describe(self):
-        collector = self.__class__.__name__
-        if 'Stats' in collector:
+        if 'Stats' in self.collector:
             statkey_yaml = self.read_collector_config()['statkeys']
-            if self.rubricated:
-                if not self.rubric:
-                    if os.environ['DEBUG'] >= '1':
-                        print(collector, "cannot work. There is no rubric given.\nSet a rubric as start parameter")
-                    return
-                for statkey_pair in statkey_yaml[collector][self.rubric]:
-                    statkey_suffix = statkey_pair['metric_suffix']
+            rubrics = [r for r in statkey_yaml[self.collector]]
+            if self.rubricated and not self.rubric:
+                logger.warning(f'{self.collector} is rubricated and has no rubric given. Considering all')
+                logger.info(f'Rubrics to be considered: { rubrics }')
+                for r in rubrics:
+                    for statkey_pair in statkey_yaml[self.collector][r]:
+                        statkey_suffix = statkey_pair.get('metric_suffix')
+                        yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
+                                                'vrops-exporter')
+            if self.rubricated and self.rubric:
+                logger.info(f'Rubric to be considered: { self.rubric }')
+                for statkey_pair in statkey_yaml[self.collector][self.rubric]:
+                    statkey_suffix = statkey_pair.get('metric_suffix')
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
                                             'vrops-exporter')
-            else:
-                for statkey_pair in statkey_yaml[collector]:
-                    statkey_suffix = statkey_pair['metric_suffix']
+            if not self.rubricated:
+                for statkey_pair in statkey_yaml[self.collector]:
+                    statkey_suffix = statkey_pair.get('metric_suffix')
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + statkey_suffix.lower(),
                                             'vrops-exporter')
 
-        if 'Properties' in collector:
+        if 'Properties' in self.collector:
             properties_yaml = self.read_collector_config()['properties']
-            if 'number_metrics' in properties_yaml[collector]:
-                for num in properties_yaml[collector]['number_metrics']:
+            if 'number_metrics' in properties_yaml[self.collector]:
+                for num in properties_yaml[self.collector]['number_metrics']:
                     yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + num['metric_suffix'].lower(),
                                             'vrops-exporter')
-            if 'enum_metrics' in properties_yaml[collector]:
-                for enum in properties_yaml[collector]['enum_metrics']:
+            if 'enum_metrics' in properties_yaml[self.collector]:
+                for enum in properties_yaml[self.collector]['enum_metrics']:
                     yield UnknownMetricFamily('vrops_' + self.vrops_entity_name + '_' + enum['metric_suffix'].lower(),
                                               'vrops-exporter')
-            if 'info_metrics' in properties_yaml[collector]:
-                for info in properties_yaml[collector]['info_metrics']:
+            if 'info_metrics' in properties_yaml[self.collector]:
+                for info in properties_yaml[self.collector]['info_metrics']:
                     yield InfoMetricFamily('vrops_' + self.vrops_entity_name + '_' + info['metric_suffix'].lower(),
                                            'vrops-exporter')
