@@ -125,7 +125,7 @@ class BaseCollector(ABC):
 
     def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames, rubric=None):
         if not isinstance(labelnames, list):
-            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
+            logger.error(f'Cannot generate Gauges without label list, called from {calling_class}')
             return {}
         # switching between metric and property types
         if metric_type == 'stats':
@@ -171,7 +171,7 @@ class BaseCollector(ABC):
 
     def generate_infos(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
-            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
+            logger.error(f'Cannot generate Gauges without label list, called from {calling_class}')
             return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'info_metrics' in properties_yaml[calling_class]:
@@ -190,7 +190,7 @@ class BaseCollector(ABC):
 
     def generate_states(self, calling_class, vrops_entity_name, labelnames):
         if not isinstance(labelnames, list):
-            logger.error(f'Can not generate Gauges without label list, called from {calling_class}')
+            logger.error(f'Cannot generate Gauges without label list, called from {calling_class}')
             return {}
         properties_yaml = self.read_collector_config()['properties']
         if 'enum_metrics' in properties_yaml[calling_class]:

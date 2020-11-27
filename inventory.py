@@ -56,16 +56,16 @@ def parse_params(logger):
         os.environ['SLEEP'] = "1800"
 
     if "PORT" not in os.environ and not options.port:
-        print("Can't start, please specify port with ENV or -o")
+        logger.error(f'Cannot start, please specify PORT with ENV or -o')
         sys.exit(0)
     if "USER" not in os.environ and not options.user:
-        print("Can't start, please specify user with ENV or -u")
+        logger.error(f'Cannot start, please specify USER with ENV or -u')
         sys.exit(0)
     if "PASSWORD" not in os.environ and not options.password:
-        print("Can't start, please specify password with ENV or -p")
+        logger.error(f'Cannot start, please specify PASSWORD with ENV or -p')
         sys.exit(0)
     if "ATLAS" not in os.environ and not options.atlas:
-        print("Can't start, please specify atlas with ENV or -a")
+        logger.error(f'Cannot start, please specify ATLAS path with ENV or -a')
         sys.exit(0)
 
     return options
