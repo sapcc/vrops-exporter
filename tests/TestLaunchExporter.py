@@ -15,10 +15,9 @@ class TestLaunchExporter(TestCase):
 
     # test with debug option on
     def test_with_cli_params_1(self):
-
         sys.argv = ['prog', '-o', '1234', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-t',
                     'testhost.test']
-        parse_params(logger=logger)
+        parse_params(logger)
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
         self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')

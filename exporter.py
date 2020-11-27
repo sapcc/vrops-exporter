@@ -69,13 +69,13 @@ def parse_params(logger):
         os.environ['RUBRIC'] = options.rubric
 
     if "PORT" not in os.environ and not options.port:
-        logger.error(f'Can not start, please specify port with ENV or -o')
+        logger.error(f'Cannot start, please specify port with ENV or -o')
         sys.exit(0)
     if "INVENTORY" not in os.environ and not options.inventory:
-        logger.error(f'Can not start, please specify inventory with ENV or -i')
+        logger.error(f'Cannot start, please specify inventory with ENV or -i')
         sys.exit(0)
     if "CONFIG" not in os.environ and not options.config:
-        logger.error(f'Can not start, please specify collector config with ENV or -m')
+        logger.error(f'Cannot start, please specify collector config with ENV or -m')
         sys.exit(0)
 
     return options
