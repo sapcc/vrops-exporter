@@ -206,7 +206,7 @@ class Vrops:
 
     # this is for a single query of a property and returns the value only
     def get_property(target, token, uuid, key, collector):
-        logger.debug(f'>---------------------------------- get_latest_stat')
+        logger.debug(f'>------------------------------------- get_property')
         logger.debug(f'key      : {key}')
         logger.debug(f'target   : {target}')
         logger.debug(f'collector: {collector}')
@@ -310,7 +310,7 @@ class Vrops:
             logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
 
-        logger.debug(f'>------------ get_latest_number_properties_multiple')
+        logger.debug(f'>-------------- get_latest_enum_properties_multiple')
         logger.debug(f'key      : {propkey}')
         logger.debug(f'target   : {target}')
         logger.debug(f'collector: {collector}')
@@ -376,7 +376,7 @@ class Vrops:
             logger.error(f'Error in get project_ids: uuids must be a list with multiple entries')
             return False
 
-        logger.debug(f'>------------ get_latest_number_properties_multiple')
+        logger.debug(f'>-------------- get_latest_info_properties_multiple')
         logger.debug(f'key      : {propkey}')
         logger.debug(f'target   : {target}')
         logger.debug(f'collector: {collector}')
