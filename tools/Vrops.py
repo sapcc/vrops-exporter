@@ -196,10 +196,13 @@ class Vrops:
             return False
 
         if response.status_code == 200:
-            for statkey in response.json()["values"][0]["stat-list"]["stat"]:
-                if statkey["statKey"]["key"] is not None and statkey["statKey"]["key"] == key:
-                    logger.debug(f'<--------------------------------------------------')
-                    return statkey["data"][0]
+            try:
+                for statkey in response.json()["values"][0]["stat-list"]["stat"]:
+                    if statkey["statKey"]["key"] is not None and statkey["statKey"]["key"] == key:
+                        logger.debug(f'<--------------------------------------------------')
+                        return statkey["data"][0]
+            except IndexError as e:
+                logger.error(f'Problem getting statkey error for {key}, Error {e}')
         else:
             logger.error(f'Return code not 200 for {key} : {response.json()}')
             return False
@@ -228,10 +231,13 @@ class Vrops:
             return False
 
         if response.status_code == 200:
-            for propkey in response.json()["property"]:
-                if propkey["name"] is not None and propkey["name"] == key:
-                    logger.debug(f'<--------------------------------------------------')
-                    return propkey["value"]
+            try:
+                for propkey in response.json()["property"]:
+                    if propkey["name"] is not None and propkey["name"] == key:
+                        logger.debug(f'<--------------------------------------------------')
+                        return propkey["value"]
+            except IndexError as e:
+                logger.error(f'Problem getting property error for {key}, Error {e}')
         else:
             logger.error(f'Return code not 200 for {key} : {response.json()}')
             return False
