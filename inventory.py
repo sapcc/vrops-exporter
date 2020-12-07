@@ -73,6 +73,6 @@ def parse_params(logger):
 
 
 if __name__ == '__main__':
-    log = logging.getLogger('vrops-exporter')
-    options = parse_params(log)
+    logger = logging.getLogger('vrops-exporter')
+    options = parse_params(logger)
     InventoryBuilder(options.atlas, os.environ['PORT'], os.environ['SLEEP'])
