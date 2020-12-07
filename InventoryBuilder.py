@@ -84,8 +84,11 @@ class InventoryBuilder:
             return json.dumps(self.target_tokens)
 
         try:
-            # WSGi is logging on INFO Level
-            WSGIServer((self.wsgi_address, self.port), app, log=logger).serve_forever()
+            if logger.level in range(1, 20):
+                # WSGi is logging on INFO Level
+                WSGIServer((self.wsgi_address, self.port), app).serve_forever()
+            else:
+                WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
         except TypeError as e:
             logger.error('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
             logger.error(f'Current used options: {self.wsgi_address} on port {self.port}')
