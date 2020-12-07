@@ -1,12 +1,13 @@
+import sys
+
+sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
 from exporter import default_collectors
 import os
 import unittest
 import logging
-import sys
 
-sys.path.append('.')
 
 logger = logging.getLogger('test-logger')
 # Level         Numeric value
