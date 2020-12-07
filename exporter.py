@@ -112,7 +112,7 @@ def get_targets():
 
 
 if __name__ == '__main__':
-    log = logging.getLogger('vrops-exporter')
-    options = parse_params(log)
-    collectors = list(map(lambda c: initialize_collector_by_name(c, log), options.collectors))
+    logger = logging.getLogger('vrops-exporter')
+    options = parse_params(logger)
+    collectors = list(map(lambda c: initialize_collector_by_name(c, logger), options.collectors))
     run_prometheus_server(int(os.environ['PORT']), collectors)
