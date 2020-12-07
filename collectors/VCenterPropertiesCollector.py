@@ -1,6 +1,8 @@
 from BaseCollector import BaseCollector
 from tools.Vrops import Vrops
-import os
+import logging
+
+logger = logging.getLogger('vrops-exporter')
 
 
 class VCenterPropertiesCollector(BaseCollector):
@@ -19,20 +21,20 @@ class VCenterPropertiesCollector(BaseCollector):
         states = self.generate_states(self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'state'])
 
-        if os.environ['DEBUG'] >= '1':
-            print(self.name, 'starts with collecting the metrics')
+        logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
         token = token[self.target]
         if not token:
-            print("skipping", self.target, "in", self.name, ", no token")
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         vc = self.get_vcenters(self.target)
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]
         for metric_suffix in gauges:
             propkey = gauges[metric_suffix]['property']
-            metric_value = Vrops.get_property(self.target, token, uuid, propkey)
+            metric_value = Vrops.get_property(self.target, token, uuid, propkey, self.name)
             if not metric_value:
+                logging.warning(f'Skipping {propkey}, no value in respond')
                 continue
             gauges[metric_suffix]['gauge'].add_metric(
                 labels=[self.vcenters[uuid]['name']],
@@ -40,8 +42,9 @@ class VCenterPropertiesCollector(BaseCollector):
 
         for metric_suffix in states:
             propkey = states[metric_suffix]['property']
-            value = Vrops.get_property(self.target, token, uuid, propkey)
+            value = Vrops.get_property(self.target, token, uuid, propkey, self.name)
             if not value:
+                logging.warning(f'Skipping {propkey}, no value in respond')
                 continue
             metric_value = (1 if states[metric_suffix]['expected'] == value else 0)
             states[metric_suffix]['state'].add_metric(
@@ -51,8 +54,9 @@ class VCenterPropertiesCollector(BaseCollector):
 
         for metric_suffix in infos:
             propkey = infos[metric_suffix]['property']
-            info_value = Vrops.get_property(self.target, token, uuid, propkey)
+            info_value = Vrops.get_property(self.target, token, uuid, propkey, self.name)
             if not info_value:
+                logging.warning(f'Skipping {propkey}, no value in respond')
                 continue
             infos[metric_suffix]['info'].add_metric(
                 labels=[self.vcenters[uuid]['name']],

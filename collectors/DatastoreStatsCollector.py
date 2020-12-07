@@ -1,6 +1,8 @@
 from BaseCollector import BaseCollector
 from tools.Vrops import Vrops
-import os
+import logging
+
+logger = logging.getLogger('vrops-exporter')
 
 
 class DatastoreStatsCollector(BaseCollector):
@@ -16,20 +18,19 @@ class DatastoreStatsCollector(BaseCollector):
                                       [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
                                        'hostsystem'])
 
-        if os.environ['DEBUG'] >= '1':
-            print(self.name, 'starts with collecting the metrics')
+        logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
         token = token[self.target]
         if not token:
-            print("skipping " + self.target + " in " + self.name + ", no token")
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_datastores_by_target()
         for metric_suffix in gauges:
             statkey = gauges[metric_suffix]['statkey']
-            values = Vrops.get_latest_stat_multiple(self.target, token, uuids, statkey)
+            values = Vrops.get_latest_stat_multiple(self.target, token, uuids, statkey, self.name)
             if not values:
-                print("skipping statkey " + str(statkey) + " in", self.name, ", no return")
+                logger.warning(f'Skipping statkey: {statkey} in {self.name} , no return')
                 continue
 
             for value_entry in values:

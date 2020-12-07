@@ -1,6 +1,8 @@
 from BaseCollector import BaseCollector
 from tools.Vrops import Vrops
-import os
+import logging
+
+logger = logging.getLogger('vrops-exporter')
 
 
 class DatastorePropertiesCollector(BaseCollector):
@@ -22,20 +24,20 @@ class DatastorePropertiesCollector(BaseCollector):
                                       [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
                                        'hostsystem', 'state'])
 
-        if os.environ['DEBUG'] >= '1':
-            print(self.name, 'starts with collecting the metrics')
+        logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
         token = token[self.target]
 
         if not token:
-            print("skipping", self.target, "in", self.name, ", no token")
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_datastores_by_target()
         for label in gauges:
             propkey = gauges[label]['property']
-            values = Vrops.get_latest_number_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_number_properties_multiple(self.target, token, uuids, propkey, self.name)
             if not values:
+                logger.warning(f'Skipping property: {propkey} in {self.name} , no return')
                 continue
             for value_entry in values:
                 if 'data' not in value_entry:
@@ -53,8 +55,9 @@ class DatastorePropertiesCollector(BaseCollector):
 
         for label in states:
             propkey = states[label]['property']
-            values = Vrops.get_latest_enum_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_enum_properties_multiple(self.target, token, uuids, propkey, self.name)
             if not values:
+                logger.warning(f'Skipping property: {propkey} in {self.name} , no return')
                 continue
             for value_entry in values:
                 if 'value' not in value_entry:
@@ -73,8 +76,9 @@ class DatastorePropertiesCollector(BaseCollector):
 
         for label in infos:
             propkey = infos[label]['property']
-            values = Vrops.get_latest_info_properties_multiple(self.target, token, uuids, propkey)
+            values = Vrops.get_latest_info_properties_multiple(self.target, token, uuids, propkey, self.name)
             if not values:
+                logger.warning(f'Skipping property: {propkey} in {self.name} , no return')
                 continue
             for value_entry in values:
                 if 'data' not in value_entry:
