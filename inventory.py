@@ -35,15 +35,15 @@ def parse_params(logger):
     if options.info:
         logger.setLevel(logging.INFO)
         ConsoleHandler.setLevel(logging.INFO)
-        logger.info(f'Starting inventory logging on INFO level')
+        logger.info('Starting inventory logging on INFO level')
     if options.debug:
         logger.setLevel(logging.DEBUG)
         ConsoleHandler.setLevel(logging.DEBUG)
-        logger.debug(f'Starting inventory logging on DEBUG level')
+        logger.debug('Starting inventory logging on DEBUG level')
     if not options.debug and not options.info:
         logger.setLevel(logging.WARNING)
         ConsoleHandler.setLevel(logging.WARNING)
-        logger.warning(f'Starting inventory logging on WARNING, ERROR and CRITICAL level')
+        logger.warning('Starting inventory logging on WARNING, ERROR and CRITICAL level')
     if options.loopback:
         os.environ['LOOPBACK'] = "1"
     if options.port:
@@ -53,19 +53,20 @@ def parse_params(logger):
     if options.sleep:
         os.environ['SLEEP'] = options.sleep
     if not options.sleep:
+        logger.info('Defaulting sleep to 1800s')
         os.environ['SLEEP'] = "1800"
 
     if "PORT" not in os.environ and not options.port:
-        logger.error(f'Cannot start, please specify PORT with ENV or -o')
+        logger.error('Cannot start, please specify PORT with ENV or -o')
         sys.exit(0)
     if "USER" not in os.environ and not options.user:
-        logger.error(f'Cannot start, please specify USER with ENV or -u')
+        logger.error('Cannot start, please specify USER with ENV or -u')
         sys.exit(0)
     if "PASSWORD" not in os.environ and not options.password:
-        logger.error(f'Cannot start, please specify PASSWORD with ENV or -p')
+        logger.error('Cannot start, please specify PASSWORD with ENV or -p')
         sys.exit(0)
     if "ATLAS" not in os.environ and not options.atlas:
-        logger.error(f'Cannot start, please specify ATLAS path with ENV or -a')
+        logger.error('Cannot start, please specify ATLAS path with ENV or -a')
         sys.exit(0)
 
     return options

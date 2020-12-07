@@ -8,13 +8,19 @@ import unittest
 import logging
 
 logger = logging.getLogger('test-logger')
-
+# Level         Numeric value
+# CRITICAL      50
+# ERROR         40
+# WARNING       30
+# INFO          20
+# DEBUG         10
+# NOTSET        0
 
 class TestLaunchExporter(TestCase):
     # test with debug option on
     def test_with_cli_params_1(self):
         sys.argv = ['prog', '-u', 'testuser', '-p', 'testpw31!', '-o', '1234',
-                    '-a', '/path/to/atlas.yaml', '-l', '-s', '180']
+                    '-a', '/path/to/atlas.yaml', '-l', '-s', '180', '-d']
         parse_params(logger)
         self.assertEqual(os.getenv('USER'), 'testuser', 'The user was not set correctly!')
         self.assertEqual(os.getenv('PASSWORD'), 'testpw31!', 'The password was not set correctly!')
@@ -22,12 +28,13 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('ATLAS'), '/path/to/atlas.yaml', 'Atlas was not set correctly')
         self.assertEqual(os.getenv('LOOPBACK'), '1', 'Loopback was not set correctly')
         self.assertEqual(os.getenv('SLEEP'), '180', 'Sleep time was not set correctly')
+        self.assertEqual(logger.level, 10)
 
     # test with debug option off
     def test_with_cli_params_2(self):
         os.environ.clear()
         sys.argv = ['prog', '--user', 'testuser', '--password', 'testpw31!', '--port', '1234',
-                    '-a', '/path/to/atlas.yaml', '-l', '--sleep', '180']
+                    '-a', '/path/to/atlas.yaml', '-l', '--sleep', '180', '--v']
         parse_params(logger)
         self.assertEqual(os.getenv('USER'), 'testuser', 'The user was not set correctly!')
         self.assertEqual(os.getenv('PASSWORD'), 'testpw31!', 'The password was not set correctly!')
@@ -35,6 +42,7 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('ATLAS'), '/path/to/atlas.yaml', 'Atlas was not set correctly')
         self.assertEqual(os.getenv('LOOPBACK'), '1', 'Loopback was not set correctly')
         self.assertEqual(os.getenv('SLEEP'), '180', 'Sleep time was not set correctly')
+        self.assertEqual(logger.level, 20)
 
     def test_with_cli_and_env_params(self):
         sys.argv = ['prog', '--user', 'cli_testuser', '--password', 'testpw31!',
@@ -53,6 +61,7 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('ATLAS'), '/path/to/atlas.yaml', 'Atlas was not set correctly')
         self.assertEqual(os.getenv('LOOPBACK'), '1', 'Loopback was not set correctly')
         self.assertEqual(os.getenv('SLEEP'), '180', 'Sleep time was not set correctly')
+        self.assertEqual(logger.level, 30)
 
     def test_with_bogus_options(self):
         os.environ.clear()

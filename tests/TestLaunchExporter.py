@@ -1,14 +1,21 @@
-import sys
-
-sys.path.append('.')
 from unittest import TestCase
 from exporter import parse_params
 from exporter import default_collectors
 import os
 import unittest
 import logging
+import sys
+
+sys.path.append('.')
 
 logger = logging.getLogger('test-logger')
+# Level         Numeric value
+# CRITICAL      50
+# ERROR         40
+# WARNING       30
+# INFO          20
+# DEBUG         10
+# NOTSET        0
 
 
 class TestLaunchExporter(TestCase):
@@ -16,12 +23,13 @@ class TestLaunchExporter(TestCase):
     # test with debug option on
     def test_with_cli_params_1(self):
         sys.argv = ['prog', '-o', '1234', '-i', 'inventory.some.url', '-m', 'tests/collector_config.yaml', '-t',
-                    'testhost.test']
+                    'testhost.test', '-d']
         parse_params(logger)
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
         self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
+        self.assertEqual(logger.level, 10)
 
     # test with debug option off
     def test_with_cli_params_2(self):
@@ -33,10 +41,11 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
         self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
+        self.assertEqual(logger.level, 30)
 
     def test_with_cli_and_env_params(self):
         sys.argv = ['prog', '--port', '1234', '-i', 'inventory.some.url', '-m',
-                    'tests/collector_config.yaml', '-t', 'testhost.test']
+                    'tests/collector_config.yaml', '-t', 'testhost.test', '-v']
         os.environ['PORT'] = '1123'
         os.environ['INVENTORY'] = 'inventory.wedontwantthis.url'
         os.environ['CONFIG'] = 'tests/other_config.yaml'
@@ -47,6 +56,7 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
         self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
+        self.assertEqual(logger.level, 20)
 
     # test use default collectors when nothing is specified
     def test_with_no_collector(self):

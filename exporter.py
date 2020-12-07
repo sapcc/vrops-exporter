@@ -43,39 +43,39 @@ def parse_params(logger):
     if options.info:
         logger.setLevel(logging.INFO)
         ConsoleHandler.setLevel(logging.INFO)
-        logger.info(f'Starting exporter logging on INFO level')
+        logger.info('Starting exporter logging on INFO level')
     if options.debug:
         logger.setLevel(logging.DEBUG)
         ConsoleHandler.setLevel(logging.DEBUG)
-        logger.debug(f'Starting exporter logging on DEBUG level')
+        logger.debug('Starting exporter logging on DEBUG level')
     if not options.debug and not options.info:
         logger.setLevel(logging.WARNING)
         ConsoleHandler.setLevel(logging.WARNING)
-        logger.warning(f'Starting exporter logging on WARNING, ERROR and CRITICAL level')
+        logger.warning('Starting exporter logging on WARNING, ERROR and CRITICAL level')
     if options.port:
         os.environ['PORT'] = options.port
     if options.config:
         os.environ['CONFIG'] = options.config
     if not options.collectors:
-        logger.debug(f'Exporter using default collectors from config')
+        logger.debug('Exporter using default collectors from config')
         options.collectors = default_collectors()
     if options.target:
         os.environ['TARGET'] = options.target
     if not options.target:
         target = get_targets()[0]
-        logger.warning(f'No target specified. Running exporter with {target} from inventory')
+        logger.warning('No target specified. Running exporter with {target} from inventory')
         os.environ['TARGET'] = target
     if options.rubric:
         os.environ['RUBRIC'] = options.rubric
 
     if "PORT" not in os.environ and not options.port:
-        logger.error(f'Cannot start, please specify port with ENV or -o')
+        logger.error('Cannot start, please specify port with ENV or -o')
         sys.exit(0)
     if "INVENTORY" not in os.environ and not options.inventory:
-        logger.error(f'Cannot start, please specify inventory with ENV or -i')
+        logger.error('Cannot start, please specify inventory with ENV or -i')
         sys.exit(0)
     if "CONFIG" not in os.environ and not options.config:
-        logger.error(f'Cannot start, please specify collector config with ENV or -m')
+        logger.error('Cannot start, please specify collector config with ENV or -m')
         sys.exit(0)
 
     return options

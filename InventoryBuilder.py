@@ -84,9 +84,10 @@ class InventoryBuilder:
             return json.dumps(self.target_tokens)
 
         try:
-            WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
+            # WSGi is logging on INFO Level
+            WSGIServer((self.wsgi_address, self.port), app, log=logger).serve_forever()
         except TypeError as e:
-            logger.error(f'Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
+            logger.error('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
             logger.error(f'Current used options: {self.wsgi_address} on port {self.port}')
             logger.error(f'TypeError: {e}')
 
@@ -143,7 +144,6 @@ class InventoryBuilder:
         logger.info(f'##############################################')
         logger.info(f'##########  Collecting resources... ##########')
         logger.info(f'##############################################')
-        time.sleep(2)
 
         vcenter = self.create_resource_objects(vrops, token)
         self.vcenter_dict[vrops] = vcenter
