@@ -89,23 +89,19 @@ def run_prometheus_server(port, collectors, *args):
         time.sleep(1)
 
 
-def initialize_collector_by_name(class_name, test=False):
+def initialize_collector_by_name(class_name, logger):
     try:
         class_module = importlib.import_module(f'collectors.{class_name}')
     except ModuleNotFoundError as e:
-        if test:
-            print('No Collector "BogusCollector" defined. Ignoring...')
-        else:
-            log.error(f'No Collector {class_name} defined. {e}')
+        print('No Collector "BogusCollector" defined. Ignoring...')
+        logger.error(f'No Collector {class_name} defined. {e}')
         return None
 
     try:
         return class_module.__getattribute__(class_name)()
     except AttributeError as e:
-        if test:
-            print('Unable to initialize "ClassNotDefinedCollector". Ignoring...')
-        else:
-            log.error(f'Unable to initialize {class_name}. {e}')
+        print('Unable to initialize "ClassNotDefinedCollector". Ignoring...')
+        logger.error(f'Unable to initialize {class_name}. {e}')
         return None
 
 
@@ -118,5 +114,5 @@ def get_targets():
 if __name__ == '__main__':
     log = logging.getLogger('vrops-exporter')
     options = parse_params(log)
-    collectors = list(map(lambda c: initialize_collector_by_name(c), options.collectors))
+    collectors = list(map(lambda c: initialize_collector_by_name(c, log), options.collectors))
     run_prometheus_server(int(os.environ['PORT']), collectors)

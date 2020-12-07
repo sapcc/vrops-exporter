@@ -84,8 +84,8 @@ class InventoryBuilder:
             return json.dumps(self.target_tokens)
 
         try:
-            if logger.level in range(1, 20):
-                # WSGi is logging on INFO Level
+            if logger.level == 10:
+                # WSGi is logging on DEBUG Level
                 WSGIServer((self.wsgi_address, self.port), app).serve_forever()
             else:
                 WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
