@@ -12,10 +12,12 @@ class HostSystemStatsCollector(BaseCollector):
         self.vrops_entity_name = 'hostsystem'
         self.wait_for_inventory_data()
         self.name = self.__class__.__name__
+        self.rubricated = True
 
     def collect(self):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster'])
+                                      [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster'],
+                                      rubric=self.rubric)
         if not gauges:
             return
 
