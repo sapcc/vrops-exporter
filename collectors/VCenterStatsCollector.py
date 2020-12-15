@@ -14,15 +14,17 @@ class VCenterStatsCollector(BaseCollector):
         self.wait_for_inventory_data()
 
     def collect(self):
-        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name])
-
         logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
-        token = token[self.target]
+        token = token.setdefault(self.target, None)
+
         if not token:
             logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name])
 
         vc = self.get_vcenters(self.target)
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]

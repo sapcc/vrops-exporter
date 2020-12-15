@@ -14,16 +14,18 @@ class DatastoreStatsCollector(BaseCollector):
         self.name = self.__class__.__name__
 
     def collect(self):
-        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
-                                       'hostsystem'])
-
         logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
-        token = token[self.target]
+        token = token.setdefault(self.target, None)
+
         if not token:
             logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
+        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
+                                      [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
+                                       'hostsystem'])
 
         uuids = self.get_datastores_by_target()
         for metric_suffix in gauges:

@@ -82,9 +82,13 @@ class BaseCollector(ABC):
         return self.iteration
 
     def get_target_tokens(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
-        self.target_tokens = request.json()
-        return self.target_tokens
+        try:
+            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
+            self.target_tokens = request.json()
+            return self.target_tokens
+        except requests.exceptions.ConnectionError as e:
+            logger.critical(f'No connection to inventory: {os.environ["INVENTORY"]} - Error: {e}')
+            return {}
 
     def get_clusters_by_target(self):
         cluster_dict = self.get_clusters(self.target)
@@ -107,11 +111,15 @@ class BaseCollector(ABC):
         return self.target_vms
 
     def get_project_ids_by_target(self):
-        token = self.get_target_tokens()
-        token = token[self.target]
-        uuids = self.get_vms_by_target()
-        project_ids = Vrops.get_project_ids(self.target, token, uuids, self.collector)
-        return project_ids
+        try:
+            token = self.get_target_tokens()
+            token = token[self.target]
+            uuids = self.get_vms_by_target()
+            project_ids = Vrops.get_project_ids(self.target, token, uuids, self.collector)
+            return project_ids
+        except requests.exceptions.ConnectionError as e:
+            logger.critical(f'No connection to inventory: {os.environ["INVENTORY"]} - Error: {e}')
+            return []
 
     def wait_for_inventory_data(self):
         iteration = 0

@@ -14,19 +14,21 @@ class VCenterPropertiesCollector(BaseCollector):
         self.vrops_entity_name = 'vcenter'
 
     def collect(self):
+        logger.info(f'{self.name} starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
                                     [self.vrops_entity_name])
         states = self.generate_states(self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'state'])
-
-        logger.info(f'{self.name} starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         vc = self.get_vcenters(self.target)
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]

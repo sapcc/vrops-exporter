@@ -14,20 +14,21 @@ class ClusterPropertiesCollector(BaseCollector):
         self.vrops_entity_name = 'cluster'
 
     def collect(self):
+        logger.info(f'{self.name} starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
                                       ['vcenter', 'vccluster', 'datacenter'])
         infos = self.generate_infos(self.name, self.vrops_entity_name,
                                     [self.vrops_entity_name, 'vcenter', 'datacenter'])
         states = self.generate_states(self.name, self.vrops_entity_name,
                                       ['vcenter', 'vccluster', 'datacenter', 'state'])
-
-        logger.info(f'{self.name} starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:

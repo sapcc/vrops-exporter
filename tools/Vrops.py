@@ -203,7 +203,7 @@ class Vrops:
             except IndexError as e:
                 logger.error(f'Problem getting statkey error for {key} - Error {e}')
         else:
-            logger.error(f'Return code not 200 for {key} : {response.json()}')
+            logger.error(f'Return code: {response.status_code} != 200 for {key} : {response.text}')
             return False
 
     # this is for a single query of a property and returns the value only
@@ -237,7 +237,7 @@ class Vrops:
             except IndexError as e:
                 logger.error(f'Problem getting property error for {key} - Error {e}')
         else:
-            logger.error(f'Return code not 200 for {key} : {response.json()}')
+            logger.error(f'Return code: {response.status_code} != 200 for {key} : {response.text}')
             return False
 
     # if we expect a number without special characters
@@ -275,7 +275,6 @@ class Vrops:
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}'
@@ -302,7 +301,7 @@ class Vrops:
 
             return return_list
         else:
-            logger.error(f'Return code not 200 for {propkey} : {response.text}')
+            logger.error(f'Return code: {response.status_code} != 200 for {propkey} : {response.text}')
             return False
 
     # if the property describes a status that has several states
@@ -343,7 +342,6 @@ class Vrops:
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}'
@@ -368,7 +366,7 @@ class Vrops:
 
             return properties_list
         else:
-            logger.error(f'Return code not 200 for {propkey} : {response.text}')
+            logger.error(f'Return code: {response.status_code} != 200 for {propkey} : {response.text}')
             return False
 
     # for all other properties that return a string or numbers with special characters
@@ -408,7 +406,6 @@ class Vrops:
         if response.status_code == 200:
             try:
                 if not response.json()['values']:
-                    logger.warning(f'skipping property key: {propkey}, no return')
                     return False
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target} and property key: {propkey}'
@@ -436,7 +433,7 @@ class Vrops:
 
             return properties_list
         else:
-            logger.error(f'Return code not 200 for {propkey} : {response.text}')
+            logger.error(f'Return code: {response.status_code} != 200 for {propkey} : {response.text}')
             return False
 
     def get_latest_stat_multiple(target, token, uuids, key, collector):
@@ -518,7 +515,7 @@ class Vrops:
                              f' - Error: {e}')
                 return False
         else:
-            logger.error(f'Return code not 200, Msg: {response.text}')
+            logger.error(f'Return code: {response.status_code} != 200 for {target} : {response.text}')
             return False
 
     def get_stat_chunk(q, uuid_list, url, headers, key, target, chunk_iteration):
@@ -547,5 +544,5 @@ class Vrops:
                              f'{chunk_iteration} - Error: {e}')
                 return False
         else:
-            logger.error(f'Return code not 200 for key {key}, Msg: {response.text}')
+            logger.error(f'Return code: {response.status_code} != 200 for {key} : {response.text}')
             return False

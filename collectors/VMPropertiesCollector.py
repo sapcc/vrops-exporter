@@ -14,6 +14,15 @@ class VMPropertiesCollector(BaseCollector):
         self.vrops_entity_name = 'virtualmachine'
 
     def collect(self):
+        logger.info(f' {self.name} starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
                                        'project'])
@@ -25,14 +34,6 @@ class VMPropertiesCollector(BaseCollector):
                                        'state', 'project'])
 
         project_ids = self.get_project_ids_by_target()
-
-        logger.info(f' {self.name} starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_vms_by_target()
         for metric_suffix in gauges:

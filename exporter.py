@@ -62,7 +62,7 @@ def parse_params(logger):
     if options.target:
         os.environ['TARGET'] = options.target
     if not options.target:
-        target = get_targets()[0]
+        target = get_targets(options.inventory)[0]
         logger.warning(f'No target specified. Running exporter with {target} from inventory')
         os.environ['TARGET'] = target
     if options.rubric:
@@ -105,10 +105,15 @@ def initialize_collector_by_name(class_name, logger):
         return None
 
 
-def get_targets():
-    request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-    targets = request.json()
-    return targets
+def get_targets(inventory):
+    try:
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
+        targets = request.json()
+        return targets
+    except requests.exceptions.ConnectionError as e:
+        logger.critical(f'No connection to {inventory} - Error: {e}')
+        logger.critical(f'Exit')
+        sys.exit(0)
 
 
 if __name__ == '__main__':
