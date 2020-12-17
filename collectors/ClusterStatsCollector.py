@@ -14,17 +14,19 @@ class ClusterStatsCollector(BaseCollector):
         self.name = self.__class__.__name__
 
     def collect(self):
+        logger.info(f'{ self.name } starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping { self.target } in { self.name }, no token')
+            return
+
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       ['vcenter', 'vccluster', 'datacenter'])
         if not gauges:
             return
-
-        logger.info(f'{ self.name } starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-        if not token:
-            logger.warning(f'skipping { self.target } in { self.name }, no token')
 
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:

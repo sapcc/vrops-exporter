@@ -15,6 +15,15 @@ class VMStatsCollector(BaseCollector):
         self.rubricated = True
 
     def collect(self):
+        logger.info(f' {self.name} starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
         if self.rubricated and not self.rubric:
             logger.warning(f'{self.name} has no rubric given. Considering all.')
 
@@ -22,14 +31,6 @@ class VMStatsCollector(BaseCollector):
                                       [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
                                        'project'], rubric=self.rubric)
         project_ids = self.get_project_ids_by_target()
-
-        logger.info(f' {self.name} starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_vms_by_target()
         for metric_suffix in gauges:

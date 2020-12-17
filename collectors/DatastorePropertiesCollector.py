@@ -14,6 +14,15 @@ class DatastorePropertiesCollector(BaseCollector):
         self.vrops_entity_name = 'datastore'
 
     def collect(self):
+        logger.info(f'{self.name} starts with collecting the metrics')
+
+        token = self.get_target_tokens()
+        token = token.setdefault(self.target, None)
+
+        if not token:
+            logger.warning(f'skipping {self.target} in {self.name}, no token')
+            return
+
         gauges = self.generate_gauges('property', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
                                        'hostsystem'])
@@ -23,14 +32,6 @@ class DatastorePropertiesCollector(BaseCollector):
         states = self.generate_states(self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
                                        'hostsystem', 'state'])
-
-        logger.info(f'{self.name} starts with collecting the metrics')
-
-        token = self.get_target_tokens()
-        token = token[self.target]
-
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
 
         uuids = self.get_datastores_by_target()
         for label in gauges:
