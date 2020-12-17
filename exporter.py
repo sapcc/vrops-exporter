@@ -106,14 +106,21 @@ def initialize_collector_by_name(class_name, logger):
 
 
 def get_targets(inventory):
-    try:
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-        targets = request.json()
-        return targets
-    except requests.exceptions.ConnectionError as e:
-        logger.critical(f'No connection to {inventory} - Error: {e}')
-        logger.critical(f'Exit')
-        sys.exit(0)
+    # error handling in case inventory is not reachable
+    attempt = 1
+    while attempt == 1:
+        try:
+            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
+            targets = request.json()
+            return targets
+        except requests.exceptions.ConnectionError as e:
+            logger.critical(f'No connection to {inventory} - Error: {e}')
+            logger.critical(f'Trying again in 5sec.')
+            time.sleep(5)
+            attempt += 1
+    logger.critical(f'{inventory} not reachable')
+    logger.critical(f'Exit')
+    sys.exit(0)
 
 
 if __name__ == '__main__':
