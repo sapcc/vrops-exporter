@@ -59,11 +59,10 @@ The exporter consists of two main components:
  
   Prometheus:
  [Prometheus | Metric and label naming](https://prometheus.io/docs/practices/naming/)
-  
-
-In the past, the two parts were in one startup script (exporter.py), but this didn't really work, because restarting the exporter always had to wait for a complete rebuild of the inventory. 
-
-Therefore, one part permanently builds the inventory and makes it available to the exporter. The exporter fetches the data via HTTP requests and uses them to execute the actual vROps queries.
+ 
+  In the past, the two parts were in one startup script (exporter.py), but this didn't really work, because restarting the exporter always had to wait for a complete rebuild of the inventory.
+ 
+  Therefore, one part permanently builds the inventory and makes it available to the exporter. The exporter fetches the data via HTTP requests and uses them to execute the actual vROps queries.
 
 1. **Build**
 
