@@ -65,42 +65,42 @@ In the past, the two parts were in one startup script (exporter.py), but this di
 
 Therefore, one part permanently builds the inventory and makes it available to the exporter. The exporter fetches the data via HTTP requests and uses them to execute the actual vROps queries.
 
-**1. Build**
+1. **Build**
 
 
    To build the container simply run `make` and get the locally created docker container.
 
 
-**2. CLI**
+2. **CLI**
 
    Either specify the vars via environment or cli params. Because the inventory and the exporter are running seperately,
    you need to enter the Docker container at least twice. Start the container:
     
-    docker run -it keppel.eu-de-1.cloud.sap/ccloud/vrops_exporter /bin/sh
+       docker run -it keppel.eu-de-1.cloud.sap/ccloud/vrops_exporter /bin/sh
 
    This will start the container and directly enter the shell. Start the inventory:
     
-    ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
+       ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
     
    Now you need to enter the container a second time:
     
-    docker exec -it <container_name> /bin/sh
+       docker exec -it <container_name> /bin/sh
         
    Now run the exporter:
     
-    ./exporter.py -o 9000 -i localhost -d
+       ./exporter.py -o 9000 -i localhost -d
        
    You can also enter the container a third time to fetch the prometheus metrics from localhost (i.e. with wget)
 
-**3. Enviroment variables**
+3. **Enviroment variables**
 
     
-    USER
-    PASSWORD
-    PORT
-    INVENTORY
-    LOOPBACK
-    
+        USER
+        PASSWORD
+        PORT
+        INVENTORY
+        LOOPBACK
+
 
 For running this in kubernetes (like we do), you might want to have a look at our [helm chart](https://github.com/sapcc/helm-charts/tree/master/prometheus-exporters/vrops-exporter)
 
