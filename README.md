@@ -79,7 +79,7 @@ The exporter consists of two main components:
 
    This will start the container and directly enter the shell. Start the inventory:
     
-       ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
+       ./inventory.py --user foobaruser --password "foobarpw" --atlas /atlas/netbox.json --port 80 --vv
     
    Now you need to enter the container a second time:
     
@@ -87,7 +87,7 @@ The exporter consists of two main components:
         
    Now run the exporter:
     
-       ./exporter.py -o 9000 -i localhost -d
+       ./exporter.py --port 9000 --inventory localhost --config tests/collector_config.yaml --target 'vrops-vcenter-test.company.com' --vv
        
    You can also enter the container a third time to fetch the prometheus metrics from localhost (i.e. with wget)
 
