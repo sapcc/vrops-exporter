@@ -32,7 +32,7 @@ The exporter consists of two main components:
              "server_name": "vrops.dns.address",
          }
      },
-     { ... }
+     { }
    ]
    ```
   
@@ -76,19 +76,19 @@ Therefore, one part permanently builds the inventory and makes it available to t
    Either specify the vars via environment or cli params. Because the inventory and the exporter are running seperately,
    you need to enter the Docker container at least twice. Start the container:
     
-        docker run -it keppel.eu-de-1.cloud.sap/ccloud/vrops_exporter /bin/sh
+    docker run -it keppel.eu-de-1.cloud.sap/ccloud/vrops_exporter /bin/sh
 
    This will start the container and directly enter the shell. Start the inventory:
     
-        ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
+    ./inventory.py -u foobaruser -p "foobarpw" -a /atlas/netbox.json -o 80 -d
     
    Now you need to enter the container a second time:
     
-        docker exec -it <container_name> /bin/sh
+    docker exec -it <container_name> /bin/sh
         
    Now run the exporter:
     
-        ./exporter.py -o 9000 -i localhost -d
+    ./exporter.py -o 9000 -i localhost -d
        
    You can also enter the container a third time to fetch the prometheus metrics from localhost (i.e. with wget)
 
@@ -114,7 +114,7 @@ Test module is called using ENV variables. Specifying these on the fly would loo
 
 Main test:
 ```
-LOOPBACK=0 DEBUG=0 INVENTORY=127.0.0.1:8000 USER=FOO PASSWORD=Bar python3 tests/TestCollectors.py
+LOOPBACK=0 DEBUG=0 INVENTORY=127.0.0.1:8000 USER=FOO PASSWORD=Bar CONFIG=tests/collector_config.yaml TARGET=testhost.test python3 tests/TestCollectors.py
 ```
 
 To run all tests you got to loop over it.
@@ -131,5 +131,3 @@ checks whether these are present.
 The test generates dummy return values for the queries to vROps and checks the functionality of the collectors. 
 It compares whether the metrics as a result of the collector match the expected metrics in `metrics.yaml`. 
 
-The developed collector must pass the test before it can be added to the master branch. 
-When a pull request is opened, this test is performed automatically.
