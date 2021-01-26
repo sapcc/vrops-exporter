@@ -16,7 +16,7 @@ def parse_params(logger):
     parser = OptionParser()
     parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
     parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
-    parser.add_option("-o", "--port", help="specify exporter port", action="store", dest="port")
+    parser.add_option("-o", "--port", help="specify inventory port", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
     parser.add_option("-v", "--v", help="logging all level except debug", action="store_true", dest="info",
                       default=False)

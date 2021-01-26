@@ -39,6 +39,29 @@ class Vrops:
             logger.error(f'Problem getting token from {target} : {response.text}')
             return False
 
+    def get_http_response_code(target, token):
+        url = "https://" + target + "/suite-api/api/adapters"
+        querystring = {
+            "adapterKindKey": "VMWARE"
+        }
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+
+        try:
+            response = requests.get(url,
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+        except Exception as e:
+            logger.error(f'Problem connecting to {target} - Error: {e}')
+            return False
+
+        return response.status_code
+
     def get_adapter(target, token):
         url = "https://" + target + "/suite-api/api/adapters"
         querystring = {
