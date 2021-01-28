@@ -58,7 +58,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return 408
+            return 503
 
         return response.status_code
 
