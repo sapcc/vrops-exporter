@@ -32,6 +32,8 @@ class DatastoreStatsCollector(BaseCollector):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'type', 'vcenter', 'datacenter', 'vccluster',
                                        'hostsystem'])
+        if not gauges:
+            return
 
         uuids = self.get_datastores_by_target()
         for metric_suffix in gauges:

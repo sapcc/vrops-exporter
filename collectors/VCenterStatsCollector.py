@@ -31,6 +31,8 @@ class VCenterStatsCollector(BaseCollector):
 
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name])
+        if not gauges:
+            return
 
         vc = self.get_vcenters(self.target)
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]

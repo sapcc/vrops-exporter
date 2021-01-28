@@ -36,6 +36,9 @@ class VMStatsCollector(BaseCollector):
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
                                        'project'], rubric=self.rubric)
+        if not gauges:
+            return
+
         project_ids = self.get_project_ids_by_target()
 
         uuids = self.get_vms_by_target()

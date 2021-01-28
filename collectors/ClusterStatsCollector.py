@@ -31,6 +31,8 @@ class ClusterStatsCollector(BaseCollector):
 
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       ['vcenter', 'vccluster', 'datacenter'])
+        if not gauges:
+            return
 
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:

@@ -31,6 +31,8 @@ class HostSystemStatsCollector(BaseCollector):
 
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster'])
+        if not gauges:
+            return
 
         uuids = self.get_hosts_by_target()
         for metric_suffix in gauges:

@@ -58,7 +58,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return 0
+            return 408
 
         return response.status_code
 
@@ -81,7 +81,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return False
+            return adapters
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
