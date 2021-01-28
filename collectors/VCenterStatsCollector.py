@@ -23,8 +23,16 @@ class VCenterStatsCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no token')
             return
 
+        api_responding, gauge = self.create_http_response_metric(self.target, token, self.name)
+        yield gauge
+
+        if not api_responding:
+            return
+
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name])
+        if not gauges:
+            return
 
         vc = self.get_vcenters(self.target)
         uuid = [vc[uuid]['uuid'] for uuid in vc][0]

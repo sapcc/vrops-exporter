@@ -35,7 +35,7 @@ def parse_params(logger):
     parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
                                              "collectors", action="store", dest="config")
     parser.add_option("-t", "--target", help="define target vrops", action="store", dest="target")
-    parser.add_option("-r", "--rubric", help="metric rubric only for VMStatsCollector", action="store", dest="rubric")
+    parser.add_option("-r", "--rubric", help="metric rubric in collector config", action="store", dest="rubric")
     (options, args) = parser.parse_args()
 
     if options.inventory:

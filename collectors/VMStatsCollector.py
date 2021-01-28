@@ -24,12 +24,21 @@ class VMStatsCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no token')
             return
 
+        api_responding, gauge = self.create_http_response_metric(self.target, token, self.name)
+        yield gauge
+
+        if not api_responding:
+            return
+
         if self.rubricated and not self.rubric:
             logger.warning(f'{self.name} has no rubric given. Considering all.')
 
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
                                        'project'], rubric=self.rubric)
+        if not gauges:
+            return
+
         project_ids = self.get_project_ids_by_target()
 
         uuids = self.get_vms_by_target()
