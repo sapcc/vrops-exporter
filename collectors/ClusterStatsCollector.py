@@ -23,15 +23,14 @@ class ClusterStatsCollector(BaseCollector):
             logger.warning(f'skipping { self.target } in { self.name }, no token')
             return
 
-        http_response_code, http_gauge = self.create_http_response_metric(self.target, token, self.name)
-        logger.debug(f'HTTP response code in {self.name} for {self.target}: {http_response_code}')
-        yield http_gauge
+        api_responding, gauge = self.create_http_response_metric(self.target, token, self.name)
+        yield gauge
+
+        if not api_responding:
+            return
 
         gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
                                       ['vcenter', 'vccluster', 'datacenter'])
-        if not gauges and http_response_code > 200:
-            logger.critical(f'HTTP response code in {self.name} for {self.target}: {http_response_code}, no return')
-            return
 
         uuids = self.get_clusters_by_target()
         for metric_suffix in gauges:

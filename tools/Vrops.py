@@ -40,7 +40,7 @@ class Vrops:
             return False
 
     def get_http_response_code(target, token):
-        url = "https://" + target + "/suite-api/api/adapters"
+        url = "https://" + target + "/suite-api/api/resources"
         querystring = {
             "adapterKindKey": "VMWARE"
         }
@@ -58,7 +58,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return False
+            return 0
 
         return response.status_code
 
@@ -92,7 +92,7 @@ class Vrops:
                 adapters.append(res)
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return False
+            return adapters
 
         return adapters
 

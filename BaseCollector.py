@@ -132,10 +132,14 @@ class BaseCollector(ABC):
         return
 
     def create_http_response_metric(self, target, token, collector):
-        http_response_code = Vrops.get_http_response_code(target, token)
-        http_gauge = GaugeMetricFamily('vrops_http_response_code', 'vrops-exporter', labels=['target', 'class'])
-        http_gauge.add_metric(labels=[self.target, collector.lower()], value=http_response_code)
-        return http_response_code, http_gauge
+        api_responding = Vrops.get_http_response_code(target, token)
+        gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class'])
+        gauge.add_metric(labels=[self.target, collector.lower()], value=api_responding)
+
+        if api_responding > 200:
+            logger.critical(f'API response {api_responding} [{collector}, {self.target}], no return')
+            return False, gauge
+        return True, gauge
 
     def generate_gauges(self, metric_type, calling_class, vrops_entity_name, labelnames, rubric=None):
         if not isinstance(labelnames, list):

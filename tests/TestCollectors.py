@@ -43,6 +43,7 @@ class TestCollectors(unittest.TestCase):
         Vrops.get_token = MagicMock(return_value="2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234")
         Vrops.get_adapter = MagicMock(return_value=[{'name': "vcenter1", 'uuid': '5628-9ba1-55e84701'}])
         # test tool get_resources to create resource objects
+        Vrops.get_http_response_code = MagicMock(return_value=200)
 
         Vrops.get_datacenter = MagicMock(
             return_value=[{'name': 'datacenter1', 'uuid': '5628-9ba1-55e847050814'},
