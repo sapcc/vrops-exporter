@@ -102,7 +102,8 @@ class Vrops:
             'parentId': parentid,
             'adapterKind': 'VMware',
             'resourceKind': resourcekind,
-            'pageSize': '50000'
+            'pageSize': '50000',
+            'resourceStatus': 'DATA_RECEIVING',
         }
         headers = {
             'Content-Type': "application/json",
