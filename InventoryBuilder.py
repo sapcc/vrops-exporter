@@ -149,29 +149,51 @@ class InventoryBuilder:
         logger.info(f'##############################################')
 
         vcenter = self.create_resource_objects(vrops, token)
+        if not vcenter:
+            return False
         self.vcenter_dict[vrops] = vcenter
         return True
 
-    def create_resource_objects(self, vrops, token):
-        for adapter in Vrops.get_adapter(target=vrops, token=token):
-            logger.debug(f'Collecting vcenter: {adapter["name"]}')
-            vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
-            vcenter.add_datacenter()
-            for dc_object in vcenter.datacenter:
-                logger.debug(f'Collecting datacenter: {dc_object.name}')
-                dc_object.add_cluster()
-                for cl_object in dc_object.clusters:
-                    logger.debug(f'Collecting cluster: {cl_object.name}')
-                    cl_object.add_host()
-                    for hs_object in cl_object.hosts:
-                        logger.debug(f'Collecting host: {hs_object.name}')
-                        hs_object.add_datastore()
-                        for ds_object in hs_object.datastores:
-                            logger.debug(f'Collecting datastore: {ds_object.name}')
-                        hs_object.add_vm()
-                        for vm_object in hs_object.vms:
-                            logger.debug(f'Collecting VM: {vm_object.name}')
-            return vcenter
+    def create_resource_objects(self, target, token):
+        vrops = Vrops()
+
+        name, uuid = Vrops.get_adapter(target, token)
+        if not name:
+            return False
+        logger.debug(f'Collecting vcenter: {name}')
+
+        datacenter = Vrops.get_resources(vrops, target, token, [uuid], resourcekinds=["Datacenter"])
+        vccluster = Vrops.get_resources(vrops, target, token, [dc.get('uuid') for dc in datacenter],
+                                        resourcekinds=["ClusterComputeResource"])
+        hosts = Vrops.get_resources(vrops, target, token, [cl.get('uuid') for cl in vccluster],
+                                    resourcekinds=["HostSystem"])
+        vms_and_ds = Vrops.get_resources(vrops, target, token, [hs.get('uuid') for hs in hosts],
+                                         resourcekinds=["Datastore", "VirtualMachine"])
+        vms = [vm for vm in vms_and_ds if vm.get('resourcekind') == "VirtualMachine"]
+        dss = [ds for ds in vms_and_ds if ds.get('resourcekind') == "Datastore"]
+
+        vcenter = Vcenter(target, token, uuid, name)
+        vcenter.add_datacenter(datacenter[0])
+        for dc_object in vcenter.datacenter:
+            logger.debug(f'Collecting datacenter: {dc_object.name}')
+            for cl in vccluster:
+                dc_object.add_cluster(cl)
+            for cl_object in dc_object.clusters:
+                logger.debug(f'Collecting cluster: {cl_object.name}')
+                for hs in hosts:
+                    if hs.get('parent') == cl_object.uuid:
+                        cl_object.add_host(hs)
+                for hs_object in cl_object.hosts:
+                    logger.debug(f'Collecting host: {hs_object.name}')
+                    for vm in vms:
+                        if vm.get('parent') == hs_object.uuid:
+                            hs_object.add_vm(vm)
+                            logger.debug(f'Collecting VM: {vm.get("name")}')
+                    for ds in dss:
+                        if ds.get('parent') == hs_object.uuid:
+                            hs_object.add_vm(ds)
+                            logger.debug(f'Collecting Datastore: {ds.get("name")}')
+        return vcenter
 
     def get_vcenters(self):
         tree = dict()
@@ -199,8 +221,8 @@ class InventoryBuilder:
                     'parent_vcenter_uuid': vcenter.uuid,
                     'parent_vcenter_name': vcenter.name,
                     'vcenter': vcenter.name,
-                    'target': dc.target,
-                    'token': dc.token,
+                    'target': vcenter.target,
+                    'token': vcenter.token,
                 }
         self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
@@ -218,8 +240,8 @@ class InventoryBuilder:
                         'parent_dc_uuid': dc.uuid,
                         'parent_dc_name': dc.name,
                         'vcenter': vcenter.name,
-                        'target': cluster.target,
-                        'token': cluster.token,
+                        'target': vcenter.target,
+                        'token': vcenter.token,
                     }
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
@@ -239,8 +261,8 @@ class InventoryBuilder:
                             'parent_cluster_name': cluster.name,
                             'datacenter': dc.name,
                             'vcenter': vcenter.name,
-                            'target': host.target,
-                            'token': host.token,
+                            'target': vcenter.target,
+                            'token': vcenter.token,
                         }
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
@@ -263,8 +285,8 @@ class InventoryBuilder:
                                 'cluster': cluster.name,
                                 'datacenter': dc.name,
                                 'vcenter': vcenter.name,
-                                'target': ds.target,
-                                'token': ds.token,
+                                'target': vcenter.target,
+                                'token': vcenter.token,
                             }
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
@@ -286,8 +308,8 @@ class InventoryBuilder:
                                 'cluster': cluster.name,
                                 'datacenter': dc.name,
                                 'vcenter': vcenter.name,
-                                'target': vm.target,
-                                'token': vm.token,
+                                'target': vcenter.target,
+                                'token': vcenter.token,
                             }
         self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree

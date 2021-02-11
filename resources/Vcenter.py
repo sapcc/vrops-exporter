@@ -11,7 +11,5 @@ class Vcenter:
         self.name = name
         self.datacenter = list()
 
-    def add_datacenter(self):
-        vrops = Vrops()
-        for dc in Vrops.get_datacenter(vrops, target=self.target, token=self.token, parentid=self.uuid):
-            self.datacenter.append(Datacenter(target=self.target, token=self.token, name=dc['name'], uuid=dc['uuid']))
+    def add_datacenter(self, datacenter):
+        self.datacenter.append(Datacenter(datacenter.get('name'), datacenter.get('uuid')))
