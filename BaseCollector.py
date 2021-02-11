@@ -17,8 +17,8 @@ class BaseCollector(ABC):
         while os.environ['TARGET'] not in self.get_target_tokens():
             logger.critical('Cannot start exporter without valid target!')
             logger.critical(f'{os.environ["TARGET"]} is not in vrops_list from inventory')
-            logger.critical(f'The following vrops are known from inventory: {[t for t in self.target_tokens]}')
-            time.sleep(1800)
+            logger.critical(f'The following vrops are known from inventory: {[t for t in self.target_tokens]}, retrying in 60s')
+            time.sleep(60)
         self.target = os.environ.get('TARGET')
         self.collector = self.__class__.__name__
 
