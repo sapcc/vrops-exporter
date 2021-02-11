@@ -26,6 +26,8 @@ def parse_params(logger):
                       action="store_true", dest="loopback")
     parser.add_option("-s", "--sleep", help="specifiy sleep time for inventory builder, default: 1800", action="store",
                       dest="sleep")
+    parser.add_option("-t", "--timeout", help="specifiy timeout for fetching data from vROps, default: 600", action="store",
+                      dest="timeout")
     (options, args) = parser.parse_args()
 
     if options.user:
@@ -55,6 +57,11 @@ def parse_params(logger):
     if not options.sleep:
         logger.info('Defaulting sleep to 1800s')
         os.environ['SLEEP'] = "1800"
+    if options.timeout:
+        os.environ['TIMEOUT'] = options.timeout
+    if not options.timeout:
+        logger.info('Defaulting timeout to 600s')
+        os.environ['TIMEOUT'] = "600"
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify PORT with ENV or -o')
@@ -75,4 +82,4 @@ def parse_params(logger):
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')
     options = parse_params(logger)
-    InventoryBuilder(options.atlas, os.environ['PORT'], os.environ['SLEEP'])
+    InventoryBuilder(options.atlas, os.environ['PORT'], os.environ['SLEEP'], os.environ['TIMEOUT'])

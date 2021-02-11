@@ -12,10 +12,11 @@ logger = logging.getLogger('vrops-exporter')
 
 
 class InventoryBuilder:
-    def __init__(self, json, port, sleep):
+    def __init__(self, json, port, sleep, timeout):
         self.json = json
         self.port = int(port)
         self.sleep = sleep
+        self.timeout = int(timeout)
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
@@ -118,9 +119,35 @@ class InventoryBuilder:
             # initialize empty inventory per iteration
             self.iterated_inventory[str(self.iteration)] = dict()
             logger.info(f'real run {self.iteration}')
+            threads = list()
             for vrops in self.vrops_list:
-                if not self.query_vrops(vrops):
-                    logger.warning(f'retrying connection to {vrops} in next iteration {self.iteration + 1}')
+                vrops_short_name = vrops.split('.')[0]
+                thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name))
+                thread.start()
+                threads.append((thread, vrops))
+
+            timeout = self.timeout
+            start_time = time.time()
+            current_time = start_time
+            joined_threads = dict()
+            while current_time <= (start_time + timeout):
+                for t in threads:
+                    if not t[0].is_alive():
+                        t[0].join()
+                        if t[0] not in joined_threads:
+                            joined_threads.setdefault(t[1], round(time.time() - start_time))
+                if len(joined_threads.keys()) >= len(threads):
+                    break
+                time.sleep(1)
+                current_time = time.time()
+            else:
+                still_running = [t for t in threads if t[0].is_alive()]
+                for running_thread in still_running:
+                    logger.info(f"Timeout {timeout}s reached for fetching {running_thread[1]}")
+                    running_thread[0].join(0)
+            for vrops in joined_threads:
+                logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
+
             self.get_vcenters()
             self.get_datacenters()
             self.get_clusters()
@@ -134,43 +161,42 @@ class InventoryBuilder:
                 logger.debug(f'Withdrawing current iteration: {self.iteration}')
                 self.iterated_inventory.pop(str(self.iteration))
             self.iteration += 1
-            logger.info(f'Inventory relaxing before going to work again')
+            logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
             time.sleep(int(self.sleep))
 
-    def query_vrops(self, vrops):
+    def query_vrops(self, vrops, vrops_short_name):
         logger.info(f'Querying {vrops}')
         token = Vrops.get_token(target=vrops)
         if not token:
+            logger.warning(f'retrying connection to {vrops} in next iteration {self.iteration + 1}')
             return False
         self.target_tokens[vrops] = token
 
-        logger.info(f'##############################################')
-        logger.info(f'##########  Collecting resources... ##########')
-        logger.info(f'##############################################')
+        logger.info(f'##########  Collecting resources {vrops_short_name}... ##########')
 
-        vcenter = self.create_resource_objects(vrops, token)
+        vcenter = self.create_resource_objects(vrops, token, vrops_short_name)
         self.vcenter_dict[vrops] = vcenter
         return True
 
-    def create_resource_objects(self, vrops, token):
+    def create_resource_objects(self, vrops, token, vrops_short_name):
         for adapter in Vrops.get_adapter(target=vrops, token=token):
-            logger.debug(f'Collecting vcenter: {adapter["name"]}')
+            logger.debug(f'{vrops_short_name}: Collecting vcenter: {adapter["name"]}')
             vcenter = Vcenter(target=vrops, token=token, name=adapter['name'], uuid=adapter['uuid'])
             vcenter.add_datacenter()
             for dc_object in vcenter.datacenter:
-                logger.debug(f'Collecting datacenter: {dc_object.name}')
+                logger.debug(f'{vrops_short_name}: Collecting datacenter: {dc_object.name}')
                 dc_object.add_cluster()
                 for cl_object in dc_object.clusters:
-                    logger.debug(f'Collecting cluster: {cl_object.name}')
+                    logger.debug(f'{vrops_short_name}: Collecting cluster: {cl_object.name}')
                     cl_object.add_host()
                     for hs_object in cl_object.hosts:
-                        logger.debug(f'Collecting host: {hs_object.name}')
+                        logger.debug(f'{vrops_short_name}: Collecting host: {hs_object.name}')
                         hs_object.add_datastore()
                         for ds_object in hs_object.datastores:
-                            logger.debug(f'Collecting datastore: {ds_object.name}')
+                            logger.debug(f'{vrops_short_name}: Collecting datastore: {ds_object.name}')
                         hs_object.add_vm()
                         for vm_object in hs_object.vms:
-                            logger.debug(f'Collecting VM: {vm_object.name}')
+                            logger.debug(f'{vrops_short_name}: Collecting VM: {vm_object.name}')
             return vcenter
 
     def get_vcenters(self):

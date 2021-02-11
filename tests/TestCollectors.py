@@ -72,7 +72,7 @@ class TestCollectors(unittest.TestCase):
         Vrops.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
                                                         {"7422-91h7-52s842060815": "0815"},
                                                         {"5628-9ba1-55e847050815": "internal"}])
-        thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180))
+        thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180, 300))
         thread.daemon = True
         thread.start()
 
