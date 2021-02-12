@@ -183,23 +183,22 @@ class InventoryBuilder:
     def create_resource_objects(self, target, token):
         vrops = Vrops()
 
-        name, uuid = Vrops.get_adapter(target, token)
-        if not name:
+        vcenter_name, vcenter_uuid = Vrops.get_adapter(target, token)
+        if not vcenter_name:
             return False
-        logger.debug(f'Collecting vcenter: {name}')
+        logger.debug(f'Collecting vcenter: {vcenter_name}')
 
-        datacenter = Vrops.get_resources(vrops, target, token, [uuid], resourcekinds=["Datacenter"])
-        vccluster = Vrops.get_resources(vrops, target, token, [dc.get('uuid') for dc in datacenter],
-                                        resourcekinds=["ClusterComputeResource"])
-        hosts = Vrops.get_resources(vrops, target, token, [cl.get('uuid') for cl in vccluster],
-                                    resourcekinds=["HostSystem"])
-        vms_and_ds = Vrops.get_resources(vrops, target, token, [hs.get('uuid') for hs in hosts],
-                                         resourcekinds=["Datastore", "VirtualMachine"])
+        datacenter = Vrops.get_datacenter(vrops, target, token, [vcenter_uuid])
+        vccluster = Vrops.get_vccluster(vrops, target, token, [dc.get('uuid') for dc in datacenter])
+        hosts = Vrops.get_hosts(vrops, target, token, [cl.get('uuid') for cl in vccluster])
+        vms_and_ds = Vrops.get_vms_and_ds(vrops, target, token, [hs.get('uuids') for hs in hosts])
+
         vms = [vm for vm in vms_and_ds if vm.get('resourcekind') == "VirtualMachine"]
         dss = [ds for ds in vms_and_ds if ds.get('resourcekind') == "Datastore"]
 
-        vcenter = Vcenter(target, token, uuid, name)
-        vcenter.add_datacenter(datacenter[0])
+        vcenter = Vcenter(target, token, vcenter_uuid, vcenter_name)
+        for dc in datacenter:
+            vcenter.add_datacenter(dc)
         for dc_object in vcenter.datacenter:
             logger.debug(f'Collecting datacenter: {dc_object.name}')
             for cl in vccluster:

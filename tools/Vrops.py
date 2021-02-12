@@ -94,6 +94,10 @@ class Vrops:
         return name, uuid
 
     def get_resources(self, target, token, uuids, resourcekinds):
+        if not isinstance(uuids, list):
+            logger.critical('Error in get_resources: uuids must be a list with multiple entries')
+            return []
+
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
             'pageSize': '100000'
@@ -141,6 +145,18 @@ class Vrops:
         else:
             logger.error(f'Problem getting resources from {target} : {response.text}')
         return resources
+
+    def get_datacenter(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["Datacenter"])
+
+    def get_vccluster(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["ClusterComputeResource"])
+
+    def get_hosts(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
+
+    def get_vms_and_ds(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["Datastore", "VirtualMachine"])
 
     def get_project_ids(target, token, uuids, collector):
         logger.debug('>---------------------------------- get_project_ids')
