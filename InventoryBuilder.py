@@ -217,7 +217,7 @@ class InventoryBuilder:
                             logger.debug(f'Collecting VM: {vm.get("name")}')
                     for ds in dss:
                         if ds.get('parent') == hs_object.uuid:
-                            hs_object.add_vm(ds)
+                            hs_object.add_datastore(ds)
                             logger.debug(f'Collecting Datastore: {ds.get("name")}')
         return vcenter
 
