@@ -72,7 +72,7 @@ class Vrops:
             'Accept': "application/json",
             'Authorization': "vRealizeOpsToken " + token
         }
-        adapters = list()
+        name = uuid = None
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
@@ -81,29 +81,36 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return adapters
+            return name, uuid
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
-                res = dict()
-                res['name'] = resource["resourceKey"]["name"]
-                res['uuid'] = resource["id"]
-                res['adapterkind'] = resource["resourceKey"]["adapterKindKey"]
-                adapters.append(res)
+                name = resource["resourceKey"]["name"]
+                uuid = resource["id"]
+
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return adapters
+            return name, uuid
+        return name, uuid
 
-        return adapters
+    def get_resources(self, target, token, uuids, resourcekinds):
+        if not isinstance(uuids, list):
+            logger.critical('Error in get_resources: uuids must be a list with multiple entries')
+            return []
 
-    def get_resources(self, target, token, resourcekind, parentid):
-        url = "https://" + target + "/suite-api/api/resources"
+        url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
-            'parentId': parentid,
-            'adapterKind': 'VMware',
-            'resourceKind': resourcekind,
-            'pageSize': '50000',
-            'resourceStatus': 'DATA_RECEIVING',
+            'pageSize': '100000'
+        }
+        payload = {
+            "relationshipType": "DESCENDANT",
+            "resourceIds": uuids,
+            "resourceQuery": {
+                "adapterKind": ["VMWARE"],
+                "resourceKind": resourcekinds,
+                "resourceStatus": ["DATA_RECEIVING"]
+            },
+            "hierarchyDepth": 5
         }
         headers = {
             'Content-Type': "application/json",
@@ -113,28 +120,43 @@ class Vrops:
         resources = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
-            response = requests.get(url,
-                                    params=querystring,
-                                    verify=False,
-                                    headers=headers)
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     params=querystring,
+                                     verify=False,
+                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return resources
 
         if response.status_code == 200:
             try:
-                resourcelist = response.json()["resourceList"]
-                for resource in resourcelist:
+                relations = response.json()["resourcesRelations"]
+                for resource in relations:
                     res = dict()
-                    res['name'] = resource["resourceKey"]["name"]
-                    res['uuid'] = resource["identifier"]
+                    res['name'] = resource["resource"]["resourceKey"]["name"]
+                    res['uuid'] = resource["resource"]["identifier"]
+                    res['resourcekind'] = resource["resource"]["resourceKey"]["resourceKindKey"]
+                    res['parent'] = resource["relatedResources"][0]
                     resources.append(res)
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target {target} and resourcekind: {resourcekind}'
+                logger.error(f'Catching JSONDecodeError for target {target}'
                              f'- Error: {e}')
         else:
-            logger.error(f'Problem getting adapter {target} : {response.text}')
+            logger.error(f'Problem getting resources from {target} : {response.text}')
         return resources
+
+    def get_datacenter(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["Datacenter"])
+
+    def get_vccluster(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["ClusterComputeResource"])
+
+    def get_hosts(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
+
+    def get_vms_and_ds(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["Datastore", "VirtualMachine"])
 
     def get_project_ids(target, token, uuids, collector):
         logger.debug('>---------------------------------- get_project_ids')
@@ -175,24 +197,6 @@ class Vrops:
         logger.debug('<--------------------------------------------------')
 
         return project_ids
-
-    def get_datacenter(self, target, token, parentid):
-        return self.get_resources(target, token, parentid=parentid, resourcekind="Datacenter")
-
-    def get_cluster(self, target, token, parentid):
-        return self.get_resources(target, token, parentid=parentid, resourcekind="ClusterComputeResource")
-
-    def get_hosts(self, target, token, parentid):
-        return self.get_resources(target, token, parentid=parentid, resourcekind="HostSystem")
-
-    def get_datastores(self, target, token, parentid):
-        return self.get_resources(target, token, parentid=parentid, resourcekind="Datastore")
-
-    def get_virtualmachines(self, target, token, parentid):
-        return self.get_resources(target, token, parentid=parentid, resourcekind="VirtualMachine")
-
-    def get_project_folders(self, target, token):
-        return self.get_resources(target, token, parentid=None, resourcekind="VMFolder")
 
     # only recommended for a small number of statkeys and resources.
     def get_latest_stat(target, token, uuid, key, collector):
@@ -331,7 +335,6 @@ class Vrops:
     # if the property describes a status that has several states
     # the expected status returns a 0, all others become 1
     def get_latest_enum_properties_multiple(target, token, uuids, propkey, collector):
-
         if not isinstance(uuids, list):
             logger.error('Error in get project_ids: uuids must be a list with multiple entries')
             return False
@@ -395,7 +398,6 @@ class Vrops:
 
     # for all other properties that return a string or numbers with special characters
     def get_latest_info_properties_multiple(target, token, uuids, propkey, collector):
-
         if not isinstance(uuids, list):
             logger.error('Error in get project_ids: uuids must be a list with multiple entries')
             return False
