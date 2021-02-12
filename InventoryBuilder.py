@@ -191,7 +191,7 @@ class InventoryBuilder:
         datacenter = Vrops.get_datacenter(vrops, target, token, [vcenter_uuid])
         vccluster = Vrops.get_vccluster(vrops, target, token, [dc.get('uuid') for dc in datacenter])
         hosts = Vrops.get_hosts(vrops, target, token, [cl.get('uuid') for cl in vccluster])
-        vms_and_ds = Vrops.get_vms_and_ds(vrops, target, token, [hs.get('uuids') for hs in hosts])
+        vms_and_ds = Vrops.get_vms_and_ds(vrops, target, token, [hs.get('uuid') for hs in hosts])
 
         vms = [vm for vm in vms_and_ds if vm.get('resourcekind') == "VirtualMachine"]
         dss = [ds for ds in vms_and_ds if ds.get('resourcekind') == "Datastore"]
