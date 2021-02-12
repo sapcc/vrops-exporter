@@ -1,4 +1,5 @@
 default_collectors:
+  - 'InventoryCollector'
   - 'VCenterStatsCollector'
   - 'VCenterPropertiesCollector'
   - 'ClusterStatsCollector'
