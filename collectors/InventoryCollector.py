@@ -16,37 +16,39 @@ class InventoryCollector(BaseCollector):
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
-        gauge = GaugeMetricFamily('vrops_inventory_resources_total', 'vrops_inventory',
-                                  labels=["target", "resourcekind"])
+        for target, token in self.get_target_tokens().items():
 
-        vcenters = len(self.get_vcenters(self.target))
-        gauge.add_metric(labels=[self.target, "vcenter"], value=vcenters)
+            gauge = GaugeMetricFamily('vrops_inventory_resources_total', 'vrops_inventory',
+                                      labels=["target", "resourcekind"])
 
-        datacenters = len(self.get_datacenters(self.target))
-        gauge.add_metric(labels=[self.target, "datacenter"], value=datacenters)
+            vcenters = len(self.get_vcenters(target))
+            gauge.add_metric(labels=[target, "vcenter"], value=vcenters)
 
-        vccluster = len(self.get_clusters(self.target))
-        gauge.add_metric(labels=[self.target, "vccluster"], value=vccluster)
+            datacenters = len(self.get_datacenters(self.target))
+            gauge.add_metric(labels=[target, "datacenter"], value=datacenters)
 
-        hosts = len(self.get_hosts(self.target))
-        gauge.add_metric(labels=[self.target, "hosts"], value=hosts)
+            vccluster = len(self.get_clusters(self.target))
+            gauge.add_metric(labels=[target, "vccluster"], value=vccluster)
 
-        datastores = len(self.get_datastores(self.target))
-        gauge.add_metric(labels=[self.target, "datastores"], value=datastores)
+            hosts = len(self.get_hosts(self.target))
+            gauge.add_metric(labels=[target, "hosts"], value=hosts)
 
-        vms = len(self.get_vms(self.target))
-        gauge.add_metric(labels=[self.target, "virtualmachines"], value=vms)
+            datastores = len(self.get_datastores(self.target))
+            gauge.add_metric(labels=[target, "datastores"], value=datastores)
 
-        yield gauge
+            vms = len(self.get_vms(target))
+            gauge.add_metric(labels=[target, "virtualmachines"], value=vms)
 
-        counter = CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory', labels=["target"])
-        iteration = self.get_iteration()
-        counter.add_metric(labels=[self.target], value=iteration)
+            yield gauge
 
-        yield counter
+            counter = CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory', labels=["target"])
+            iteration = self.get_iteration()
+            counter.add_metric(labels=[target], value=iteration)
 
-        collection_time = self.get_collection_times()[self.target]
-        time = GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory', labels=["target"])
-        time.add_metric(labels=[self.target], value=collection_time)
+            yield counter
 
-        yield time
+            collection_time = self.get_collection_times()[target]
+            time = GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory', labels=["target"])
+            time.add_metric(labels=[target], value=collection_time)
+
+            yield time
