@@ -81,6 +81,11 @@ class BaseCollector(ABC):
         self.iteration = request.json()
         return self.iteration
 
+    def get_collection_times(self):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/collection_times")
+        self.collection_times = request.json()
+        return self.collection_times
+
     def get_target_tokens(self):
         try:
             request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")

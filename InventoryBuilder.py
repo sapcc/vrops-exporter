@@ -22,6 +22,7 @@ class InventoryBuilder:
         self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
+        self.vrops_collection_times = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
         if 'LOOPBACK' in os.environ:
@@ -72,6 +73,11 @@ class InventoryBuilder:
         def iteration():
             return_iteration = self.successful_iteration_list[-1]
             return str(return_iteration)
+
+        @app.route('/collection_times', methods=['GET'])
+        def collection_times():
+            vrops_collection_times = self.vrops_collection_times
+            return json.dumps(vrops_collection_times)
 
         # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
@@ -146,6 +152,7 @@ class InventoryBuilder:
                     logger.info(f"Timeout {timeout}s reached for fetching {running_thread[1]}")
                     running_thread[0].join(0)
             for vrops in joined_threads:
+                self.vrops_collection_times[vrops] = joined_threads[vrops]
                 logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
 
             self.get_vcenters()
