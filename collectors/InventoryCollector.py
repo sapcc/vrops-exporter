@@ -39,7 +39,7 @@ class InventoryCollector(BaseCollector):
 
             yield time
 
-            status_code = self.get_inventory_api_response()
+            status_code = self.get_inventory_api_responses()[target]
             api_response = GaugeMetricFamily('vrops_api_response', 'vrops-exporter',
                                              labels=['target', 'class', 'message'])
             api_response.add_metric(labels=[target, self.name.lower(), responses()[status_code][0]],
