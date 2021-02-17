@@ -18,11 +18,11 @@ class InventoryCollector(BaseCollector):
         logger.info(f'{self.name} starts with collecting the metrics')
 
         for target, token in self.get_target_tokens().items():
-            for type in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
-                gauge = GaugeMetricFamily(f'vrops_inventory_{type}', f'Amount of {type} in inventory',
+            for resourcekind in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
+                gauge = GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory',
                                           labels=["target"])
 
-                type_method = getattr(BaseCollector, f'get_{type}')
+                type_method = getattr(BaseCollector, f'get_{resourcekind}')
                 amount = len(type_method(self, target))
                 gauge.add_metric(labels=[target], value=amount)
                 yield gauge

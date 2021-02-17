@@ -144,7 +144,7 @@ class BaseCollector(ABC):
 
     def create_http_response_metric(self, target, token, collector):
         api_responding = Vrops.get_http_response_code(target, token)
-        gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class', 'message'])
+        gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class', 'http_message'])
         gauge.add_metric(labels=[self.target, collector.lower(), responses()[api_responding][0]],
                          value=api_responding)
 
