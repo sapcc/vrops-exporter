@@ -1,7 +1,7 @@
 VCenterStatsCollector:
   rubrics: false
   metrics:
-    - 'vrops_api_response{class="vcenterstatscollector",target="testhost.test"}'
+    - 'vrops_api_response{class="vcenterstatscollector",http_message="OK",target="testhost.test"}'
     - 'vrops_vcenter_cpu_used_percent{vcenter="vcenter1"}'
     - 'vrops_vcenter_memory_used_percent{vcenter="vcenter1"}'
     - 'vrops_vcenter_diskspace_total_gigabytes{vcenter="vcenter1"}'
@@ -11,14 +11,14 @@ VCenterStatsCollector:
 VCenterPropertiesCollector:
   rubrics: false
   metrics:
-    - 'vrops_api_response{class="vcenterpropertiescollector",target="testhost.test"}'
+    - 'vrops_api_response{class="vcenterpropertiescollector",http_message="OK",target="testhost.test"}'
     - 'vrops_vcenter_summary_version_info{summary_version="test_property",vcenter="vcenter1"}'
     - 'vrops_vcenter_vc_fullname_info{vc_fullname="test_property",vcenter="vcenter1"}'
 
 ClusterStatsCollector:
   rubrics: false
   metrics:
-    - 'vrops_api_response{class="clusterstatscollector",target="testhost.test"}'
+    - 'vrops_api_response{class="clusterstatscollector",http_message="OK",target="testhost.test"}'
     - 'vrops_cluster_cpu_capacity_usage_percentage{datacenter="datacenter3",vccluster="cluster1",vcenter="vcenter1"}'
     - 'vrops_cluster_memory_usage_kilobytes{datacenter="datacenter3",vccluster="cluster1",vcenter="vcenter1"}'
     - 'vrops_cluster_memory_capacity_kilobytes{datacenter="datacenter3",vccluster="cluster3",vcenter="vcenter1"}'
@@ -47,7 +47,7 @@ ClusterStatsCollector:
 ClusterPropertiesCollector:
   rubrics: false
   metrics:
-    - 'vrops_api_response{class="clusterpropertiescollector",target="testhost.test"}'
+    - 'vrops_api_response{class="clusterpropertiescollector",http_message="OK",target="testhost.test"}'
     - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster1",vcenter="vcenter1"}'
     - 'vrops_cluster_configuration_dasconfig_admissioncontrolenabled{datacenter="datacenter3",state="test_enum_property",vccluster="cluster2",vcenter="vcenter1"}'
     - 'vrops_cluster_configuration_dasconfig_admissioncontrolpolicyid{datacenter="datacenter3",vccluster="cluster1",vcenter="vcenter1"}'
@@ -70,7 +70,7 @@ ClusterPropertiesCollector:
 HostSystemStatsCollector:
   rubrics: false
   metrics:
-  - 'vrops_api_response{class="hostsystemstatscollector",target="testhost.test"}'
+  - 'vrops_api_response{class="hostsystemstatscollector",http_message="OK",target="testhost.test"}'
   - 'vrops_hostsystem_cpu_demand_percentage{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3",vcenter="vcenter1"}'
   - 'vrops_hostsystem_cpu_usage_megahertz{datacenter="datacenter3",hostsystem="hostsystem3",vccluster="cluster3",vcenter="vcenter1"}'
   - 'vrops_hostsystem_cpu_sockets_number{datacenter="datacenter3",hostsystem="hostsystem2",vccluster="cluster3",vcenter="vcenter1"}'
@@ -165,7 +165,7 @@ HostSystemStatsCollector:
 HostSystemPropertiesCollector:
   rubrics: false
   metrics:
-     - 'vrops_api_response{class="hostsystempropertiescollector",target="testhost.test"}'
+     - 'vrops_api_response{class="hostsystempropertiescollector",http_message="OK",target="testhost.test"}'
      - 'vrops_hostsystem_summary_version_info{datacenter="datacenter3",hostsystem="hostsystem1",summary_version="test_info_property",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_hostsystem_summary_version_info{datacenter="datacenter3",hostsystem="hostsystem3",summary_version="test_info_property",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_hostsystem_sys_build_info{datacenter="datacenter3",hostsystem="hostsystem1",sys_build="test_info_property",vccluster="cluster3",vcenter="vcenter1"}'
@@ -191,7 +191,7 @@ HostSystemPropertiesCollector:
 DatastoreStatsCollector:
   rubrics: false
   metrics:
-     - 'vrops_api_response{class="datastorestatscollector",target="testhost.test"}'
+     - 'vrops_api_response{class="datastorestatscollector",http_message="OK",target="testhost.test"}'
      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_datastore_diskspace_freespace_gigabytes{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
@@ -208,7 +208,7 @@ DatastoreStatsCollector:
 DatastorePropertiesCollector:
   rubrics: false
   metrics:
-     - 'vrops_api_response{class="datastorepropertiescollector",target="testhost.test"}'
+     - 'vrops_api_response{class="datastorepropertiescollector",http_message="OK",target="testhost.test"}'
      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="vmfs_vc-w-0_p_ssd_bb091_001",hostsystem="hostsystem3",state="test_enum_property",type="vmfs_p_ssd",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="eph-bb112-1",hostsystem="hostsystem3",state="test_enum_property",type="ephemeral",vccluster="cluster3",vcenter="vcenter1"}'
      - 'vrops_datastore_summary_datastore_accessible{datacenter="datacenter3",datastore="B121_Management_DS03",hostsystem="hostsystem3",state="test_enum_property",type="Management",vccluster="cluster3",vcenter="vcenter1"}'
@@ -217,7 +217,7 @@ VMStatsCollector:
   rubrics: true
   metrics:
     network:
-      - 'vrops_api_response{class="vmstatscollector",target="testhost.test"}'
+      - 'vrops_api_response{class="vmstatscollector",http_message="OK",target="testhost.test"}'
       - 'vrops_virtualmachine_network_packets_dropped_tx_number{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
       - 'vrops_virtualmachine_network_data_received_kilobytes_per_second{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
       - 'vrops_virtualmachine_network_data_received_kilobytes_per_second{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
@@ -240,7 +240,7 @@ VMStatsCollector:
       - 'vrops_virtualmachine_network_packets_tx_number{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'
       - 'vrops_virtualmachine_network_packets_dropped_rx_number{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
     cpu:
-      - 'vrops_api_response{class="vmstatscollector",target="testhost.test"}'
+      - 'vrops_api_response{class="vmstatscollector",http_message="OK",target="testhost.test"}'
       - 'vrops_virtualmachine_number_vcpus_total{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_number_vcpus_total{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
       - 'vrops_virtualmachine_cpu_demand_ratio{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'
@@ -266,7 +266,7 @@ VMStatsCollector:
       - 'vrops_virtualmachine_cpu_ready_ratio{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_cpu_usage_ratio{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'
     memory:
-      - 'vrops_api_response{class="vmstatscollector",target="testhost.test"}'
+      - 'vrops_api_response{class="vmstatscollector",http_message="OK",target="testhost.test"}'
       - 'vrops_virtualmachine_memory_ballooning_ratio{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_memory_active_ratio{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_swapped_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
@@ -296,7 +296,7 @@ VMStatsCollector:
       - 'vrops_virtualmachine_memory_usage_average{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
 
     virtualdisk:
-      - 'vrops_api_response{class="vmstatscollector",target="testhost.test"}'
+      - 'vrops_api_response{class="vmstatscollector",http_message="OK",target="testhost.test"}'
       - 'vrops_virtualmachine_virtual_disk_average_read_miliseconds{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_virtual_disk_read_kilobytes_per_second{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
       - 'vrops_virtualmachine_virtual_disk_outstanding_io{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'
@@ -320,7 +320,7 @@ VMStatsCollector:
       - 'vrops_virtualmachine_virtual_disk_outstanding_write_number{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
 
     other:
-      - 'vrops_api_response{class="vmstatscollector",target="testhost.test"}'
+      - 'vrops_api_response{class="vmstatscollector",http_message="OK",target="testhost.test"}'
       - 'vrops_virtualmachine_datastore_outstanding_io_requests{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
       - 'vrops_virtualmachine_datastore_total{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
       - 'vrops_virtualmachine_datastore_total{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'
@@ -349,7 +349,7 @@ VMStatsCollector:
 VMPropertiesCollector:
   rubrics: false
   metrics:
-    - 'vrops_api_response{class="vmpropertiescollector",target="testhost.test"}'
+    - 'vrops_api_response{class="vmpropertiescollector",http_message="OK",target="testhost.test"}'
     - 'vrops_virtualmachine_summary_ethernetcards{datacenter="datacenter3",hostsystem="hostsystem3",project="internal",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm2"}'
     - 'vrops_virtualmachine_config_hardware_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
     - 'vrops_virtualmachine_config_hardware_memory_kilobytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm3"}'

@@ -6,6 +6,7 @@ import logging
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily, UnknownMetricFamily
+from tools.http_status_codes import responses
 
 logger = logging.getLogger('vrops-exporter')
 
@@ -86,6 +87,11 @@ class BaseCollector(ABC):
         self.collection_times = request.json()
         return self.collection_times
 
+    def get_inventory_api_responses(self):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
+        self.api_responses = request.json()
+        return self.api_responses
+
     def get_target_tokens(self):
         try:
             request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
@@ -138,8 +144,9 @@ class BaseCollector(ABC):
 
     def create_http_response_metric(self, target, token, collector):
         api_responding = Vrops.get_http_response_code(target, token)
-        gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class'])
-        gauge.add_metric(labels=[self.target, collector.lower()], value=api_responding)
+        gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class', 'http_message'])
+        gauge.add_metric(labels=[self.target, collector.lower(), responses()[api_responding][0]],
+                         value=api_responding)
 
         if api_responding > 200:
             logger.critical(f'API response {api_responding} [{collector}, {self.target}], no return')

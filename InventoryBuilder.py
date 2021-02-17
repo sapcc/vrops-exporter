@@ -23,6 +23,7 @@ class InventoryBuilder:
         self.target_tokens = dict()
         self.iterated_inventory = dict()
         self.vrops_collection_times = dict()
+        self.response_codes = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
         if 'LOOPBACK' in os.environ:
@@ -78,6 +79,11 @@ class InventoryBuilder:
         def collection_times():
             vrops_collection_times = self.vrops_collection_times
             return json.dumps(vrops_collection_times)
+
+        @app.route('/api_response_codes', methods=['GET'])
+        def api_response_codes():
+            response_codes = self.response_codes
+            return json.dumps(response_codes)
 
         # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
@@ -176,7 +182,7 @@ class InventoryBuilder:
 
     def query_vrops(self, vrops, vrops_short_name):
         logger.info(f'Querying {vrops}')
-        token = Vrops.get_token(target=vrops)
+        token, self.response_codes[vrops] = Vrops.get_token(target=vrops)
         if not token:
             logger.warning(f'retrying connection to {vrops} in next iteration {self.iteration + 1}')
             return False
