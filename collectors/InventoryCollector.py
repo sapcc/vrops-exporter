@@ -17,29 +17,14 @@ class InventoryCollector(BaseCollector):
         logger.info(f'{self.name} starts with collecting the metrics')
 
         for target, token in self.get_target_tokens().items():
+            for type in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
+                gauge = GaugeMetricFamily(f'vrops_inventory_{type}', f'Amount of {type} in inventory',
+                                          labels=["target"])
 
-            gauge = GaugeMetricFamily('vrops_inventory_resources_total', 'vrops_inventory',
-                                      labels=["target", "resourcekind"])
-
-            vcenters = len(self.get_vcenters(target))
-            gauge.add_metric(labels=[target, "vcenter"], value=vcenters)
-
-            datacenters = len(self.get_datacenters(self.target))
-            gauge.add_metric(labels=[target, "datacenter"], value=datacenters)
-
-            vccluster = len(self.get_clusters(self.target))
-            gauge.add_metric(labels=[target, "vccluster"], value=vccluster)
-
-            hosts = len(self.get_hosts(self.target))
-            gauge.add_metric(labels=[target, "hosts"], value=hosts)
-
-            datastores = len(self.get_datastores(self.target))
-            gauge.add_metric(labels=[target, "datastores"], value=datastores)
-
-            vms = len(self.get_vms(target))
-            gauge.add_metric(labels=[target, "virtualmachines"], value=vms)
-
-            yield gauge
+                type_method = getattr(BaseCollector, f'get_{type}')
+                amount = len(type_method(self, target))
+                gauge.add_metric(labels=[target], value=amount)
+                yield gauge
 
             counter = CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory', labels=["target"])
             iteration = self.get_iteration()

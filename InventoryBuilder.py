@@ -133,6 +133,7 @@ class InventoryBuilder:
                 threads.append((thread, vrops))
 
             timeout = self.timeout
+            timeout_reached = False
             start_time = time.time()
             current_time = start_time
             joined_threads = dict()
@@ -151,6 +152,7 @@ class InventoryBuilder:
                 for running_thread in still_running:
                     logger.info(f"Timeout {timeout}s reached for fetching {running_thread[1]}")
                     running_thread[0].join(0)
+                    timeout_reached = True
             for vrops in joined_threads:
                 self.vrops_collection_times[vrops] = joined_threads[vrops]
                 logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
@@ -168,8 +170,9 @@ class InventoryBuilder:
                 logger.debug(f'Withdrawing current iteration: {self.iteration}')
                 self.iterated_inventory.pop(str(self.iteration))
             self.iteration += 1
-            logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
-            time.sleep(int(self.sleep))
+            if not timeout_reached:
+                logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
+                time.sleep(int(self.sleep))
 
     def query_vrops(self, vrops, vrops_short_name):
         logger.info(f'Querying {vrops}')

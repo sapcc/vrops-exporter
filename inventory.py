@@ -54,12 +54,12 @@ def parse_params(logger):
         os.environ['ATLAS'] = options.atlas
     if options.sleep:
         os.environ['SLEEP'] = options.sleep
-    if not options.sleep:
+    if not options.sleep and 'SLEEP' not in os.environ:
         logger.info('Defaulting sleep to 1800s')
         os.environ['SLEEP'] = "1800"
     if options.timeout:
         os.environ['TIMEOUT'] = options.timeout
-    if not options.timeout:
+    if not options.timeout and 'TIMEOUT' not in os.environ:
         logger.info('Defaulting timeout to 600s')
         os.environ['TIMEOUT'] = "600"
 

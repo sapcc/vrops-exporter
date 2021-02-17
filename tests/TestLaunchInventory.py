@@ -67,6 +67,24 @@ class TestLaunchExporter(TestCase):
         self.assertEqual(os.getenv('TIMEOUT'), '300', 'Timeout time was not set correctly')
         self.assertEqual(logger.level, 30)
 
+    def test_env_params(self):
+        os.environ.clear()
+        os.environ['USER'] = 'testuser'
+        os.environ['PASSWORD'] = 'testpw31!'
+        os.environ['PORT'] = '1234'
+        os.environ['ATLAS'] = '/path/to/atlas.yaml'
+        os.environ['LOOPBACK'] = '0'
+        os.environ['SLEEP'] = '180'
+        os.environ['TIMEOUT'] = '60'
+        parse_params(logger)
+        self.assertEqual(os.getenv('USER'), 'testuser', 'The user was not set correctly!')
+        self.assertEqual(os.getenv('PASSWORD'), 'testpw31!', 'The password was not set correctly!')
+        self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
+        self.assertEqual(os.getenv('ATLAS'), '/path/to/atlas.yaml', 'Atlas was not set correctly')
+        self.assertEqual(os.getenv('LOOPBACK'), '0', 'Loopback was not set correctly')
+        self.assertEqual(os.getenv('SLEEP'), '180', 'Sleep time was not set correctly')
+        self.assertEqual(os.getenv('TIMEOUT'), '60', 'Timeout time was not set correctly')
+
     def test_with_bogus_options(self):
         os.environ.clear()
         sys.argv = ['prog', '-z', 'foo', '-x', 'bar', '-w', 'bar']
