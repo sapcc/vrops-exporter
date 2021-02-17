@@ -19,6 +19,7 @@ class InventoryBuilder:
         self.timeout = int(timeout)
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
+        self.response_code = 200
         self.vcenter_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
@@ -78,6 +79,11 @@ class InventoryBuilder:
         def collection_times():
             vrops_collection_times = self.vrops_collection_times
             return json.dumps(vrops_collection_times)
+
+        @app.route('/api_response_code', methods=['GET'])
+        def api_response_code():
+            response_code = self.response_code
+            return str(response_code)
 
         # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
@@ -173,7 +179,7 @@ class InventoryBuilder:
 
     def query_vrops(self, vrops, vrops_short_name):
         logger.info(f'Querying {vrops}')
-        token = Vrops.get_token(target=vrops)
+        token, self.response_code = Vrops.get_token(target=vrops)
         if not token:
             logger.warning(f'retrying connection to {vrops} in next iteration {self.iteration + 1}')
             return False
