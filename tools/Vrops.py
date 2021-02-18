@@ -31,7 +31,7 @@ class Vrops:
                                      timeout=10)
         except Exception as e:
             logger.error(f'Problem connecting to {target}. Error: {e}')
-            return False, 522
+            return False, 503
 
         if response.status_code == 200:
             return response.json()["token"], response.status_code
@@ -58,7 +58,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return 522
+            return 503
 
         return response.status_code
 

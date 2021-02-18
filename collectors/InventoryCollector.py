@@ -1,7 +1,6 @@
 from BaseCollector import BaseCollector
 
 from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
-from tools.http_status_codes import responses
 import logging
 
 logger = logging.getLogger('vrops-exporter')
@@ -42,6 +41,6 @@ class InventoryCollector(BaseCollector):
             status_code = self.get_inventory_api_responses()[target]
             api_response = GaugeMetricFamily('vrops_api_response', 'vrops-exporter',
                                              labels=['target', 'class', 'message'])
-            api_response.add_metric(labels=[target, self.name.lower(), responses()[status_code][0]],
+            api_response.add_metric(labels=[target, self.name.lower()],
                                     value=status_code)
             yield api_response

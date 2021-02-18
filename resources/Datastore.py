@@ -19,4 +19,4 @@ class Datastore:
         if "local" in self.name:
             return "local"
         else:
-            return "Unknown"
+            return "other"
