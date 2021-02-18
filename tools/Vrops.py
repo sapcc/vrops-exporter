@@ -31,13 +31,13 @@ class Vrops:
                                      timeout=10)
         except Exception as e:
             logger.error(f'Problem connecting to {target}. Error: {e}')
-            return False, 522
+            return False
 
         if response.status_code == 200:
-            return response.json()["token"], response.status_code
+            return response.json()["token"]
         else:
             logger.error(f'Problem getting token from {target} : {response.text}')
-            return False, response.status_code
+            return False
 
     def get_http_response_code(target, token):
         url = "https://" + target + "/suite-api/api/resources"
@@ -58,7 +58,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return 522
+            return 503
 
         return response.status_code
 
