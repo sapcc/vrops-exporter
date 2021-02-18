@@ -17,11 +17,11 @@ class InventoryCollector(BaseCollector):
         logger.info(f'{self.name} starts with collecting the metrics')
 
         for target, token in self.get_target_tokens().items():
-            for type in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
-                gauge = GaugeMetricFamily(f'vrops_inventory_{type}', f'Amount of {type} in inventory',
+            for resourcekind in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
+                gauge = GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory',
                                           labels=["target"])
 
-                type_method = getattr(BaseCollector, f'get_{type}')
+                type_method = getattr(BaseCollector, f'get_{resourcekind}')
                 amount = len(type_method(self, target))
                 gauge.add_metric(labels=[target], value=amount)
                 yield gauge
@@ -37,3 +37,10 @@ class InventoryCollector(BaseCollector):
             time.add_metric(labels=[target], value=collection_time)
 
             yield time
+
+            status_code = self.get_inventory_api_responses()[target]
+            api_response = GaugeMetricFamily('vrops_api_response', 'vrops-exporter',
+                                             labels=['target', 'class', 'message'])
+            api_response.add_metric(labels=[target, self.name.lower()],
+                                    value=status_code)
+            yield api_response

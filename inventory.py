@@ -56,12 +56,12 @@ def parse_params(logger):
         os.environ['SLEEP'] = options.sleep
     if not options.sleep and 'SLEEP' not in os.environ:
         logger.info('Defaulting sleep to 1800s')
-        os.environ['SLEEP'] = "1800"
+        os.environ['SLEEP'] = "60"
     if options.timeout:
         os.environ['TIMEOUT'] = options.timeout
     if not options.timeout and 'TIMEOUT' not in os.environ:
         logger.info('Defaulting timeout to 600s')
-        os.environ['TIMEOUT'] = "600"
+        os.environ['TIMEOUT'] = "120"
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify PORT with ENV or -o')
