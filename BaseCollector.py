@@ -24,7 +24,6 @@ class BaseCollector(ABC):
         self.vrops = Vrops()
         self.name = self.__class__.__name__
         self.wait_for_inventory_data()
-        self.collector_config = self.read_collector_config()
         self.label_names = []
         self.project_ids = []
 
@@ -158,19 +157,21 @@ class BaseCollector(ABC):
         return gauge
 
     def generate_metrics(self, label_names: list) -> dict:
+        collector_config = self.read_collector_config()
         metrics = {m['key']: {'metric_suffix': m['metric_suffix'],
                               'key': m['key'],
                               'expected': m.setdefault('expected', None),
                               'gauge': GaugeMetricFamily(
                                   'vrops_' + self.vrops_entity_name + '_' + m['metric_suffix'].lower(),
                                   'vrops-exporter', labels=label_names)
-                              } for m in self.collector_config.get(self.name, {})}
+                              } for m in collector_config.get(self.name, {})}
         if not metrics:
             logger.error(f'Cannot find {self.name} in collector_config')
         return metrics
 
     def describe(self):
-        for metric in self.collector_config[self.name]:
+        collector_config = self.read_collector_config()
+        for metric in collector_config[self.name]:
             metric_suffix = metric['metric_suffix']
             yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + metric_suffix.lower(),
                                     'vrops-exporter')
