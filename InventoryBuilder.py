@@ -1,7 +1,7 @@
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 from threading import Thread
-from resources.Vcenter import Vcenter
+from resources.Resourceskinds import Vcenter
 from tools.Vrops import Vrops
 import time
 import json
@@ -12,8 +12,8 @@ logger = logging.getLogger('vrops-exporter')
 
 
 class InventoryBuilder:
-    def __init__(self, json, port, sleep, timeout):
-        self.json = json
+    def __init__(self, atlas_config, port, sleep, timeout):
+        self.atlas_config = atlas_config
         self.port = int(port)
         self.sleep = sleep
         self.timeout = int(timeout)
@@ -108,7 +108,7 @@ class InventoryBuilder:
             logger.error(f'TypeError: {e}')
 
     def get_vrops(self):
-        with open(self.json) as json_file:
+        with open(self.atlas_config) as json_file:
             netbox_json = json.load(json_file)
         self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
                            target['labels']['job'] == "vrops"]
@@ -196,28 +196,32 @@ class InventoryBuilder:
         self.vcenter_dict[vrops] = vcenter
         return True
 
-    def create_resource_objects(self, target, token):
+    def create_resource_objects(self, target: str, token: str) -> Vcenter:
         vrops = Vrops()
-
-        vcenter_name, vcenter_uuid = Vrops.get_adapter(target, token)
+        vcenter_name, vcenter_uuid = Vrops.get_adapter(vrops, target, token)
         if not vcenter_name:
             return False
         logger.debug(f'Collecting vcenter: {vcenter_name}')
 
         datacenter = Vrops.get_datacenter(vrops, target, token, [vcenter_uuid])
-        vccluster = Vrops.get_vccluster(vrops, target, token, [dc.get('uuid') for dc in datacenter])
-        hosts = Vrops.get_hosts(vrops, target, token, [cl.get('uuid') for cl in vccluster])
-        vms_and_ds = Vrops.get_vms_and_ds(vrops, target, token, [hs.get('uuid') for hs in hosts])
+        cluster_and_ds = Vrops.get_cluster_and_datastores(vrops, target, token, [dc.get('uuid') for dc in datacenter])
 
-        vms = [vm for vm in vms_and_ds if vm.get('resourcekind') == "VirtualMachine"]
-        dss = [ds for ds in vms_and_ds if ds.get('resourcekind') == "Datastore"]
+        cluster = [cl for cl in cluster_and_ds if cl.get('resourcekind') == "ClusterComputeResource"]
+        dss = [ds for ds in cluster_and_ds if ds.get('resourcekind') == "Datastore"]
+
+        hosts = Vrops.get_hosts(vrops, target, token, [cl.get('uuid') for cl in cluster])
+        vms = Vrops.get_vms(vrops, target, token, [hs.get('uuid') for hs in hosts])
 
         vcenter = Vcenter(target, token, vcenter_uuid, vcenter_name)
         for dc in datacenter:
             vcenter.add_datacenter(dc)
         for dc_object in vcenter.datacenter:
             logger.debug(f'Collecting datacenter: {dc_object.name}')
-            for cl in vccluster:
+            for ds in dss:
+                if ds.get('parent') == dc_object.uuid:
+                    dc_object.add_datastore(ds)
+                    logger.debug(f'Collecting Datastore: {ds.get("name")}')
+            for cl in cluster:
                 dc_object.add_cluster(cl)
             for cl_object in dc_object.clusters:
                 logger.debug(f'Collecting cluster: {cl_object.name}')
@@ -230,13 +234,9 @@ class InventoryBuilder:
                         if vm.get('parent') == hs_object.uuid:
                             hs_object.add_vm(vm)
                             logger.debug(f'Collecting VM: {vm.get("name")}')
-                    for ds in dss:
-                        if ds.get('parent') == hs_object.uuid:
-                            hs_object.add_datastore(ds)
-                            logger.debug(f'Collecting Datastore: {ds.get("name")}')
         return vcenter
 
-    def get_vcenters(self):
+    def get_vcenters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -250,7 +250,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 
-    def get_datacenters(self):
+    def get_datacenters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -268,7 +268,27 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
 
-    def get_clusters(self):
+    def get_datastores(self) -> dict:
+        tree = dict()
+        for vcenter_entry in self.vcenter_dict:
+            vcenter = self.vcenter_dict[vcenter_entry]
+            tree[vcenter.target] = dict()
+            for dc in vcenter.datacenter:
+                for datastore in dc.datastores:
+                    tree[vcenter.target][datastore.uuid] = {
+                        'uuid': datastore.uuid,
+                        'name': datastore.name,
+                        'parent_dc_uuid': dc.uuid,
+                        'parent_dc_name': dc.name,
+                        'type': datastore.type,
+                        'vcenter': vcenter.name,
+                        'target': vcenter.target,
+                        'token': vcenter.token,
+                    }
+        self.iterated_inventory[str(self.iteration)]['datastores'] = tree
+        return tree
+
+    def get_clusters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -287,7 +307,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
 
-    def get_hosts(self):
+    def get_hosts(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -308,31 +328,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
 
-    def get_datastores(self):
-        tree = dict()
-        for vcenter_entry in self.vcenter_dict:
-            vcenter = self.vcenter_dict[vcenter_entry]
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        for ds in host.datastores:
-                            tree[vcenter.target][ds.uuid] = {
-                                'uuid': ds.uuid,
-                                'name': ds.name,
-                                'type': ds.type,
-                                'parent_host_uuid': host.uuid,
-                                'parent_host_name': host.name,
-                                'cluster': cluster.name,
-                                'datacenter': dc.name,
-                                'vcenter': vcenter.name,
-                                'target': vcenter.target,
-                                'token': vcenter.token,
-                            }
-        self.iterated_inventory[str(self.iteration)]['datastores'] = tree
-        return tree
-
-    def get_vms(self):
+    def get_vms(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]

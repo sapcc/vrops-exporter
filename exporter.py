@@ -35,7 +35,6 @@ def parse_params(logger):
     parser.add_option("-m", "--config", help="path to config to set default collectors, statkeys and properties for "
                                              "collectors", action="store", dest="config")
     parser.add_option("-t", "--target", help="define target vrops", action="store", dest="target")
-    parser.add_option("-r", "--rubric", help="metric rubric in collector config", action="store", dest="rubric")
     (options, args) = parser.parse_args()
 
     if options.inventory:
@@ -65,8 +64,6 @@ def parse_params(logger):
         target = get_targets(options.inventory)[0]
         logger.warning(f'No target specified. Running exporter with {target} from inventory')
         os.environ['TARGET'] = target
-    if options.rubric:
-        os.environ['RUBRIC'] = options.rubric
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify port with ENV or -o')

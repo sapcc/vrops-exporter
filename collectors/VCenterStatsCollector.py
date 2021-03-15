@@ -1,50 +1,15 @@
-from BaseCollector import BaseCollector
-from tools.Vrops import Vrops
-import logging
-
-logger = logging.getLogger('vrops-exporter')
+from collectors.StatsCollector import StatsCollector
 
 
-class VCenterStatsCollector(BaseCollector):
+class VCenterStatsCollector(StatsCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'vcenter'
-        self.name = self.__class__.__name__
-        self.wait_for_inventory_data()
+        self.label_names = [self.vrops_entity_name]
 
-    def collect(self):
-        logger.info(f'{self.name} starts with collecting the metrics')
+    def get_uuids(self):
+        return self.get_vcenters_by_target()
 
-        token = self.get_target_tokens()
-        token = token.setdefault(self.target, None)
-
-        if not token:
-            logger.warning(f'skipping {self.target} in {self.name}, no token')
-            return
-
-        api_responding, gauge = self.create_http_response_metric(self.target, token, self.name)
-        yield gauge
-
-        if not api_responding:
-            return
-
-        gauges = self.generate_gauges('stats', self.name, self.vrops_entity_name,
-                                      [self.vrops_entity_name])
-        if not gauges:
-            return
-
-        vc = self.get_vcenters(self.target)
-        uuid = [vc[uuid]['uuid'] for uuid in vc][0]
-        for metric_suffix in gauges:
-            statkey = gauges[metric_suffix]['statkey']
-            values = Vrops.get_latest_stat(self.target, token, uuid, statkey, self.name)
-            if not values:
-                logger.warning(f'Skipping statkey: {statkey} in {self.name} , no return')
-                continue
-            metric_value = float(values)
-            gauges[metric_suffix]['gauge'].add_metric(labels=[self.vcenters[uuid]['name']],
-                                                      value=metric_value)
-
-        for metric_suffix in gauges:
-            yield gauges[metric_suffix]['gauge']
+    def set_labels(self, resource_id, project_ids):
+        return [self.vcenters[resource_id]['name']] if resource_id else []
