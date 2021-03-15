@@ -136,10 +136,8 @@ class Vrops:
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int):
 
-        # vrops can not handle more than 1000 uuids
-        max_keys = round(1000 / len(uuids) - 0.5, 0) if len(uuids) > 0 and round(1000 / len(uuids), 0) >= 1 else 1
-        uuids_chunked = list(chunk_list(uuids, 1000))
-        keys_chunked = list(chunk_list(keys, int(max_keys)))
+        # vrops can not handle more than 1000 uuids for stats
+        uuids_chunked = list(chunk_list(uuids, 1000)) if kind == 'stats' else [uuids]
 
         url = f"https://{target}/suite-api/api/resources/stats/latest/query" if kind == 'stats' else \
             f"https://{target}/suite-api/api/resources/properties/latest/query"
@@ -157,16 +155,18 @@ class Vrops:
         logger.debug('>----------------------- get_latest_values_multiple')
         logger.debug(f'target   : {target}')
         logger.debug(f'collector: {collector}')
+        logger.debug(f'Amount keys : {len(keys)}')
+        for k in keys:
+            logger.debug(f'key  : {k}')
 
-        for key_list in keys_chunked:
-            for uuid_list in uuids_chunked:
-                chunk_iteration += 1
-                t = Thread(target=Vrops._get_chunk,
-                           args=(q, uuid_list, url, headers, key_list, target, kind, collector, chunk_iteration))
-                thread_list.append(t)
-                t.start()
-            for t in thread_list:
-                t.join()
+        for uuid_list in uuids_chunked:
+            chunk_iteration += 1
+            t = Thread(target=Vrops._get_chunk,
+                       args=(q, uuid_list, url, headers, keys, target, kind, collector, chunk_iteration))
+            thread_list.append(t)
+            t.start()
+        for t in thread_list:
+            t.join()
 
         return_list = list()
         response_status_code = 503
@@ -190,15 +190,15 @@ class Vrops:
 
     def _get_chunk(q, uuid_list, url, headers, keys, target, kind, collector, chunk_iteration):
         logger.debug(f'chunk: {chunk_iteration}')
-        for k in keys:
-            logger.debug(f'key      : {k}')
 
         payload = {
             "resourceId": uuid_list,
-            "statKey": keys
+            "statKey": keys,
+            "PageSize": 500000
         } if kind == 'stats' else {
             "resourceIds": uuid_list,
-            "propertyKeys": keys
+            "propertyKeys": keys,
+            "PageSize": 500000
         }
 
         disable_warnings(exceptions.InsecureRequestWarning)
