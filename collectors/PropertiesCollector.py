@@ -38,7 +38,8 @@ class PropertiesCollector(BaseCollector):
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
             return
 
-        skipped = set()
+        no_match_in_config = set()
+        values_received = set()
 
         for resource in values:
             resource_id = resource.get('resourceId')
@@ -47,6 +48,8 @@ class PropertiesCollector(BaseCollector):
                 labels = self.set_labels(resource_id, project_ids)
 
                 statkey = value_entry.get('statKey')
+                values_received.add(statkey)
+
                 metric_data = value_entry.get('data', [False])[0]
                 metric_value = value_entry.get('values', [False])[0]
 
@@ -78,10 +81,15 @@ class PropertiesCollector(BaseCollector):
                     else:
                         metrics[statkey]['gauge'].add_metric(labels=labels, value=metric_data)
                 else:
-                    skipped.add(statkey)
+                    no_match_in_config.add(statkey)
 
-        if list(skipped):
-            logger.warning(f'Skipped keys in {self.name}: {list(skipped)} <-- compare with collector_config')
+        if list(no_match_in_config):
+            logger.warning(f'Skipped keys, due to no match with config in {self.name}: {list(no_match_in_config)} '
+                           f'<-- compare with collector_config')
+
+        metrics_without_values = {m for m in metrics if m not in values_received}
+        if list(metrics_without_values):
+            logger.warning(f'No values for keys in {self.name}: {list(metrics_without_values)}')
 
         for metric in metrics:
             yield metrics[metric]['gauge']
