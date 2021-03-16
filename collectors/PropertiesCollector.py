@@ -87,9 +87,9 @@ class PropertiesCollector(BaseCollector):
             logger.warning(f'Skipped keys, due to no match with config in {self.name}: {list(no_match_in_config)} '
                            f'<-- compare with collector_config')
 
-        metrics_without_values = {m for m in metrics if m not in values_received}
-        if list(metrics_without_values):
-            logger.warning(f'No values for keys in {self.name}: {list(metrics_without_values)}')
+        metrics_without_values = [m for m in metrics if m not in values_received]
+        if metrics_without_values:
+            logger.warning(f'No values for keys in {self.name}: {metrics_without_values}')
 
         for metric in metrics:
             yield metrics[metric]['gauge']
