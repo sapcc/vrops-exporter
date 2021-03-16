@@ -241,12 +241,16 @@ class InventoryBuilder:
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
             tree[vcenter.target] = dict()
-            tree[vcenter.target][vcenter.uuid] = {
-                'uuid': vcenter.uuid,
-                'name': vcenter.name,
-                'target': vcenter.target,
-                'token': vcenter.token,
-            }
+            for dc in vcenter.datacenter:
+                tree[vcenter.target][vcenter.uuid] = {
+                    'uuid': vcenter.uuid,
+                    'name': vcenter.name,
+                    'kind_dc_name': dc.name,
+                    'kind_dc_uuid': dc.uuid,
+                    'vcenter': vcenter.name,
+                    'target': vcenter.target,
+                    'token': vcenter.token,
+                }
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 

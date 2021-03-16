@@ -1,17 +1,17 @@
 VCenterStatsCollector:
   - 'vrops_api_response{class="vcenterstatscollector",target="testhost.test"}'
-  - 'vrops_vcenter_cpu_used_percent{vcenter="vcenter1"}'
-  - 'vrops_vcenter_memory_used_percent{vcenter="vcenter1"}'
-  - 'vrops_vcenter_diskspace_total_gigabytes{vcenter="vcenter1"}'
-  - 'vrops_vcenter_diskspace_usage_gigabytes{vcenter="vcenter1"}'
-  - 'vrops_vcenter_vcsa_certificate_remaining_days{vcenter="vcenter1"}'
+  - 'vrops_vcenter_diskspace_usage_gigabytes{datacenter="datacenter3",vcenter="vcenter1"}'
+  - 'vrops_vcenter_diskspace_total_gigabytes{datacenter="datacenter3",vcenter="vcenter1"}'
+  - 'vrops_vcenter_vcsa_certificate_remaining_days{datacenter="datacenter3",vcenter="vcenter1"}'
+  - 'vrops_vcenter_cpu_used_percent{datacenter="datacenter3",vcenter="vcenter1"}'
+  - 'vrops_vcenter_memory_used_percent{datacenter="datacenter3",vcenter="vcenter1"}'
 
 VCenterPropertiesCollector:
   - 'vrops_api_response{class="vcenterpropertiescollector",target="testhost.test"}'
-  - 'vrops_vcenter_vc_fullname{vc_fullname="test",vcenter="vcenter1"}'
-  - 'vrops_vcenter_summary_version{vcenter="vcenter1"}'
-  - 'vrops_vcenter_summary_version{summary_version="test",vcenter="vcenter1"}'
-  - 'vrops_vcenter_vc_fullname{vcenter="vcenter1"}'
+  - 'vrops_vcenter_vc_fullname{datacenter="datacenter3",vcenter="vcenter1"}'
+  - 'vrops_vcenter_summary_version{datacenter="datacenter3",summary_version="test",vcenter="vcenter1"}'
+  - 'vrops_vcenter_vc_fullname{datacenter="datacenter3",vc_fullname="test",vcenter="vcenter1"}'
+  - 'vrops_vcenter_summary_version{datacenter="datacenter3",vcenter="vcenter1"}'
 
 ClusterStatsCollector:
   - 'vrops_api_response{class="clusterstatscollector",target="testhost.test"}'
