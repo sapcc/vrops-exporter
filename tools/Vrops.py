@@ -223,13 +223,11 @@ class Vrops:
             logger.error(f'Return code: {response.status_code} != 200 for {collector} : {response.text}')
             return False, response.status_code
 
-    def get_project_ids(target: str, token: str, uuids: list, collector: str) -> list:
+    def get_project_ids(target: str, token: str, uuids: list, collector: str) -> (list, int):
         logger.debug('>---------------------------------- get_project_ids')
         logger.debug(f'target   : {target}')
         logger.debug(f'collector: {collector}')
 
-        # vrops can not handle more than 1000 uuids
-        uuids_chunked = list(chunk_list(uuids, 1000))
         project_ids = list()
         url = f'https://{target}/suite-api/api/resources/bulk/relationships'
         headers = {
@@ -237,35 +235,9 @@ class Vrops:
             'Accept': "application/json",
             'Authorization': "vRealizeOpsToken " + token
         }
-        import queue
-        q = queue.Queue()
-        thread_list = list()
-        chunk_iteration = 0
-
-        for uuid_list in uuids_chunked:
-            chunk_iteration += 1
-            t = Thread(target=Vrops._get_project_id_chunk,
-                       args=(q, uuid_list, url, headers, target, chunk_iteration))
-            thread_list.append(t)
-            t.start()
-        for t in thread_list:
-            t.join()
-
-        while not q.empty():
-            project_ids.extend(q.get())
-
-        logger.debug(f'Amount uuids: {len(uuids)}')
-        logger.debug(f'Fetched     : {len(project_ids)}')
-        logger.debug('<--------------------------------------------------')
-
-        return project_ids
-
-    def _get_project_id_chunk(q, uuid_list, url, headers, target, chunk_iteration):
-        logger.debug(f'chunk: {chunk_iteration}')
-
         payload = {
             "relationshipType": "ANCESTOR",
-            "resourceIds": uuid_list,
+            "resourceIds": uuids,
             "resourceQuery": {
                 "name": ["Project"],
                 "adapterKind": ["VMWARE"],
@@ -281,7 +253,8 @@ class Vrops:
                                      headers=headers)
         except Exception as e:
             logger.error(f'Problem getting project folder - Error: {e}')
-            return False, 503
+            return [], 503
+
         if response.status_code == 200:
             try:
                 for project in response.json()['resourcesRelations']:
@@ -289,11 +262,16 @@ class Vrops:
                     for vm_uuid in project["relatedResources"]:
                         project_name = project["resource"]["resourceKey"]["name"]
                         p_ids[vm_uuid] = project_name[project_name.find("(") + 1:project_name.find(")")]
-                    q.put([p_ids])
+                    project_ids.append(p_ids)
             except json.decoder.JSONDecodeError as e:
-                logger.error(f'Catching JSONDecodeError for target: {target}, chunk iteration: {chunk_iteration}'
+                logger.error(f'Catching JSONDecodeError for target: {target}, {collector}'
                              f' - Error: {e}')
-                return False, response.status_code
+                return [], response.status_code
         else:
             logger.error(f'Return code: {response.status_code} != 200 for {target} : {response.text}')
-            return False, response.status_code
+            return [], response.status_code
+
+        logger.debug(f'Fetched project ids: {len(project_ids)}')
+        logger.debug('<--------------------------------------------------')
+
+        return project_ids
