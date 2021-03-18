@@ -7,6 +7,7 @@ from exporter import run_prometheus_server
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
 from InventoryBuilder import InventoryBuilder
+from BaseCollector import BaseCollector
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
@@ -46,6 +47,8 @@ class TestCollectors(unittest.TestCase):
         self.random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(self.random_prometheus_port))
 
+        BaseCollector.get_target_tokens = MagicMock(
+            return_value={'testhost.test': '2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234'})
         Vrops.get_token = MagicMock(return_value=("2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234", 200))
         Vrops.get_adapter = MagicMock(return_value=("vcenter1", "3628-93a1-56e84634050814"))
         # test tool get_resources to create resource objects
