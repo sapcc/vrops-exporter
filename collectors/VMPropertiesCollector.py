@@ -9,7 +9,7 @@ class VMPropertiesCollector(PropertiesCollector):
         self.label_names = [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem', 'project']
         self.project_ids = True
 
-    def get_uuids(self):
+    def get_resource_uuids(self):
         return self.get_vms_by_target()
 
     def set_labels(self, resource_id, project_ids):

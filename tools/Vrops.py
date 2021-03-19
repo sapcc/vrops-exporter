@@ -85,6 +85,7 @@ class Vrops:
                 "resourceKind": resourcekinds,
                 "resourceStatus": ["DATA_RECEIVING"]
             },
+            "PageSize": 500000,
             "hierarchyDepth": 5
         }
         headers = {
@@ -207,7 +208,7 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=10)
+                                     timeout=30)
         except Exception as e:
             logger.error(f'{collector} has problems getting latest data from: {target} - Error: {e}')
             return False, 503

@@ -1,15 +1,13 @@
 from BaseCollector import BaseCollector
 import logging
+import re
 
 logger = logging.getLogger('vrops-exporter')
 
 
 class StatsCollector(BaseCollector):
 
-    def __init__(self):
-        super().__init__()
-
-    def get_uuids(self):
+    def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
     def set_labels(self, resource_id: str, project_ids: list):
@@ -24,7 +22,7 @@ class StatsCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no token')
             return
 
-        uuids = self.get_uuids()
+        uuids = self.get_resource_uuids()
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding = self.vrops.get_latest_stats_multiple(self.target,
@@ -38,7 +36,6 @@ class StatsCollector(BaseCollector):
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
             return
 
-        no_match_in_config = set()
         values_received = set()
 
         for resource in values:
@@ -53,15 +50,16 @@ class StatsCollector(BaseCollector):
                 if statkey in metrics and metric_data is not None:
                     metrics[statkey]['gauge'].add_metric(labels=labels, value=metric_data)
                 else:
-                    no_match_in_config.add(statkey)
-
-        if list(no_match_in_config):
-            logger.warning(f'Skipped keys, due to no match with config in {self.name}: {list(no_match_in_config)} '
-                           f'<-- compare with collector_config')
+                    new_metric_suffix = re.sub('[^a-zA-Z/s0-9\n.]', '_', statkey)
+                    values_received.add(new_metric_suffix)
+                    metrics[new_metric_suffix] = {}
+                    metrics[new_metric_suffix]['gauge'] = self.generate_metrics_renamed_by_api(new_metric_suffix,
+                                                                                               self.label_names)
+                    metrics[new_metric_suffix]['gauge'].add_metric(labels=labels, value=metric_data)
 
         metrics_without_values = [m for m in metrics if m not in values_received]
         if metrics_without_values:
-            logger.warning(f'No values for keys in {self.name}: {metrics_without_values}')
+            logger.warning(f'No values for keys in {self.name}: {metrics_without_values} | Check renaming!')
 
         for metric in metrics:
             yield metrics[metric]['gauge']

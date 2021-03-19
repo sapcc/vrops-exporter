@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import requests
 import time
 import os
+import re
 import logging
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
@@ -162,17 +163,20 @@ class BaseCollector(ABC):
         metrics = {m['key']: {'metric_suffix': m['metric_suffix'],
                               'key': m['key'],
                               'expected': m.setdefault('expected', None),
-                              'gauge': GaugeMetricFamily(
-                                  'vrops_' + self.vrops_entity_name + '_' + m['metric_suffix'].lower(),
-                                  'vrops-exporter', labels=label_names)
+                              'gauge': GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{m["metric_suffix"].lower()}',
+                                                         'vrops-exporter', labels=label_names)
                               } for m in collector_config.get(self.name, {})}
         if not metrics:
             logger.error(f'Cannot find {self.name} in collector_config')
         return metrics
 
+    def generate_metrics_renamed_by_api(self, metric_suffix, label_names):
+        gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}',
+                                  'vrops-exporter', labels=label_names)
+        return gauge
+
     def describe(self):
         collector_config = self.read_collector_config()
         for metric in collector_config[self.name]:
             metric_suffix = metric['metric_suffix']
-            yield GaugeMetricFamily('vrops_' + self.vrops_entity_name + '_' + metric_suffix.lower(),
-                                    'vrops-exporter')
+            yield GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}', 'vrops-exporter')

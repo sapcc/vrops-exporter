@@ -8,7 +8,7 @@ class ClusterPropertiesCollector(PropertiesCollector):
         self.vrops_entity_name = 'cluster'
         self.label_names = ['vccluster', 'vcenter', 'datacenter']
 
-    def get_uuids(self):
+    def get_resource_uuids(self):
         return self.get_clusters_by_target()
 
     def set_labels(self, resource_id, project_ids):

@@ -6,10 +6,7 @@ logger = logging.getLogger('vrops-exporter')
 
 class PropertiesCollector(BaseCollector):
 
-    def __init__(self):
-        super().__init__()
-
-    def get_uuids(self):
+    def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
     def set_labels(self, resource_id: str, project_ids: list):
@@ -24,7 +21,7 @@ class PropertiesCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no token')
             return
 
-        uuids = self.get_uuids()
+        uuids = self.get_resource_uuids()
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding = self.vrops.get_latest_properties_multiple(self.target,
@@ -56,10 +53,8 @@ class PropertiesCollector(BaseCollector):
                 if statkey in metrics:
                     # enum metrics
                     if metrics[statkey]['expected']:
-                        relabel = metrics[statkey]['gauge']._labelnames
-                        if 'state' not in relabel:
-                            relabel += ('state',)
-                        metrics[statkey]['gauge']._labelnames = relabel
+                        if 'state' not in metrics[statkey]['gauge']._labelnames:
+                            metrics[statkey]['gauge']._labelnames += ('state',)
 
                         state = metric_value if metric_value else 'n/a'
                         labels.append(state)
@@ -69,10 +64,8 @@ class PropertiesCollector(BaseCollector):
                     # string values
                     elif metric_value:
                         metric_suffix = metrics[statkey]['metric_suffix']
-                        relabel = metrics[statkey]['gauge']._labelnames
-                        if metric_suffix not in relabel:
-                            relabel += (metric_suffix,)
-                        metrics[statkey]['gauge']._labelnames = relabel
+                        if metric_suffix not in metrics[statkey]['gauge']._labelnames:
+                            metrics[statkey]['gauge']._labelnames += (metric_suffix,)
 
                         labels.append(metric_value)
                         metrics[statkey]['gauge'].add_metric(labels=labels, value=1)

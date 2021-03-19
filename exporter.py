@@ -12,7 +12,8 @@ from tools.helper import yaml_read
 
 
 def default_collectors():
-    return [collector for collector in yaml_read(os.environ['CONFIG'])['default_collectors']]
+    collector_config = yaml_read(os.environ['CONFIG']).get('default_collectors')
+    return [collector for collector in collector_config] if collector_config else None
 
 
 def parse_params(logger):
@@ -73,6 +74,9 @@ def parse_params(logger):
         sys.exit(0)
     if "CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify collector config with ENV or -m')
+        sys.exit(0)
+    if not options.collectors:
+        logger.error('Cannot start, no default collectors activated in config')
         sys.exit(0)
 
     return options
