@@ -16,6 +16,7 @@ logger = logging.getLogger('test-logger')
 # DEBUG         10
 # NOTSET        0
 
+
 class TestLaunchExporter(TestCase):
     # test with debug option on
     def test_with_cli_params_1(self):
