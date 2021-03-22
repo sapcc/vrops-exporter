@@ -13,6 +13,9 @@ class InventoryCollector(BaseCollector):
         self.name = self.__class__.__name__
         self.wait_for_inventory_data()
 
+    def describe(self):
+        self.collect()
+
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
