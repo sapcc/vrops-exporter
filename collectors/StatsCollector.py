@@ -50,6 +50,7 @@ class StatsCollector(BaseCollector):
                 if statkey in metrics and metric_data is not None:
                     metrics[statkey]['gauge'].add_metric(labels=labels, value=metric_data)
                 else:
+                    # no match in config, bring into the right format and yield
                     new_metric_suffix = re.sub('[^a-zA-Z/s0-9\n.]', '_', statkey)
                     values_received.add(new_metric_suffix)
                     metrics[new_metric_suffix] = {}
