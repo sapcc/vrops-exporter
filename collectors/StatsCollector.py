@@ -37,6 +37,7 @@ class StatsCollector(BaseCollector):
             return
 
         values_received = set()
+        no_match_in_config = []
 
         for resource in values:
             resource_id = resource.get('resourceId')
@@ -44,23 +45,20 @@ class StatsCollector(BaseCollector):
 
             for value_entry in resource.get('stat-list', {}).get('stat', []):
                 statkey = value_entry.get('statKey', {}).get('key')
-                values_received.add(statkey)
+                norm_statkey = re.sub("[^a-zA-Z|_]+", "", statkey)
+                values_received.add(norm_statkey)
 
-                metric_data = value_entry.get('data', [None])[0]
-                if statkey in metrics and metric_data is not None:
-                    metrics[statkey]['gauge'].add_metric(labels=labels, value=metric_data)
+                metric_data = value_entry.get('data', [0])[0]
+                if norm_statkey in metrics:
+                    metrics[norm_statkey]['gauge'].add_metric(labels=labels, value=metric_data)
                 else:
-                    # no match in config, bring into the right format and yield
-                    new_metric_suffix = re.sub('[^a-zA-Z/s0-9\n.]', '_', statkey)
-                    values_received.add(new_metric_suffix)
-                    metrics[new_metric_suffix] = {}
-                    metrics[new_metric_suffix]['gauge'] = self.generate_metrics_renamed_by_api(new_metric_suffix,
-                                                                                               self.label_names)
-                    metrics[new_metric_suffix]['gauge'].add_metric(labels=labels, value=metric_data)
+                    no_match_in_config.append([statkey, metric_data, labels])
 
-        metrics_without_values = [m for m in metrics if m not in values_received]
-        if metrics_without_values:
-            logger.warning(f'No values for keys in {self.name}: {metrics_without_values} | Check renaming!')
+        # no match in config, bring into the right format
+        created_metrics = self.generate_metrics_enriched_by_api(no_match_in_config, label_names=self.label_names)
 
         for metric in metrics:
             yield metrics[metric]['gauge']
+        for metric in created_metrics:
+            logger.info(f'Created metrics enriched by API in {self.name}: {created_metrics[metric].name}')
+            yield created_metrics[metric]
