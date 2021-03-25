@@ -170,10 +170,17 @@ class BaseCollector(ABC):
             logger.error(f'Cannot find {self.name} in collector_config')
         return metrics
 
-    def generate_metrics_renamed_by_api(self, metric_suffix, label_names):
-        gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}',
-                                  'vrops-exporter', labels=label_names)
-        return gauge
+    def generate_metrics_enriched_by_api(self, no_match_in_config: list, label_names: list) -> dict:
+        gauges = dict()
+        for statkey in no_match_in_config:
+            new_metric_suffix = re.sub("[^0-9a-zA-Z]+", "_", statkey[0])
+            value = statkey[1]
+            labels = statkey[2]
+            if new_metric_suffix not in gauges:
+                gauges[new_metric_suffix] = GaugeMetricFamily(
+                    f'vrops_{self.vrops_entity_name}_{new_metric_suffix.lower()}', 'vrops-exporter', labels=label_names)
+            gauges[new_metric_suffix].add_metric(labels=labels, value=value)
+        return gauges
 
     def describe(self):
         collector_config = self.read_collector_config()
