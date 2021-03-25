@@ -45,6 +45,7 @@ class StatsCollector(BaseCollector):
 
             for value_entry in resource.get('stat-list', {}).get('stat', []):
                 statkey = value_entry.get('statKey', {}).get('key')
+                # Normalisation of keys retrieved from API (e.g. cpu:102|usage_average -> cpu|usage_average)
                 norm_statkey = re.sub("[^a-zA-Z|_ ]+", "", statkey)
                 values_received.add(norm_statkey)
 
