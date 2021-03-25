@@ -154,10 +154,11 @@ VMStatsDefaultCollector:
   - 'vrops_virtualmachine_datastore_outstanding_io_requests{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
   - 'vrops_virtualmachine_diskspace_virtual_machine_used_gigabytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
   - 'vrops_virtualmachine_diskspace_gigabytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
-  - 'vrops_virtualmachine_database_disk_usage_percent{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
-  - 'vrops_virtualmachine_database_disk_usage_gigabytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
   - 'vrops_virtualmachine_disk_usage_average_kilobytes_per_second{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
-  - 'vrops_virtualmachine_database_disk_capacity_gigabytes{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
+  - 'vrops_virtualmachine_guestfilesystem_storage_db_capacity{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
+  - 'vrops_virtualmachine_guestfilesystem_storage_db_percentage{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
+  - 'vrops_virtualmachine_guestfilesystem_storage_db_usage{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
+
 
 VMPropertiesCollector:
   - 'vrops_api_response{class="vmpropertiescollector",target="testhost.test"}'

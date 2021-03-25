@@ -45,7 +45,7 @@ class StatsCollector(BaseCollector):
 
             for value_entry in resource.get('stat-list', {}).get('stat', []):
                 statkey = value_entry.get('statKey', {}).get('key')
-                norm_statkey = re.sub("[^a-zA-Z|_]+", "", statkey)
+                norm_statkey = re.sub("[^a-zA-Z|_ ]+", "", statkey)
                 values_received.add(norm_statkey)
 
                 metric_data = value_entry.get('data', [0])[0]
