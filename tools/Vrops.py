@@ -71,8 +71,7 @@ class Vrops:
             return name, uuid
         return name, uuid
 
-    def get_resources(self, target: str, token: str, uuids: list, resourcekinds: list) -> list:
-
+    def get_resources(self, target: str, token: str, uuids: list, resourcekinds: list, data_receiving=False) -> list:
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
             'pageSize': '100000'
@@ -87,7 +86,17 @@ class Vrops:
             },
             "PageSize": 500000,
             "hierarchyDepth": 5
+        } if data_receiving else {
+            "relationshipType": "DESCENDANT",
+            "resourceIds": uuids,
+            "resourceQuery": {
+                "adapterKind": ["VMWARE"],
+                "resourceKind": resourcekinds,
+            },
+            "PageSize": 500000,
+            "hierarchyDepth": 5
         }
+
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
@@ -132,7 +141,7 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
 
     def get_vms(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["VirtualMachine"])
+        return self.get_resources(target, token, parent_uuids, resourcekinds=["VirtualMachine"], data_receiving=True)
 
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int):
