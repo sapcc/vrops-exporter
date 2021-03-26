@@ -40,7 +40,7 @@ class PropertiesCollector(BaseCollector):
             return
 
         values_received = set()
-        no_match_in_config = []
+        no_match_in_config = list()
 
         for resource in values:
             resource_id = resource.get('resourceId')
