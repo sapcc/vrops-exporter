@@ -22,6 +22,10 @@ class PropertiesCollector(BaseCollector):
             return
 
         uuids = self.get_resource_uuids()
+        if not uuids:
+            logger.warning(f'skipping {self.target} in {self.name}, no resources')
+            return
+
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding = self.vrops.get_latest_properties_multiple(self.target,
@@ -35,8 +39,8 @@ class PropertiesCollector(BaseCollector):
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
             return
 
-        no_match_in_config = set()
         values_received = set()
+        no_match_in_config = list()
 
         for resource in values:
             resource_id = resource.get('resourceId')
@@ -74,15 +78,13 @@ class PropertiesCollector(BaseCollector):
                     else:
                         metrics[statkey]['gauge'].add_metric(labels=labels, value=metric_data)
                 else:
-                    no_match_in_config.add(statkey)
+                    no_match_in_config.append([statkey, metric_data, labels])
 
-        if list(no_match_in_config):
-            logger.warning(f'Skipped keys, due to no match with config in {self.name}: {list(no_match_in_config)} '
-                           f'<-- compare with collector_config')
-
-        metrics_without_values = [m for m in metrics if m not in values_received]
-        if metrics_without_values:
-            logger.warning(f'No values for keys in {self.name}: {metrics_without_values}')
+        # no match in config, bring into the right format
+        created_metrics = self.generate_metrics_enriched_by_api(no_match_in_config, label_names=self.label_names)
 
         for metric in metrics:
             yield metrics[metric]['gauge']
+        for metric in created_metrics:
+            logger.info(f'Created metrics enriched by API in {self.name}: {created_metrics[metric].name}')
+            yield created_metrics[metric]

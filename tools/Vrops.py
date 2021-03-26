@@ -72,6 +72,7 @@ class Vrops:
         return name, uuid
 
     def get_resources(self, target: str, token: str, uuids: list, resourcekinds: list, data_receiving=False) -> list:
+        logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
             'pageSize': '100000'
@@ -91,7 +92,7 @@ class Vrops:
             "resourceIds": uuids,
             "resourceQuery": {
                 "adapterKind": ["VMWARE"],
-                "resourceKind": resourcekinds,
+                "resourceKind": resourcekinds
             },
             "PageSize": 500000,
             "hierarchyDepth": 5

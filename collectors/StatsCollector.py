@@ -23,6 +23,10 @@ class StatsCollector(BaseCollector):
             return
 
         uuids = self.get_resource_uuids()
+        if not uuids:
+            logger.warning(f'skipping {self.target} in {self.name}, no resources')
+            return
+
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding = self.vrops.get_latest_stats_multiple(self.target,
@@ -37,7 +41,7 @@ class StatsCollector(BaseCollector):
             return
 
         values_received = set()
-        no_match_in_config = []
+        no_match_in_config = list()
 
         for resource in values:
             resource_id = resource.get('resourceId')
