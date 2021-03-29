@@ -15,8 +15,7 @@ class BaseCollector(ABC):
 
     def __init__(self):
         self.vrops_entity_name = 'base'
-        self.target_tokens = self.get_target_tokens()
-        while os.environ['TARGET'] not in self.target_tokens:
+        while os.environ['TARGET'] not in self.get_target_tokens():
             logger.critical('Cannot start exporter without valid target!')
             logger.critical(f'{os.environ["TARGET"]} is not in vrops_list from inventory')
             logger.critical(
