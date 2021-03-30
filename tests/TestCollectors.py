@@ -129,7 +129,7 @@ class TestCollectors(unittest.TestCase):
                     multiple_metrics_generated.append(
                         {"resourceId": "3628-93a1-56e84634050814", "stat-list": {"stat": [
                             {"timestamps": [1582797716394], "statKey": {"key": metric['key']}, "data": [55.0]}]}})
-                Vrops.get_latest_stats_multiple = MagicMock(return_value=(multiple_metrics_generated, 200))
+                Vrops.get_latest_stats_multiple = MagicMock(return_value=(multiple_metrics_generated, 200, 0.5))
 
             if "Properties" in collector:
                 multiple_metrics_generated = list()
@@ -149,7 +149,7 @@ class TestCollectors(unittest.TestCase):
                             "property-content": [
                                 {"timestamps": [1582797716394], "statKey": metric['key'],
                                  "values": ["test"]}]}})
-                Vrops.get_latest_properties_multiple = MagicMock(return_value=(multiple_metrics_generated, 200))
+                Vrops.get_latest_properties_multiple = MagicMock(return_value=(multiple_metrics_generated, 200, 0.5))
 
             thread_list = list()
 

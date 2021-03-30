@@ -29,12 +29,13 @@ class StatsCollector(BaseCollector):
 
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
-        values, api_responding = self.vrops.get_latest_stats_multiple(self.target,
-                                                                      token,
-                                                                      uuids,
-                                                                      [m for m in metrics],
-                                                                      self.name)
-        yield self.create_api_response_metric(self.name, api_responding)
+        values, api_responding, response_time = self.vrops.get_latest_stats_multiple(self.target,
+                                                                                     token,
+                                                                                     uuids,
+                                                                                     [m for m in metrics],
+                                                                                     self.name)
+        yield self.create_api_response_code_metric(self.name, api_responding)
+        yield self.create_api_response_time_metric(self.name, response_time)
 
         if not values:
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
@@ -46,6 +47,8 @@ class StatsCollector(BaseCollector):
         for resource in values:
             resource_id = resource.get('resourceId')
             labels = self.set_labels(resource_id, project_ids)
+            if not labels:
+                continue
 
             for value_entry in resource.get('stat-list', {}).get('stat', []):
                 statkey = value_entry.get('statKey', {}).get('key')
