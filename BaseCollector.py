@@ -148,13 +148,19 @@ class BaseCollector(ABC):
         logger.info(f'-----Initial query done------: {self.name}')
         return
 
-    def create_api_response_metric(self, collector: str, api_responding: int) -> GaugeMetricFamily:
+    def create_api_response_code_metric(self, collector: str, api_responding: int) -> GaugeMetricFamily:
         gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter', labels=['target', 'class'])
         gauge.add_metric(labels=[self.target, collector.lower()], value=api_responding)
 
         if api_responding > 200:
             logger.critical(f'API response {api_responding} [{collector}, {self.target}], no return')
             return gauge
+        return gauge
+
+    def create_api_response_time_metric(self, collector: str, response_time: float) -> GaugeMetricFamily:
+        gauge = GaugeMetricFamily('vrops_api_response_time_seconds', 'vrops-exporter',
+                                  labels=['target', 'class'])
+        gauge.add_metric(labels=[self.target, collector.lower()], value=response_time)
         return gauge
 
     def generate_metrics(self, label_names: list) -> dict:

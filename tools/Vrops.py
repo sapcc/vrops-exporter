@@ -145,7 +145,7 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, resourcekinds=["VirtualMachine"], data_receiving=True)
 
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
-                                   kind: str = None) -> (list, int):
+                                   kind: str = None) -> (list, int, float):
 
         # vrops can not handle more than 1000 uuids for stats
         uuids_chunked = list(chunk_list(uuids, 1000)) if kind == 'stats' else [uuids]
@@ -180,18 +180,20 @@ class Vrops:
             t.join()
 
         return_list = list()
-        response_status_code = 503
+        response_status_codes = list()
+        response_time_elapsed = list()
 
         while not q.empty():
             returned_chunks = q.get()
-            response_status_code = returned_chunks[1] if returned_chunks[1] > 200 else 200
+            response_time_elapsed.append(returned_chunks[2])
+            response_status_codes.append(returned_chunks[1])
             return_list.extend(returned_chunks[0])
 
         logger.debug(f'Amount uuids: {len(uuids)}')
         logger.debug(f'Fetched     : {len({r.get("resourceId") for r in return_list})}')
         logger.debug('<--------------------------------------------------')
 
-        return return_list, response_status_code
+        return return_list, max(response_status_codes), sum(response_time_elapsed) / len(response_time_elapsed)
 
     def get_latest_properties_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str):
         return self.get_latest_values_multiple(target, token, uuids, keys, collector, kind='properties')
@@ -218,21 +220,21 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=30)
+                                     timeout=60)
         except Exception as e:
             logger.error(f'{collector} has problems getting latest data from: {target} - Error: {e}')
-            return False, 503
+            return [], 503, 999
 
         if response.status_code == 200:
             try:
-                q.put([response.json().get('values', []), response.status_code])
+                q.put([response.json().get('values', []), response.status_code, response.elapsed.total_seconds()])
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for {collector}, target: {collector}, chunk_iteration: '
                              f'{chunk_iteration} - Error: {e}')
-                return False, response.status_code
+                return [], response.status_code, response.elapsed.total_seconds()
         else:
             logger.error(f'Return code: {response.status_code} != 200 for {collector} : {response.text}')
-            return False, response.status_code
+            return [], response.status_code, response.elapsed.total_seconds()
 
     def get_project_ids(target: str, token: str, uuids: list, collector: str) -> (list, int):
         logger.debug('>---------------------------------- get_project_ids')

@@ -28,12 +28,13 @@ class PropertiesCollector(BaseCollector):
 
         metrics = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
-        values, api_responding = self.vrops.get_latest_properties_multiple(self.target,
-                                                                           token,
-                                                                           uuids,
-                                                                           [m for m in metrics],
-                                                                           self.name)
-        yield self.create_api_response_metric(self.name, api_responding)
+        values, api_responding, response_time = self.vrops.get_latest_properties_multiple(self.target,
+                                                                                          token,
+                                                                                          uuids,
+                                                                                          [m for m in metrics],
+                                                                                          self.name)
+        yield self.create_api_response_code_metric(self.name, api_responding)
+        yield self.create_api_response_time_metric(self.name, response_time)
 
         if not values:
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
@@ -47,6 +48,8 @@ class PropertiesCollector(BaseCollector):
 
             for value_entry in resource.get('property-contents', {}).get('property-content', []):
                 labels = self.set_labels(resource_id, project_ids)
+                if not labels:
+                    continue
 
                 statkey = value_entry.get('statKey')
                 values_received.add(statkey)
