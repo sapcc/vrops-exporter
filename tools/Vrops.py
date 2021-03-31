@@ -220,7 +220,7 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=30)
+                                     timeout=60)
         except Exception as e:
             logger.error(f'{collector} has problems getting latest data from: {target} - Error: {e}')
             return [], 503, 999
