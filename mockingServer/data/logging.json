@@ -1,0 +1,16 @@
+{
+    "value": [
+        {
+            "hostname": "host1.vcsa.com",
+            "state": "UP"
+        },
+        {
+            "hostname": "host2.vcsa.com",
+            "state": "UNKNOWN"
+        },
+        {
+            "hostname": "host3.vcsa.com",
+            "state": "UP"
+        }
+    ]
+}
