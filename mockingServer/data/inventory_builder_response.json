@@ -1,0 +1,16 @@
+{
+  "resourcesRelations": [
+    {
+      "resource": {
+        "resourceKey": {
+          "name": "Testname",
+          "resourceKindKey": "ResourceKindKey"
+        },
+        "identifier": "1337ID"
+      },
+      "relatedResources": [
+        "relatedResources_response"
+      ]
+    }
+  ]
+}
