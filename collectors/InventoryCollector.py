@@ -11,13 +11,20 @@ class InventoryCollector(BaseCollector):
     def __init__(self):
         super().__init__()
         self.name = self.__class__.__name__
-        self.wait_for_inventory_data()
+        self.resourcekinds = ["vcenters", "datacenters", "clusters", "hosts", "datastores", "vms"]
+
+    def describe(self):
+        for resourcekind in self.resourcekinds:
+            yield GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory')
+        yield CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
+        yield GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory')
+        yield GaugeMetricFamily('vrops_api_response', 'vrops-exporter')
 
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
         for target, token in self.get_target_tokens().items():
-            for resourcekind in "vcenters", "datacenters", "clusters", "hosts", "datastores", "vms":
+            for resourcekind in self.resourcekinds:
                 gauge = GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory',
                                           labels=["target"])
 

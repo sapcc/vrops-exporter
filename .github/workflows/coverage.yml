@@ -33,4 +33,4 @@ jobs:
          do 
            LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar CONFIG=tests/collector_config.yaml TARGET=testhost.test coverage run -a --omit "*.md","*.txt",LICENSE,Makefile,Dockerfile $i
          done
-         coveralls
+         coveralls --service=github
