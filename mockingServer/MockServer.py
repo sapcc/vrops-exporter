@@ -1,8 +1,5 @@
 from flask import Flask
 from mockingServer.modules.Authentication import authBluePrint
-from mockingServer.modules.VmonService import vmonBluePrint
-from mockingServer.modules.LoggingSession import loggingBluePrint
-from mockingServer.modules.BaseCollectorService import baseCollectorBluePrint
 from mockingServer.modules.InventoryBuilderService import inventoryBuilderBluePrint
 from gevent.pywsgi import WSGIServer
 
