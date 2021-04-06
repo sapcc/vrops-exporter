@@ -223,7 +223,8 @@ class Vrops:
                                      timeout=60)
         except Exception as e:
             logger.error(f'{collector} has problems getting latest data from: {target} - Error: {e}')
-            return [], 503, 999
+            q.put([[], 503, 999])
+            return
 
         if response.status_code == 200:
             try:
@@ -231,10 +232,12 @@ class Vrops:
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for {collector}, target: {collector}, chunk_iteration: '
                              f'{chunk_iteration} - Error: {e}')
-                return [], response.status_code, response.elapsed.total_seconds()
+                q.put([[], response.status_code, response.elapsed.total_seconds()])
+                return
         else:
             logger.error(f'Return code: {response.status_code} != 200 for {collector} : {response.text}')
-            return [], response.status_code, response.elapsed.total_seconds()
+            q.put([[], response.status_code, response.elapsed.total_seconds()])
+            return
 
     def get_project_ids(target: str, token: str, uuids: list, collector: str) -> (list, int):
         logger.debug('>---------------------------------- get_project_ids')
