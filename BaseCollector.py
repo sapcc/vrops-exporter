@@ -37,6 +37,7 @@ class BaseCollector(ABC):
         return config_file
 
     def get_vcenters(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcenters/{}".format(current_iteration)
         request = requests.get(url)
@@ -44,6 +45,7 @@ class BaseCollector(ABC):
         return self.vcenters
 
     def get_datacenters(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datacenters/{}".format(current_iteration)
         request = requests.get(url)
@@ -51,6 +53,7 @@ class BaseCollector(ABC):
         return self.datacenters
 
     def get_clusters(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/clusters/{}".format(current_iteration)
         request = requests.get(url)
@@ -58,6 +61,7 @@ class BaseCollector(ABC):
         return self.clusters
 
     def get_hosts(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/hosts/{}".format(current_iteration)
         request = requests.get(url)
@@ -65,6 +69,7 @@ class BaseCollector(ABC):
         return self.hosts
 
     def get_datastores(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datastores/{}".format(current_iteration)
         request = requests.get(url)
@@ -72,6 +77,7 @@ class BaseCollector(ABC):
         return self.datastores
 
     def get_vms(self, target):
+        self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vms/{}".format(current_iteration)
         request = requests.get(url)
@@ -139,13 +145,11 @@ class BaseCollector(ABC):
             return []
 
     def wait_for_inventory_data(self):
-        iteration = 0
+        iteration = self.get_iteration()
         while not iteration:
             time.sleep(5)
             iteration = self.get_iteration()
-            logger.info(f'Waiting for initial iteration: {self.name}')
-
-        logger.info(f'-----Initial query done------: {self.name}')
+            logger.debug(f'Waiting for initial iteration: {self.name}')
         return
 
     def create_api_response_code_metric(self, collector: str, api_responding: int) -> GaugeMetricFamily:
