@@ -142,7 +142,12 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
 
     def get_vms(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["VirtualMachine"], data_receiving=True)
+        uuids_chunked = list(chunk_list(parent_uuids, 150))
+        vms = list()
+        for uuid_list in uuids_chunked:
+            vms.extend(self.get_resources(target, token, uuid_list, resourcekinds=["VirtualMachine"],
+                                          data_receiving=True))
+        return vms
 
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int, float):
