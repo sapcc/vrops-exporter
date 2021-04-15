@@ -24,7 +24,6 @@ class BaseCollector(ABC):
         self.target = os.environ.get('TARGET')
         self.vrops = Vrops()
         self.name = self.__class__.__name__
-        self.wait_for_inventory_data()
         self.label_names = []
         self.project_ids = []
 
@@ -90,11 +89,13 @@ class BaseCollector(ABC):
         return self.iteration
 
     def get_collection_times(self):
+        self.wait_for_inventory_data()
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/collection_times")
         self.collection_times = request.json()
         return self.collection_times
 
     def get_inventory_api_responses(self):
+        self.wait_for_inventory_data()
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
         self.api_responses = request.json()
         return self.api_responses

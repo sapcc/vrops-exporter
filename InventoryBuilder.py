@@ -210,7 +210,7 @@ class InventoryBuilder:
         dss = [ds for ds in cluster_and_ds if ds.get('resourcekind') == "Datastore"]
 
         hosts = Vrops.get_hosts(vrops, target, token, [cl.get('uuid') for cl in cluster])
-        vms = Vrops.get_vms(vrops, target, token, [hs.get('uuid') for hs in hosts])
+        vms = Vrops.get_vms(vrops, target, token, [hs.get('uuid') for hs in hosts], vcenter_uuid)
 
         vcenter = Vcenter(target, token, vcenter_uuid, vcenter_name)
         for dc in datacenter:
