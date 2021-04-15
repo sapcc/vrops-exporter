@@ -142,15 +142,16 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid):
-        amount_vms, api_responding, response_time = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
-                                                                                   ['summary|total_number_vms'],
-                                                                                   'Inventory')
+        amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
+                                                                       ['summary|total_number_vms'],
+                                                                       'Inventory')
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
             api_responding == 200 else 0
 
         # vrops cannot handle more than 10000 resource requests
-        if number_of_vms > 10000:
-            uuids_chunked = list(chunk_list(parent_uuids, int(round(len(parent_uuids) / 2, 0))))
+        split_factor = int(number_of_vms / 10000)
+        if split_factor >= 1:
+            uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor * 2))))
             logger.debug(f'Chunking VM requests into {len(uuids_chunked)} chunks')
             vms = list()
             for uuid_list in uuids_chunked:
