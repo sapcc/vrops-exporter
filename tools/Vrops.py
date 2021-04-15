@@ -149,7 +149,7 @@ class Vrops:
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
             api_responding == 200 else 0
 
-        # vrops cannot handle more than 10000 resource requests
+        # vrops cannot handle more than 10000 uuids in a single request
         split_factor = int(number_of_vms / 10000)
         if split_factor >= 1:
             uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor * 2))))
