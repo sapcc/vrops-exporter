@@ -145,6 +145,7 @@ class Vrops:
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
+
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
             api_responding == 200 else 0
 
