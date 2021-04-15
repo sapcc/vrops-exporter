@@ -142,7 +142,7 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid):
-        amount_vms, api_responding, response_time = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
+        amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                                    ['summary|total_number_vms'],
                                                                                    'Inventory')
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
