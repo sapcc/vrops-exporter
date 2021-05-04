@@ -80,3 +80,30 @@ class VirtualMachine:
         self.uuid = uuid
 
 
+class NSX_T_Mgmt_Plane:
+
+    def __init__(self, target, token):
+        self.target = target
+        self.token = token
+        self.adapter = list()
+
+    def add_adapter(self, adapter):
+        self.adapter.append(NSX_T_Adapter_Instance(adapter.get('name'), adapter.get('uuid')))
+
+
+class NSX_T_Adapter_Instance:
+
+    def __init__(self, name, uuid):
+        self.name = name
+        self.uuid = uuid
+        self.management_cluster = list()
+
+    def add_mgmt_cluster(self, mgmt_cluster):
+        self.management_cluster.append(NSX_T_ManagementCluster(mgmt_cluster.get('name'), mgmt_cluster.get('uuid')))
+
+
+class NSX_T_ManagementCluster:
+
+    def __init__(self, name, uuid):
+        self.name = name
+        self.uuid = uuid

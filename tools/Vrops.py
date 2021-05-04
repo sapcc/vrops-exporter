@@ -40,17 +40,17 @@ class Vrops:
             logger.error(f'Problem getting token from {target} : {response.text}')
             return False, response.status_code
 
-    def get_adapter(self, target: str, token: str) -> (str, str):
+    def get_adapter(self, target: str, token: str, adapterkind: str) -> (str, str):
         url = f'https://{target}/suite-api/api/adapters'
         querystring = {
-            "adapterKindKey": "VMWARE"
+            "adapterKindKey": adapterkind
         }
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
             'Authorization': f"vRealizeOpsToken {token}"
         }
-        name = uuid = None
+        adapter = list()
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.get(url,
@@ -59,19 +59,21 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return name, uuid
+            return []
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
-                name = resource["resourceKey"]["name"]
-                uuid = resource["id"]
-
+                ada = dict()
+                ada['name'] = resource["resourceKey"]["name"]
+                ada['uuid'] = resource["id"]
+                adapter.append(ada)
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return name, uuid
-        return name, uuid
+            return []
+        return adapter
 
-    def get_resources(self, target: str, token: str, uuids: list, resourcekinds: list, data_receiving=False) -> list:
+    def get_resources(self, target: str, token: str, uuids: list, adapterkind: str, resourcekinds: list,
+                      data_receiving=False) -> list:
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
@@ -81,7 +83,7 @@ class Vrops:
             "relationshipType": "DESCENDANT",
             "resourceIds": uuids,
             "resourceQuery": {
-                "adapterKind": ["VMWARE"],
+                "adapterKind": [adapterkind],
                 "resourceKind": resourcekinds,
                 "resourceStatus": ["DATA_RECEIVING"]
             },
@@ -91,7 +93,7 @@ class Vrops:
             "relationshipType": "DESCENDANT",
             "resourceIds": uuids,
             "resourceQuery": {
-                "adapterKind": ["VMWARE"],
+                "adapterKind": [adapterkind],
                 "resourceKind": resourcekinds
             },
             "PageSize": 500000,
@@ -133,13 +135,14 @@ class Vrops:
         return resources
 
     def get_datacenter(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["Datacenter"])
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datacenter"])
 
     def get_cluster_and_datastores(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["ClusterComputeResource", "Datastore"])
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
+                                  resourcekinds=["ClusterComputeResource", "Datastore"])
 
     def get_hosts(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["HostSystem"])
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["HostSystem"])
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid):
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
@@ -156,12 +159,20 @@ class Vrops:
             logger.debug(f'Chunking VM requests into {len(uuids_chunked)} chunks')
             vms = list()
             for uuid_list in uuids_chunked:
-                vms.extend(self.get_resources(target, token, uuid_list, resourcekinds=["VirtualMachine"],
-                                              data_receiving=True))
+                vms.extend(self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
+                                              resourcekinds=["VirtualMachine"], data_receiving=True))
             logger.debug(f'Number of VMs collected: {len(vms)}')
             return vms
-        return self.get_resources(target, token, parent_uuids, resourcekinds=["VirtualMachine"],
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
                                   data_receiving=True)
+
+    def get_nsx_t_adapter_instance(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
+                                  resourcekinds=["NSXTAdapterInstance"])
+
+    def get_nsx_t_mgmt_cluster(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
+                                  resourcekinds=["ManagementCluster"])
 
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int, float):

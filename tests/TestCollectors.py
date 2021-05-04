@@ -22,13 +22,13 @@ from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
 from collectors.VCenterStatsCollector import VCenterStatsCollector
 from collectors.VCenterPropertiesCollector import VCenterPropertiesCollector
+from collectors.NSXTMmgtClusterStatsCollector import NSXTMmgtClusterStatsCollector
 from prometheus_client.core import REGISTRY
 import unittest
 import random
 import http.client
 import os
 import time
-import importlib
 
 
 class TestCollectors(unittest.TestCase):
@@ -50,7 +50,8 @@ class TestCollectors(unittest.TestCase):
         BaseCollector.get_target_tokens = MagicMock(
             return_value={'testhost.test': '2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234'})
         Vrops.get_token = MagicMock(return_value=("2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234", 200))
-        Vrops.get_adapter = MagicMock(return_value=("vcenter1", "3628-93a1-56e84634050814"))
+        Vrops.get_adapter = MagicMock(return_value=([{"name": "adapter1",
+                                                      "uuid": "3628-93a1-56e84634050814"}]))
         # test tool get_resources to create resource objects
 
         Vrops.get_datacenter = MagicMock(
@@ -62,6 +63,16 @@ class TestCollectors(unittest.TestCase):
                            'parent': '3628-93a1-56e84634050814'},
                           {'name': 'datacenter3', 'uuid': '7422-91h7-52s842060815',
                            'resourcekind': 'Datacenter',
+                           'parent': '3628-93a1-56e84634050814'}])
+        Vrops.get_nsx_t_mgmt_cluster = MagicMock(
+            return_value=[{'name': 'nsx_t_mgmt_cluster1', 'uuid': '3628-93a1-56e84634050814',
+                           'resourcekind': 'ManagementCluster',
+                           'parent': '3628-93a1-56e84634050814'},
+                          {'name': 'nsx_t_mgmt_cluster2', 'uuid': '5628-9ba1-55e847050815',
+                           'resourcekind': 'ManagementCluster',
+                           'parent': '3628-93a1-56e84634050814'},
+                          {'name': 'nsx_t_mgmt_cluster3', 'uuid': '7422-91h7-52s842060815',
+                           'resourcekind': 'ManagementCluster',
                            'parent': '3628-93a1-56e84634050814'}])
         Vrops.get_cluster_and_datastores = MagicMock(
             return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814',
