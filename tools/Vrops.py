@@ -2,6 +2,7 @@ from urllib3 import disable_warnings
 from urllib3 import exceptions
 from tools.helper import chunk_list
 from threading import Thread
+from resources.Resourceskinds import *
 import requests
 import json
 import os
@@ -40,7 +41,7 @@ class Vrops:
             logger.error(f'Problem getting token from {target} : {response.text}')
             return False, response.status_code
 
-    def get_adapter(self, target: str, token: str, adapterkind: str) -> (str, str):
+    def get_adapter(self, target: str, token: str, adapterkind: str, adapter_obj) -> list:
         url = f'https://{target}/suite-api/api/adapters'
         querystring = {
             "adapterKindKey": adapterkind
@@ -59,20 +60,27 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return []
+            return adapter
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
-                ada = dict()
-                ada['name'] = resource["resourceKey"]["name"]
-                ada['uuid'] = resource["id"]
-                adapter.append(ada)
+                adapter_object = adapter_obj(target, token)
+                adapter_object.name = resource["resourceKey"]["name"]
+                adapter_object.uuid = resource["id"]
+                adapter.append(adapter_object)
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return []
+            return adapter
         return adapter
 
-    def get_resources(self, target: str, token: str, uuids: list, adapterkind: str, resourcekinds: list,
+    def get_vcenter_adapter(self, target, token):
+        # just one vcenter adapter supported
+        return self.get_adapter(target, token, adapterkind="VMWARE", adapter_obj=Vcenter)[0]
+
+    def get_nsxt_adapter(self, target, token):
+        return self.get_adapter(target, token, adapterkind="NSXTAdapter", adapter_obj=NSXTAdapterInstance)
+
+    def get_resources(self, target: str, token: str, uuids: list, adapterkind: str, resourcekinds: list, resource_obj,
                       data_receiving=False) -> list:
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
@@ -121,12 +129,12 @@ class Vrops:
             try:
                 relations = response.json()["resourcesRelations"]
                 for resource in relations:
-                    res = dict()
-                    res['name'] = resource["resource"]["resourceKey"]["name"]
-                    res['uuid'] = resource["resource"]["identifier"]
-                    res['resourcekind'] = resource["resource"]["resourceKey"]["resourceKindKey"]
-                    res['parent'] = resource.get("relatedResources", [None])[0]
-                    resources.append(res)
+                    resource_object = resource_obj()
+                    resource_object.name = resource["resource"]["resourceKey"]["name"]
+                    resource_object.uuid = resource["resource"]["identifier"]
+                    resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
+                    resource_object.parent = resource.get("relatedResources", [None])[0]
+                    resources.append(resource_object)
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target}'
                              f'- Error: {e}')
@@ -135,14 +143,23 @@ class Vrops:
         return resources
 
     def get_datacenter(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datacenter"])
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datacenter"],
+                                  resource_obj=Datacenter)
 
-    def get_cluster_and_datastores(self, target, token, parent_uuids):
+    def get_cluster(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                  resourcekinds=["ClusterComputeResource", "Datastore"])
+                                  resourcekinds=["ClusterComputeResource"], resource_obj=Cluster)
+
+    def get_datastores(self, target, token, parent_uuids):
+        datastores = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datastore"],
+                                        resource_obj=Datastore)
+        for datastore in datastores:
+            datastore.get_type(datastore.name)
+        return datastores
 
     def get_hosts(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["HostSystem"])
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["HostSystem"],
+                                  resource_obj=Host)
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid):
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
@@ -160,19 +177,16 @@ class Vrops:
             vms = list()
             for uuid_list in uuids_chunked:
                 vms.extend(self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
-                                              resourcekinds=["VirtualMachine"], data_receiving=True))
+                                              resourcekinds=["VirtualMachine"], resource_obj=VirtualMachine,
+                                              data_receiving=True))
             logger.debug(f'Number of VMs collected: {len(vms)}')
             return vms
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
-                                  data_receiving=True)
+                                  resource_obj=VirtualMachine, data_receiving=True)
 
-    def get_nsx_t_adapter_instance(self, target, token, parent_uuids):
+    def get_nsxt_mgmt_cluster(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["NSXTAdapterInstance"])
-
-    def get_nsx_t_mgmt_cluster(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementCluster"])
+                                  resourcekinds=["ManagementCluster"], resource_obj=NSXTManagementCluster)
 
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int, float):
