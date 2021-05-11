@@ -1,4 +1,5 @@
 default_collectors:
+    - 'NSXTMmgtClusterStatsCollector'
     - 'ClusterStatsCollector'
     - 'ClusterPropertiesCollector'
     - 'DatastoreStatsCollector'
@@ -280,3 +281,11 @@ VMStatsDefaultCollector:
     key: "guestfilesystem:/storage/db|capacity"
   - metric_suffix: "guestfilesystem_storage_db_percentage"
     key: "guestfilesystem:/storage/db|percentage"
+
+NSXTMmgtClusterStatsCollector:
+  - metric_suffix: "sys_capacity_distributed_firewall_rules_usage_count"
+    key: "System Capacity|Distributed Firewall Rules|UsageCount"
+  - metric_suffix: "sys_capacity_distributed_firewall_rules_usage_count_percentage"
+    key: "System Capacity|Distributed Firewall Rules|UsageCountPercentage"
+  - metric_suffix: "sys_capacity_distributed_firewall_rules_max_supported_count"
+    key: "System Capacity|Distributed Firewall Rules|MaxSupportedCount"

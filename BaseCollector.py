@@ -83,6 +83,14 @@ class BaseCollector(ABC):
         self.vms = request.json()
         return self.vms
 
+    def get_nsxt_mgmt_cluster(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/nsxt_mgmt_cluster/{}".format(current_iteration)
+        request = requests.get(url)
+        self.nsxt_mgmt_cluster = request.json()
+        return self.nsxt_mgmt_cluster
+
     def get_iteration(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
         self.iteration = request.json()
@@ -133,6 +141,11 @@ class BaseCollector(ABC):
         vms_dict = self.get_vms(self.target)
         self.target_vms = [vms_dict[uuid]['uuid'] for uuid in vms_dict]
         return self.target_vms
+
+    def get_nsxt_mgmt_cluster_by_target(self):
+        nsxt_resources_dict = self.get_nsxt_mgmt_cluster(self.target)
+        self.target_nsxt_mgmt_cluster = [nsxt_resources_dict[uuid]['uuid'] for uuid in nsxt_resources_dict]
+        return self.target_nsxt_mgmt_cluster
 
     def get_project_ids_by_target(self):
         try:

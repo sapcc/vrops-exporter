@@ -194,3 +194,9 @@ VMPropertiesCollector:
   - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
   - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
 
+NSXTMmgtClusterStatsCollector:
+  - 'vrops_api_response{class="nsxtmmgtclusterstatscollector",target="testhost.test"}'
+  - 'vrops_nsxt_sys_capacity_distributed_firewall_rules_usage_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
+  - 'vrops_nsxt_sys_capacity_distributed_firewall_rules_max_supported_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
+  - 'vrops_api_response_time_seconds{class="nsxtmmgtclusterstatscollector",target="testhost.test"}'
+  - 'vrops_nsxt_sys_capacity_distributed_firewall_rules_usage_count_percentage{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'

@@ -8,6 +8,7 @@ from tools.helper import yaml_read
 from tools.Vrops import Vrops
 from InventoryBuilder import InventoryBuilder
 from BaseCollector import BaseCollector
+from resources.Resourceskinds import *
 from collectors.HostSystemStatsCollector import HostSystemStatsCollector
 from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
 from collectors.DatastoreStatsCollector import DatastoreStatsCollector
@@ -22,13 +23,13 @@ from collectors.VMPropertiesCollector import VMPropertiesCollector
 from collectors.ClusterStatsCollector import ClusterStatsCollector
 from collectors.VCenterStatsCollector import VCenterStatsCollector
 from collectors.VCenterPropertiesCollector import VCenterPropertiesCollector
+from collectors.NSXTMmgtClusterStatsCollector import NSXTMmgtClusterStatsCollector
 from prometheus_client.core import REGISTRY
 import unittest
 import random
 import http.client
 import os
 import time
-import importlib
 
 
 class TestCollectors(unittest.TestCase):
@@ -43,68 +44,119 @@ class TestCollectors(unittest.TestCase):
     def test_collector_metrics(self):
         self.metrics_yaml = yaml_read('tests/metrics.yaml')
         self.collector_config = yaml_read(os.environ['CONFIG'])
+        self.target = os.getenv('TARGET')
+        self.token = '2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234'
         # every collector got to be tested in here
         self.random_prometheus_port = random.randrange(9000, 9700, 1)
         print("chosen testport: " + str(self.random_prometheus_port))
 
         BaseCollector.get_target_tokens = MagicMock(
-            return_value={'testhost.test': '2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234'})
+            return_value={self.target: self.token})
         Vrops.get_token = MagicMock(return_value=("2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234", 200))
-        Vrops.get_adapter = MagicMock(return_value=("vcenter1", "3628-93a1-56e84634050814"))
-        # test tool get_resources to create resource objects
 
+        vc = Vcenter(target=self.target, token=self.token)
+        vc.name = "vcenter1"
+        vc.uuid = "3628-93a1-56e84634050814"
+
+        nsxt_adapter1 = NSXTAdapterInstance(target=self.target, token=self.token)
+        nsxt_adapter2 = NSXTAdapterInstance(target=self.target, token=self.token)
+        nsxt_adapter1.name = "nsxt_adapter1"
+        nsxt_adapter2.name = "nsxt_adapter2"
+        nsxt_adapter1.uuid = nsxt_adapter2.uuid = "3628-93a1-56e84634050814"
+
+        Vrops.get_adapter = MagicMock(return_value=None)
+        Vrops.get_vcenter_adapter = MagicMock(return_value=([vc][0]))
+        Vrops.get_nsxt_adapter = MagicMock(return_value=([nsxt_adapter1, nsxt_adapter2]))
+
+        # test tool get_resources to create resource objects
+        nsxt1 = NSXTManagementCluster()
+        nsxt2 = NSXTManagementCluster()
+        nsxt3 = NSXTManagementCluster()
+        nsxt1.name = "nsxt_mgmt_cluster1"
+        nsxt2.name = "nsxt_mgmt_cluster2"
+        nsxt3.name = "nsxt_mgmt_cluster3"
+        nsxt1.uuid = "5628-9ba1-55e847050815"
+        nsxt2.uuid = "3628-93a1-56e84634050814"
+        nsxt3.uuid = "7422-91h7-52s842060815"
+        nsxt1.resourcekind = nsxt2.resourcekind = nsxt3.resourcekind = "ManagementCluster"
+        nsxt1.parent = nsxt2.parent = nsxt3.parent = "3628-93a1-56e84634050814"
+
+        dc1 = Datacenter()
+        dc2 = Datacenter()
+        dc3 = Datacenter()
+        dc1.name = "datacenter1"
+        dc2.name = "datacenter2"
+        dc3.name = "datacenter3"
+        dc1.uuid = "3628-93a1-56e84634050814"
+        dc2.uuid = "5628-9ba1-55e847050815"
+        dc3.uuid = "7422-91h7-52s842060815"
+        dc1.resourcekind = dc2.resourcekind = dc3.resourcekind = "Datacenter"
+        dc1.parent = dc2.parent = dc3.parent = "3628-93a1-56e84634050814"
+
+        cl1 = Cluster()
+        cl2 = Cluster()
+        cl3 = Cluster()
+        cl1.name = "cluster1"
+        cl2.name = "cluster2"
+        cl3.name = "cluster3"
+        cl1.uuid = "3628-93a1-56e84634050814"
+        cl2.uuid = "5628-9ba1-55e847050815"
+        cl3.uuid = "7422-91h7-52s842060815"
+        cl1.resourcekind = cl2.resourcekind = cl3.resourcekind = "ClusterComputeResource"
+        cl1.parent = cl2.parent = cl3.parent = "3628-93a1-56e84634050814"
+
+        ds1 = Datastore()
+        ds2 = Datastore()
+        ds3 = Datastore()
+        ds1.name = "vmfs_vc-w-0_p_ssd_bb091_001"
+        ds2.name = "eph-bb112-1"
+        ds3.name = "B121_Management_DS03"
+        ds1.uuid = "3628-93a1-56e84634050814"
+        ds2.uuid = "5628-9ba1-55e847050815"
+        ds3.uuid = "7422-91h7-52s842060815"
+        ds1.type = "vmfs_p_ssd"
+        ds2.type = "ephemeral"
+        ds3.type = "Management"
+        ds1.resourcekind = ds2.resourcekind = ds3.resourcekind = "Datastore"
+        ds1.parent = ds2.parent = ds3.parent = "7422-91h7-52s842060815"
+
+        hs1 = Host()
+        hs2 = Host()
+        hs3 = Host()
+        hs1.name = "hostsystem1"
+        hs2.name = "hostsystem2"
+        hs3.name = "hostsystem3"
+        hs1.uuid = "3628-93a1-56e84634050814"
+        hs2.uuid = "5628-9ba1-55e847050815"
+        hs3.uuid = "7422-91h7-52s842060815"
+        hs1.resourcekind = hs2.resourcekind = hs3.resourcekind = "HostSystem"
+        hs1.parent = hs2.parent = hs3.parent = "7422-91h7-52s842060815"
+
+        vm1 = VirtualMachine()
+        vm2 = VirtualMachine()
+        vm3 = VirtualMachine()
+        vm1.name = "vm1"
+        vm2.name = "vm2"
+        vm3.name = "vm3"
+        vm1.uuid = "3628-93a1-56e84634050814"
+        vm2.uuid = "5628-9ba1-55e847050815"
+        vm3.uuid = "7422-91h7-52s842060815"
+        vm1.resourcekind = vm2.resourcekind = vm3.resourcekind = "VirtualMachine"
+        vm1.parent = vm2.parent = vm3.parent = "7422-91h7-52s842060815"
+
+        Vrops.get_nsxt_mgmt_cluster = MagicMock(
+            return_value=[nsxt1, nsxt2, nsxt3])
         Vrops.get_datacenter = MagicMock(
-            return_value=[{'name': 'datacenter1', 'uuid': '3628-93a1-56e84634050814',
-                           'resourcekind': 'Datacenter',
-                           'parent': '3628-93a1-56e84634050814'},
-                          {'name': 'datacenter2', 'uuid': '5628-9ba1-55e847050815',
-                           'resourcekind': 'Datacenter',
-                           'parent': '3628-93a1-56e84634050814'},
-                          {'name': 'datacenter3', 'uuid': '7422-91h7-52s842060815',
-                           'resourcekind': 'Datacenter',
-                           'parent': '3628-93a1-56e84634050814'}])
-        Vrops.get_cluster_and_datastores = MagicMock(
-            return_value=[{'name': 'cluster1', 'uuid': '3628-93a1-56e84634050814',
-                           'resourcekind': 'ClusterComputeResource',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'cluster2', 'uuid': '5628-9ba1-55e847050815',
-                           'resourcekind': 'ClusterComputeResource',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'cluster3', 'uuid': '7422-91h7-52s842060815',
-                           'resourcekind': 'ClusterComputeResource',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'vmfs_vc-w-0_p_ssd_bb091_001',
-                           'uuid': '3628-93a1-56e84634050814',
-                           'resourcekind': 'Datastore',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'eph-bb112-1',
-                           'uuid': '5628-9ba1-55e847050815',
-                           'resourcekind': 'Datastore',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'B121_Management_DS03',
-                           'uuid': '7422-91h7-52s842060815',
-                           'resourcekind': 'Datastore',
-                           'parent': '7422-91h7-52s842060815'}])
+            return_value=[dc1, dc2, dc3])
+        Vrops.get_cluster = MagicMock(
+            return_value=[cl1, cl2, cl3])
+        Vrops.get_datastores = MagicMock(
+            return_value=[ds1, ds2, ds3])
         Vrops.get_hosts = MagicMock(
-            return_value=[{'name': 'hostsystem1', 'uuid': '3628-93a1-56e84634050814',
-                           'resourcekind': 'HostSystem',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'hostsystem2', 'uuid': '5628-9ba1-55e847050815',
-                           'resourcekind': 'HostSystem',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'hostsystem3', 'uuid': '7422-91h7-52s842060815',
-                           'resourcekind': 'HostSystem',
-                           'parent': '7422-91h7-52s842060815'}])
+            return_value=[hs1, hs2, hs3])
         Vrops.get_vms = MagicMock(
-            return_value=[{'name': 'vm1', 'uuid': '3628-93a1-56e84634050814',
-                           'resourcekind': 'VirtualMachine',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'vm2', 'uuid': '5628-9ba1-55e847050815',
-                           'resourcekind': 'VirtualMachine',
-                           'parent': '7422-91h7-52s842060815'},
-                          {'name': 'vm3', 'uuid': '7422-91h7-52s842060815',
-                           'resourcekind': 'VirtualMachine',
-                           'parent': '7422-91h7-52s842060815'}])
+            return_value=[vm1, vm2, vm3])
+
         Vrops.get_latest_stat = MagicMock(return_value=1)
         Vrops.get_property = MagicMock(return_value="test_property")
         Vrops.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
