@@ -40,7 +40,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcenters/{}".format(current_iteration)
         request = requests.get(url)
-        self.vcenters = request.json()
+        self.vcenters = request.json() if request else {}
         return self.vcenters
 
     def get_datacenters(self, target):
@@ -48,7 +48,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datacenters/{}".format(current_iteration)
         request = requests.get(url)
-        self.datacenters = request.json()
+        self.datacenters = request.json() if request else {}
         return self.datacenters
 
     def get_clusters(self, target):
@@ -56,7 +56,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/clusters/{}".format(current_iteration)
         request = requests.get(url)
-        self.clusters = request.json()
+        self.clusters = request.json() if request else {}
         return self.clusters
 
     def get_hosts(self, target):
@@ -64,7 +64,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/hosts/{}".format(current_iteration)
         request = requests.get(url)
-        self.hosts = request.json()
+        self.hosts = request.json() if request else {}
         return self.hosts
 
     def get_datastores(self, target):
@@ -72,7 +72,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/datastores/{}".format(current_iteration)
         request = requests.get(url)
-        self.datastores = request.json()
+        self.datastores = request.json() if request else {}
         return self.datastores
 
     def get_vms(self, target):
@@ -80,7 +80,7 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vms/{}".format(current_iteration)
         request = requests.get(url)
-        self.vms = request.json()
+        self.vms = request.json() if request else {}
         return self.vms
 
     def get_nsxt_mgmt_cluster(self, target):
@@ -88,30 +88,30 @@ class BaseCollector(ABC):
         current_iteration = self.get_iteration()
         url = "http://" + os.environ['INVENTORY'] + "/" + target + "/nsxt_mgmt_cluster/{}".format(current_iteration)
         request = requests.get(url)
-        self.nsxt_mgmt_cluster = request.json()
+        self.nsxt_mgmt_cluster = request.json() if request else {}
         return self.nsxt_mgmt_cluster
 
     def get_iteration(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
-        self.iteration = request.json()
+        self.iteration = request.json() if request else {}
         return self.iteration
 
     def get_collection_times(self):
         self.wait_for_inventory_data()
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/collection_times")
-        self.collection_times = request.json()
+        self.collection_times = request.json() if request else {}
         return self.collection_times
 
     def get_inventory_api_responses(self):
         self.wait_for_inventory_data()
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
-        self.api_responses = request.json()
+        self.api_responses = request.json() if request else {}
         return self.api_responses
 
     def get_target_tokens(self):
         try:
             request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
-            self.target_tokens = request.json()
+            self.target_tokens = request.json() if request else {}
             return self.target_tokens
         except requests.exceptions.ConnectionError as e:
             logger.critical(f'No connection to inventory: {os.environ["INVENTORY"]} - Error: {e}')
