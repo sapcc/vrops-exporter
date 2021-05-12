@@ -75,6 +75,10 @@ class InventoryBuilder:
         def nsxt_mgmt_cluster(target, iteration):
             return self.iterated_inventory[str(iteration)]['nsxt_resources'].get(target, {})
 
+        @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
+        def nsxt_mgmt_cluster(target, iteration):
+            return self.iterated_inventory[str(iteration)]['nsxt_resources'][target]
+
         @app.route('/iteration', methods=['GET'])
         def iteration():
             return_iteration = self.successful_iteration_list[-1]
@@ -396,8 +400,11 @@ class InventoryBuilder:
         tree = dict()
         for nsxt_entry in self.nsxt_dict:
             nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+<<<<<<< HEAD
             if not nsxt_mgmt_plane:
                 continue
+=======
+>>>>>>> 78e400bcf5bd7f75d81e7f59baeab85955f4ccb0
             tree[nsxt_mgmt_plane.target] = dict()
             for nsxt_adapter in nsxt_mgmt_plane.adapter:
                 for mgmt_cluster in nsxt_adapter.management_cluster:
