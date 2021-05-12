@@ -1,7 +1,7 @@
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 from threading import Thread
-from resources.Resourceskinds import Vcenter, NSXTMgmtPlane
+from resources.Resourceskinds import NSXTMgmtPlane
 from tools.Vrops import Vrops
 import time
 import json
@@ -49,31 +49,31 @@ class InventoryBuilder:
 
         @app.route('/<target>/vcenters/<int:iteration>', methods=['GET'])
         def vcenters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['vcenters'][target]
+            return self.iterated_inventory[str(iteration)]['vcenters'].get(target, {})
 
         @app.route('/<target>/datacenters/<int:iteration>', methods=['GET'])
         def datacenters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['datacenters'][target]
+            return self.iterated_inventory[str(iteration)]['datacenters'].get(target, {})
 
         @app.route('/<target>/clusters/<int:iteration>', methods=['GET'])
         def clusters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['clusters'][target]
+            return self.iterated_inventory[str(iteration)]['clusters'].get(target, {})
 
         @app.route('/<target>/hosts/<int:iteration>', methods=['GET'])
         def hosts(target, iteration):
-            return self.iterated_inventory[str(iteration)]['hosts'][target]
+            return self.iterated_inventory[str(iteration)]['hosts'].get(target, {})
 
         @app.route('/<target>/datastores/<int:iteration>', methods=['GET'])
         def datastores(target, iteration):
-            return self.iterated_inventory[str(iteration)]['datastores'][target]
+            return self.iterated_inventory[str(iteration)]['datastores'].get(target, {})
 
         @app.route('/<target>/vms/<int:iteration>', methods=['GET'])
         def vms(target, iteration):
-            return self.iterated_inventory[str(iteration)]['vms'][target]
+            return self.iterated_inventory[str(iteration)]['vms'].get(target, {})
 
         @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_cluster(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_resources'][target]
+            return self.iterated_inventory[str(iteration)]['nsxt_resources'].get(target, {})
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
@@ -199,9 +199,6 @@ class InventoryBuilder:
         vcenter = self.create_vcenter_objects(vrops, token)
         nsxt_adapter = self.create_nsxt_objects(vrops, token)
 
-        if not vcenter or not nsxt_adapter:
-            return False
-
         self.vcenter_dict[vrops] = vcenter
         self.nsxt_dict[vrops] = nsxt_adapter
 
@@ -212,7 +209,7 @@ class InventoryBuilder:
         vcenter_adapter = Vrops.get_vcenter_adapter(vrops, target, token)
         if not vcenter_adapter:
             logger.critical(f'Could not get vcenter adapter!')
-            return
+            return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
         datacenter = Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid])
@@ -268,6 +265,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 tree[vcenter.target][vcenter.uuid] = {
@@ -286,6 +285,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 tree[vcenter.target][dc.uuid] = {
@@ -304,6 +305,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for datastore in dc.datastores:
@@ -324,6 +327,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
@@ -343,6 +348,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
@@ -364,6 +371,8 @@ class InventoryBuilder:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
+            if not vcenter:
+                continue
             tree[vcenter.target] = dict()
             for dc in vcenter.datacenter:
                 for cluster in dc.clusters:
@@ -387,6 +396,8 @@ class InventoryBuilder:
         tree = dict()
         for nsxt_entry in self.nsxt_dict:
             nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+            if not nsxt_mgmt_plane:
+                continue
             tree[nsxt_mgmt_plane.target] = dict()
             for nsxt_adapter in nsxt_mgmt_plane.adapter:
                 for mgmt_cluster in nsxt_adapter.management_cluster:
