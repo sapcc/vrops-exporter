@@ -1,7 +1,7 @@
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 from threading import Thread
-from resources.Resourceskinds import Vcenter, NSXTMgmtPlane
+from resources.Resourceskinds import NSXTMgmtPlane
 from tools.Vrops import Vrops
 import time
 import json
@@ -74,10 +74,6 @@ class InventoryBuilder:
         @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_cluster(target, iteration):
             return self.iterated_inventory[str(iteration)]['nsxt_resources'].get(target, {})
-
-        @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
-        def nsxt_mgmt_cluster(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_resources'][target]
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
