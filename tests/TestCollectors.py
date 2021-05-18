@@ -9,27 +9,13 @@ from tools.Vrops import Vrops
 from InventoryBuilder import InventoryBuilder
 from BaseCollector import BaseCollector
 from resources.Resourceskinds import *
-from collectors.HostSystemStatsCollector import HostSystemStatsCollector
-from collectors.HostSystemPropertiesCollector import HostSystemPropertiesCollector
-from collectors.DatastoreStatsCollector import DatastoreStatsCollector
-from collectors.DatastorePropertiesCollector import DatastorePropertiesCollector
-from collectors.ClusterPropertiesCollector import ClusterPropertiesCollector
-from collectors.VMStatsNetworkCollector import VMStatsNetworkCollector
-from collectors.VMStatsCPUCollector import VMStatsCPUCollector
-from collectors.VMStatsDefaultCollector import VMStatsDefaultCollector
-from collectors.VMStatsMemoryCollector import VMStatsMemoryCollector
-from collectors.VMStatsVirtualDiskCollector import VMStatsVirtualDiskCollector
-from collectors.VMPropertiesCollector import VMPropertiesCollector
-from collectors.ClusterStatsCollector import ClusterStatsCollector
-from collectors.VCenterStatsCollector import VCenterStatsCollector
-from collectors.VCenterPropertiesCollector import VCenterPropertiesCollector
-from collectors.NSXTMmgtClusterStatsCollector import NSXTMmgtClusterStatsCollector
 from prometheus_client.core import REGISTRY
 import unittest
 import random
 import http.client
 import os
 import time
+import importlib
 
 
 class TestCollectors(unittest.TestCase):
@@ -168,6 +154,8 @@ class TestCollectors(unittest.TestCase):
 
         for collector in self.metrics_yaml.keys():
             print("\nTesting " + collector)
+            class_module = importlib.import_module(f'collectors.{collector}')
+            collector_instance = class_module.__getattribute__(collector)()
 
             if "Stats" in collector:
                 multiple_metrics_generated = list()
@@ -206,7 +194,7 @@ class TestCollectors(unittest.TestCase):
             thread_list = list()
 
             # start prometheus server to provide metrics later on
-            collector_instance = globals()[collector]()
+
             thread1 = Thread(target=run_prometheus_server, args=(self.random_prometheus_port, [collector_instance]))
             thread1.daemon = True
             thread1.start()
