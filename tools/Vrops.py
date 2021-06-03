@@ -248,13 +248,19 @@ class Vrops:
     def _get_chunk(q, uuid_list, url, headers, keys, target, kind, collector, chunk_iteration):
         logger.debug(f'chunk: {chunk_iteration}')
 
+        # Indicates whether to report only "current" stat values, i.e. skip the stat-s that haven't published any value
+        # during recent collection cycles.
+        current_only = True
+
         payload = {
             "resourceId": uuid_list,
             "statKey": keys,
+            "currentOnly": current_only,
             "PageSize": 500000
         } if kind == 'stats' else {
             "resourceIds": uuid_list,
             "propertyKeys": keys,
+            "currentOnly": current_only,
             "PageSize": 500000
         }
 
