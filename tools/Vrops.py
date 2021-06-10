@@ -188,6 +188,10 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
                                   resourcekinds=["ManagementCluster"], resource_obj=NSXTManagementCluster)
 
+    def get_nsxt_mgmt_nodes(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
+                                  resourcekinds=["ManagementNode"], resource_obj=NSXTManagementNode)
+
     def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
                                    kind: str = None) -> (list, int, float):
 

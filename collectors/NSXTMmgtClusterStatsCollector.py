@@ -5,7 +5,7 @@ class NSXTMmgtClusterStatsCollector(StatsCollector):
 
     def __init__(self):
         super().__init__()
-        self.vrops_entity_name = 'nsxt'
+        self.vrops_entity_name = 'nsxt_mgmt_cluster'
         self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter']
 
     def get_resource_uuids(self):
