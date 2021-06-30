@@ -430,16 +430,16 @@ class InventoryBuilder:
             if not nsxt_mgmt_plane:
                 continue
             tree[nsxt_mgmt_plane.target] = dict()
-            for nsxt_adapter in nsxt_mgmt_plane.adapter:
-                for mgmt_cluster in nsxt_adapter.management_cluster:
+            for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
+                for mgmt_cluster in nsxt_adapter_object.management_cluster:
                     for mgmt_node in mgmt_cluster.management_nodes:
                         tree[nsxt_mgmt_plane.target][mgmt_node.uuid] = {
                             'uuid': mgmt_node.uuid,
                             'name': mgmt_node.name,
                             'mgmt_cluster_name': mgmt_cluster.name,
                             'mgmt_cluster_uuid': mgmt_cluster.uuid,
-                            'nsxt_adapter_name': nsxt_adapter.name,
-                            'nsxt_adapter_uuid': nsxt_adapter.uuid,
+                            'nsxt_adapter_name': nsxt_adapter_object.name,
+                            'nsxt_adapter_uuid': nsxt_adapter_object.uuid,
                             'target': nsxt_mgmt_plane.target,
                             'token': nsxt_mgmt_plane.token,
                         }
