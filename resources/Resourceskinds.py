@@ -89,4 +89,13 @@ class NSXTAdapterInstance:
 
 
 class NSXTManagementCluster:
+
+    def __init__(self):
+        self.management_nodes = list()
+
+    def add_mgmt_node(self, mgmt_node):
+        self.management_nodes.append(mgmt_node)
+
+
+class NSXTManagementNode:
     pass

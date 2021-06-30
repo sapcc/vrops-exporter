@@ -55,17 +55,30 @@ class TestCollectors(unittest.TestCase):
         Vrops.get_nsxt_adapter = MagicMock(return_value=([nsxt_adapter1, nsxt_adapter2]))
 
         # test tool get_resources to create resource objects
-        nsxt1 = NSXTManagementCluster()
-        nsxt2 = NSXTManagementCluster()
-        nsxt3 = NSXTManagementCluster()
-        nsxt1.name = "nsxt_mgmt_cluster1"
-        nsxt2.name = "nsxt_mgmt_cluster2"
-        nsxt3.name = "nsxt_mgmt_cluster3"
-        nsxt1.uuid = "5628-9ba1-55e847050815"
-        nsxt2.uuid = "3628-93a1-56e84634050814"
-        nsxt3.uuid = "7422-91h7-52s842060815"
-        nsxt1.resourcekind = nsxt2.resourcekind = nsxt3.resourcekind = "ManagementCluster"
-        nsxt1.parent = nsxt2.parent = nsxt3.parent = "3628-93a1-56e84634050814"
+        nsxt_mgmt_cluster1 = NSXTManagementCluster()
+        nsxt_mgmt_cluster2 = NSXTManagementCluster()
+        nsxt_mgmt_cluster3 = NSXTManagementCluster()
+        nsxt_mgmt_cluster1.name = "nsxt_mgmt_cluster1"
+        nsxt_mgmt_cluster2.name = "nsxt_mgmt_cluster2"
+        nsxt_mgmt_cluster3.name = "nsxt_mgmt_cluster3"
+        nsxt_mgmt_cluster1.uuid = "5628-9ba1-55e847050815"
+        nsxt_mgmt_cluster2.uuid = "3628-93a1-56e84634050814"
+        nsxt_mgmt_cluster3.uuid = "7422-91h7-52s842060815"
+        nsxt_mgmt_cluster1.resourcekind = nsxt_mgmt_cluster2.resourcekind = \
+            nsxt_mgmt_cluster3.resourcekind = "ManagementCluster"
+        nsxt_mgmt_cluster1.parent = nsxt_mgmt_cluster2.parent = nsxt_mgmt_cluster3.parent = "3628-93a1-56e84634050814"
+
+        nsxt_mgmt_node1 = NSXTManagementNode()
+        nsxt_mgmt_node2 = NSXTManagementNode()
+        nsxt_mgmt_node3 = NSXTManagementNode()
+        nsxt_mgmt_node1.name = "nsxt_mgmt_node1"
+        nsxt_mgmt_node2.name = "nsxt_mgmt_node2"
+        nsxt_mgmt_node3.name = "nsxt_mgmt_node3"
+        nsxt_mgmt_node1.uuid = "5628-9ba1-55e847050815"
+        nsxt_mgmt_node2.uuid = "3628-93a1-56e84634050814"
+        nsxt_mgmt_node3.uuid = "7422-91h7-52s842060815"
+        nsxt_mgmt_node1.resourcekind = nsxt_mgmt_node2.resourcekind = nsxt_mgmt_node3.resourcekind = "ManagementNode"
+        nsxt_mgmt_node1.parent = nsxt_mgmt_node2.parent = nsxt_mgmt_node3.parent = "3628-93a1-56e84634050814"
 
         dc1 = Datacenter()
         dc2 = Datacenter()
@@ -131,7 +144,9 @@ class TestCollectors(unittest.TestCase):
         vm1.parent = vm2.parent = vm3.parent = "7422-91h7-52s842060815"
 
         Vrops.get_nsxt_mgmt_cluster = MagicMock(
-            return_value=[nsxt1, nsxt2, nsxt3])
+            return_value=[nsxt_mgmt_cluster1, nsxt_mgmt_cluster2, nsxt_mgmt_cluster3])
+        Vrops.get_nsxt_mgmt_nodes = MagicMock(
+            return_value=[nsxt_mgmt_node1, nsxt_mgmt_node2, nsxt_mgmt_node3])
         Vrops.get_datacenter = MagicMock(
             return_value=[dc1, dc2, dc3])
         Vrops.get_cluster = MagicMock(
