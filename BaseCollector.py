@@ -218,6 +218,12 @@ class BaseCollector(ABC):
             gauges[new_metric_suffix].add_metric(labels=labels, value=value)
         return gauges
 
+    def generate_alert_metrics(self, label_names: list) -> GaugeMetricFamily:
+        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact'])
+        gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter',
+                                  labels=label_names)
+        return gauge
+
     def describe(self):
         collector_config = self.read_collector_config()
         for metric in collector_config[self.name]:

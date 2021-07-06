@@ -345,3 +345,69 @@ class Vrops:
         logger.debug('<--------------------------------------------------')
 
         return project_ids
+
+    def get_alerts(self, target: str, token: str,
+                   alert_criticality: list,  # [ "CRITICAL", "IMMEDIATE", "WARNING", "INFORMATION" ]
+                   resourcekinds: list,  # [ "HostSystem" ]
+                   active_only=True,
+                   resourceIds: list = None,
+                   resource_names: list = None,  # [ "Windows2017VM", "Windows2018VM" ]
+                   regex: list = None,  # [ "\\\\S+-BNA-\\\\S+", null ]
+                   adapterkinds: list = None  # [ "VMWARE" ]
+                   ):
+
+        logger.debug('>---------------------------------- get_alerts')
+        logger.debug(f'target   : {target}')
+
+        alerts = list()
+        url = f'https://{target}/suite-api/api/alerts/query'
+
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        payload = {
+            "compositeOperator": "AND",
+            "resource-query": {
+                "name": resource_names,
+                "regex": regex,
+                "adapterKind": adapterkinds,
+                "resourceKind": resourcekinds,
+                "resourceId": resourceIds,
+                "statKeyInclusive": True
+            },
+            "activeOnly": active_only,
+            "alertCriticality": alert_criticality
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.post(url,
+                                     data=json.dumps(payload),
+                                     verify=False,
+                                     headers=headers)
+        except Exception as e:
+            logger.error(f'Problem getting project folder - Error: {e}')
+            return [], 503
+        if response.status_code == 200:
+            try:
+                for alert in response.json()['alerts']:
+                    alert_dict = dict()
+                    alert_dict["resourceId"] = alert["resourceId"]
+                    alert_dict["alertLevel"] = alert["alertLevel"]
+                    alert_dict["status"] = alert['status']
+                    alert_dict["alertDefinitionName"] = alert["alertDefinitionName"]
+                    alert_dict["alertImpact"] = alert["alertImpact"]
+                    alerts.append(alert_dict)
+            except json.decoder.JSONDecodeError as e:
+                logger.error(f'Catching JSONDecodeError for target: {target}'
+                             f' - Error: {e}')
+                return [], response.status_code
+        else:
+            logger.error(f'Return code get_alerts: {response.status_code} != 200 for {target} : {response.text}')
+            return [], response.status_code
+
+        logger.debug(f'Fetched alerts: {len(alerts)}')
+        logger.debug('<--------------------------------------------------')
+
+        return alerts, response.status_code, response.elapsed.total_seconds()

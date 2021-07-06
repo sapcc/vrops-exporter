@@ -17,6 +17,14 @@ default_collectors:
     - 'VMStatsVirtualDiskCollector'
     - 'VMStatsMemoryCollector'
     - 'VMStatsDefaultCollector'
+    #  Alerts
+    - 'NSXTMmgtClusterAlertCollector'
+    - 'NSXTMmgtNodeAlertCollector'
+    - 'ClusterAlertCollector'
+    - 'DatastoreAlertCollector'
+    - 'HostSystemAlertCollector'
+    - 'VCenterAlertCollector'
+    - 'VMAlertCollector'
 
 ClusterPropertiesCollector:
   - metric_suffix: "configuration_dasConfig_admissionControlEnabled"
