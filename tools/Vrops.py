@@ -351,11 +351,10 @@ class Vrops:
                    resourcekinds: list,  # [ "HostSystem" ]
                    active_only=True,
                    resourceIds: list = None,
+                   adapterkinds: list = None,  # [ "VMWARE" ]
                    resource_names: list = None,  # [ "Windows2017VM", "Windows2018VM" ]
-                   regex: list = None,  # [ "\\\\S+-BNA-\\\\S+", null ]
-                   adapterkinds: list = None  # [ "VMWARE" ]
+                   regex: list = None  # [ "\\\\S+-BNA-\\\\S+", null ]
                    ):
-
         logger.debug('>---------------------------------- get_alerts')
         logger.debug(f'target   : {target}')
 
@@ -398,6 +397,7 @@ class Vrops:
                     alert_dict["status"] = alert['status']
                     alert_dict["alertDefinitionName"] = alert["alertDefinitionName"]
                     alert_dict["alertImpact"] = alert["alertImpact"]
+                    alert_dict["alertDefinitionId"] = alert["alertDefinitionId"]
                     alerts.append(alert_dict)
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target: {target}'
@@ -411,3 +411,45 @@ class Vrops:
         logger.debug('<--------------------------------------------------')
 
         return alerts, response.status_code, response.elapsed.total_seconds()
+
+    def get_definitions(self, target, token, name: str):
+        url = ''
+        if name == 'alertdefinitions':
+            url = f'https://{target}/suite-api/api/alertdefinitions'
+        if name == 'recommendations':
+            url = f'https://{target}/suite-api/api/recommendations'
+        if name == 'symptomdefinitions':
+            url = f'https://{target}/suite-api/api/symptomdefinitions'
+        querystring = {
+            'pageSize': '100000'
+        }
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': "vRealizeOpsToken " + token
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.get(url,
+                                    params=querystring,
+                                    verify=False,
+                                    headers=headers)
+        except Exception as e:
+            logger.error(f'Problem connecting to {target} - Error: {e}')
+            return {}
+
+        if response.status_code == 200:
+            return response.json()
+
+        else:
+            logger.error(f'Problem getting symptomdefinitions {target} : {response.text}')
+            return {}
+
+    def get_alertdefinitions(self, target, token):
+        return self.get_definitions(target, token, name='alertdefinitions')
+
+    def get_alert_recommendations(self, target, token):
+        return self.get_definitions(target, token, name='recommendations')
+
+    def get_alert_symptomdefinitions(self, target, token):
+        return self.get_definitions(target, token, name='symptomdefinitions')

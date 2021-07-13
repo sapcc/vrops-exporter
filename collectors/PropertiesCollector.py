@@ -9,7 +9,7 @@ class PropertiesCollector(BaseCollector):
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
-    def set_labels(self, resource_id: str, project_ids: list):
+    def get_labels(self, resource_id: str, project_ids: list):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
@@ -47,7 +47,7 @@ class PropertiesCollector(BaseCollector):
             resource_id = resource.get('resourceId')
 
             for value_entry in resource.get('property-contents', {}).get('property-content', []):
-                labels = self.set_labels(resource_id, project_ids)
+                labels = self.get_labels(resource_id, project_ids)
                 if not labels:
                     continue
 

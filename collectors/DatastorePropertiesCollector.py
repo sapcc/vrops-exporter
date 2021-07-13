@@ -11,7 +11,7 @@ class DatastorePropertiesCollector(PropertiesCollector):
     def get_resource_uuids(self):
         return self.get_datastores_by_target()
 
-    def set_labels(self, resource_id, project_ids):
+    def get_labels(self, resource_id, project_ids):
         return [self.datastores[resource_id]['name'],
                 self.datastores[resource_id]['vcenter'],
                 self.datastores[resource_id]['type'],

@@ -10,7 +10,7 @@ class HostSystemStatsCollector(StatsCollector):
     def get_resource_uuids(self):
         return self.get_hosts_by_target()
 
-    def set_labels(self, resource_id, project_ids):
+    def get_labels(self, resource_id, project_ids):
         return [self.hosts[resource_id]['name'],
                 self.hosts[resource_id]['vcenter'],
                 self.hosts[resource_id]['datacenter'].lower(),

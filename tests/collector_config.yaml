@@ -18,6 +18,7 @@ default_collectors:
     - 'VMStatsMemoryCollector'
     - 'VMStatsDefaultCollector'
     #  Alerts
+    - 'NSXTAdapterAlertCollector'
     - 'NSXTMmgtClusterAlertCollector'
     - 'NSXTMmgtNodeAlertCollector'
     - 'ClusterAlertCollector'
@@ -25,6 +26,10 @@ default_collectors:
     - 'HostSystemAlertCollector'
     - 'VCenterAlertCollector'
     - 'VMAlertCollector'
+
+alerts:
+  alertCriticality: ['CRITICAL', 'WARNING', 'IMMEDIATE']
+  activeOnly: True
 
 ClusterPropertiesCollector:
   - metric_suffix: "configuration_dasConfig_admissionControlEnabled"

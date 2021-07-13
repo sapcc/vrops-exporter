@@ -83,6 +83,14 @@ class BaseCollector(ABC):
         self.vms = request.json() if request else {}
         return self.vms
 
+    def get_nsxt_adapter(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/nsxt_adapter/{}".format(current_iteration)
+        request = requests.get(url)
+        self.nsxt_adapter = request.json() if request else {}
+        return self.nsxt_adapter
+
     def get_nsxt_mgmt_cluster(self, target):
         self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
@@ -98,6 +106,21 @@ class BaseCollector(ABC):
         request = requests.get(url)
         self.nsxt_mgmt_nodes = request.json() if request else {}
         return self.nsxt_mgmt_nodes
+
+    def get_alertdefinitions(self):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions")
+        self.alertdefinitions = request.json() if request else {}
+        return self.alertdefinitions
+
+    def get_symptomdefinitions(self):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/symptomdefinitions")
+        self.symptomdefinitions = request.json() if request else {}
+        return self.symptomdefinitions
+
+    def get_recommendations(self):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/recommendations")
+        self.recommendations = request.json() if request else {}
+        return self.recommendations
 
     def get_iteration(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
@@ -150,14 +173,19 @@ class BaseCollector(ABC):
         self.target_vms = [vms_dict[uuid]['uuid'] for uuid in vms_dict]
         return self.target_vms
 
+    def get_nsxt_adapter_by_target(self):
+        nsxt_adapter_dict = self.get_nsxt_adapter(self.target)
+        self.target_nsxt_adapter = [nsxt_adapter_dict[uuid]['uuid'] for uuid in nsxt_adapter_dict]
+        return self.target_nsxt_adapter
+
     def get_nsxt_mgmt_cluster_by_target(self):
-        nsxt_resources_dict = self.get_nsxt_mgmt_cluster(self.target)
-        self.target_nsxt_mgmt_cluster = [nsxt_resources_dict[uuid]['uuid'] for uuid in nsxt_resources_dict]
+        nsxt_mgmt_cluster_dict = self.get_nsxt_mgmt_cluster(self.target)
+        self.target_nsxt_mgmt_cluster = [nsxt_mgmt_cluster_dict[uuid]['uuid'] for uuid in nsxt_mgmt_cluster_dict]
         return self.target_nsxt_mgmt_cluster
 
     def get_nsxt_mgmt_nodes_by_target(self):
-        nsxt_resources_dict = self.get_nsxt_mgmt_nodes(self.target)
-        self.target_nsxt_mgmt_nodes = [nsxt_resources_dict[uuid]['uuid'] for uuid in nsxt_resources_dict]
+        nsxt_mgmt_nodes_dict = self.get_nsxt_mgmt_nodes(self.target)
+        self.target_nsxt_mgmt_nodes = [nsxt_mgmt_nodes_dict[uuid]['uuid'] for uuid in nsxt_mgmt_nodes_dict]
         return self.target_nsxt_mgmt_nodes
 
     def get_project_ids_by_target(self):
@@ -219,7 +247,8 @@ class BaseCollector(ABC):
         return gauges
 
     def generate_alert_metrics(self, label_names: list) -> GaugeMetricFamily:
-        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact'])
+        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact', 'symptom_name',
+                            'symptom_data', 'recommendation'])
         gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter',
                                   labels=label_names)
         return gauge
@@ -229,3 +258,8 @@ class BaseCollector(ABC):
         for metric in collector_config[self.name]:
             metric_suffix = metric['metric_suffix']
             yield GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}', 'vrops-exporter')
+
+    def remove_html_tags(self, text):
+        tag_re = re.compile(r'<[^\n>-]+>')
+        text_mod = tag_re.sub('', text)
+        return re.sub("\n", "", text_mod)

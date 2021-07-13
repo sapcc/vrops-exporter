@@ -12,7 +12,7 @@ class VMPropertiesCollector(PropertiesCollector):
     def get_resource_uuids(self):
         return self.get_vms_by_target()
 
-    def set_labels(self, resource_id, project_ids):
+    def get_labels(self, resource_id, project_ids):
         project_id = [vm_id_project_mapping[resource_id] for vm_id_project_mapping in project_ids if
                       resource_id in vm_id_project_mapping] if resource_id in self.vms else []
         project_id = project_id[0] if project_id else 'internal'

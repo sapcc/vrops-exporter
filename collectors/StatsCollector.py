@@ -10,7 +10,7 @@ class StatsCollector(BaseCollector):
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
-    def set_labels(self, resource_id: str, project_ids: list):
+    def get_labels(self, resource_id: str, project_ids: list):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
@@ -46,7 +46,7 @@ class StatsCollector(BaseCollector):
 
         for resource in values:
             resource_id = resource.get('resourceId')
-            labels = self.set_labels(resource_id, project_ids)
+            labels = self.get_labels(resource_id, project_ids)
             if not labels:
                 continue
 
