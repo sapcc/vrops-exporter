@@ -1,7 +1,7 @@
 from collectors.AlertCollector import AlertCollector
 
 
-class NSXTMmgtClusterAlertCollector(AlertCollector):
+class NSXTMgmtClusterAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()

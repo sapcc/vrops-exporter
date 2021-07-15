@@ -13,7 +13,6 @@ class AlertCollector(BaseCollector):
         self.symptomdefinitions = self.get_symptomdefinitions()["symptomDefinitions"]
         self.recommendations = self.get_recommendations()["recommendations"]
         self.resourcekind = list()
-        self.use_resource_uuids = False
 
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
@@ -33,8 +32,8 @@ class AlertCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no token')
             return
 
-        # # Mapping uuids to names
-        # self.get_resource_uuids()
+        # Mapping uuids to names
+        self.get_resource_uuids()
 
         alert_config = self.read_collector_config()['alerts']
 
@@ -43,8 +42,7 @@ class AlertCollector(BaseCollector):
         alerts, api_responding, api_response_time = \
             self.vrops.get_alerts(self.target, token,
                                   resourcekinds=self.resourcekind,
-                                  resourceIds=self.get_resource_uuids() if self.use_resource_uuids else [],
-                                  alert_criticality=alert_config.get('alertCriticality'),
+                                  alert_criticality=[a for a in alert_config.get('alertCriticality')],
                                   active_only=alert_config.get('activeOnly'))
         yield self.create_api_response_code_metric(self.name, api_responding)
         yield self.create_api_response_time_metric(self.name, api_response_time)

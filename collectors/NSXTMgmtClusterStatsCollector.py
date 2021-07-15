@@ -1,7 +1,7 @@
 from collectors.StatsCollector import StatsCollector
 
 
-class NSXTMmgtClusterStatsCollector(StatsCollector):
+class NSXTMgmtClusterStatsCollector(StatsCollector):
 
     def __init__(self):
         super().__init__()

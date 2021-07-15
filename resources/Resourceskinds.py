@@ -83,9 +83,17 @@ class NSXTAdapterInstance:
         self.target = target
         self.token = token
         self.management_cluster = list()
+        self.management_service = list()
 
     def add_mgmt_cluster(self, mgmt_cluster):
         self.management_cluster.append(mgmt_cluster)
+
+    def add_mgmt_service(self, mgmt_service):
+        self.management_service.append(mgmt_service)
+
+
+class NSXTManagementService:
+    pass
 
 
 class NSXTManagementCluster:

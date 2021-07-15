@@ -86,6 +86,10 @@ class InventoryBuilder:
         def nsxt_mgmt_nodes(target, iteration):
             return self.iterated_inventory[str(iteration)]['nsxt_mgmt_nodes'].get(target, {})
 
+        @app.route('/<target>/nsxt_mgmt_service/<int:iteration>', methods=['GET'])
+        def nsxt_mgmt_service(target, iteration):
+            return self.iterated_inventory[str(iteration)]['nsxt_mgmt_service'].get(target, {})
+
         @app.route('/alertdefinitions/', methods=['GET'])
         def alert_alertdefinitions():
             return self.alertdefinitions
@@ -200,6 +204,7 @@ class InventoryBuilder:
             self.expose_nsxt_adapter()
             self.expose_nsxt_mgmt_cluster()
             self.expose_nsxt_mgmt_nodes()
+            self.expose_nsxt_mgmt_service()
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -283,6 +288,7 @@ class InventoryBuilder:
 
         nsxt_mgmt_cluster = Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter])
         nsxt_mgmt_nodes = Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
+        nsxt_mgmt_service = Vrops.get_nsxt_mgmt_service(vrops, target, token, [a.uuid for a in nsxt_adapter])
 
         for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
             for mgmt_cluster in nsxt_mgmt_cluster:
@@ -293,6 +299,10 @@ class InventoryBuilder:
                 for mgmt_node in nsxt_mgmt_nodes:
                     mgmt_cluster_object.add_mgmt_node(mgmt_node)
                     logger.debug(f'Collecting NSX-T management node: {mgmt_node.name}')
+            for mgmt_service_instance in nsxt_mgmt_service:
+                if mgmt_service_instance.parent == nsxt_adapter_object.uuid:
+                    nsxt_adapter_object.add_mgmt_service(mgmt_service_instance)
+                    logger.debug(f'Collecting NSX-T management service: {mgmt_service_instance.name}')
 
         return nsxt_mgmt_plane
 
@@ -484,4 +494,24 @@ class InventoryBuilder:
                             'token': nsxt_mgmt_plane.token,
                         }
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_nodes'] = tree
+        return tree
+
+    def expose_nsxt_mgmt_service(self) -> dict:
+        tree = dict()
+        for nsxt_entry in self.nsxt_dict:
+            nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+            if not nsxt_mgmt_plane:
+                continue
+            tree[nsxt_mgmt_plane.target] = dict()
+            for nsxt_adapter in nsxt_mgmt_plane.adapter:
+                for mgmt_service in nsxt_adapter.management_service:
+                    tree[nsxt_mgmt_plane.target][mgmt_service.uuid] = {
+                        'uuid': mgmt_service.uuid,
+                        'name': mgmt_service.name,
+                        'nsxt_adapter_name': nsxt_adapter.name,
+                        'nsxt_adapter_uuid': nsxt_adapter.uuid,
+                        'target': nsxt_mgmt_plane.target,
+                        'token': nsxt_mgmt_plane.token,
+                    }
+        self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_service'] = tree
         return tree

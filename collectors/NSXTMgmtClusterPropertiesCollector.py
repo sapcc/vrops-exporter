@@ -1,7 +1,7 @@
 from collectors.PropertiesCollector import PropertiesCollector
 
 
-class NSXTMmgtClusterPropertiesCollector(PropertiesCollector):
+class NSXTMgmtClusterPropertiesCollector(PropertiesCollector):
 
     def __init__(self):
         super().__init__()

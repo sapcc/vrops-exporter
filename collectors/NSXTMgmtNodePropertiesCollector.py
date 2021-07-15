@@ -1,7 +1,7 @@
 from collectors.PropertiesCollector import PropertiesCollector
 
 
-class NSXTMmgtNodePropertiesCollector(PropertiesCollector):
+class NSXTMgmtNodePropertiesCollector(PropertiesCollector):
 
     def __init__(self):
         super().__init__()
