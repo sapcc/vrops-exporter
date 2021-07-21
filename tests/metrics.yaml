@@ -221,11 +221,11 @@ VMPropertiesCollector:
   - 'vrops_virtualmachine_runtime_powerstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
   - 'vrops_virtualmachine_runtime_connectionstate{datacenter="datacenter3",hostsystem="hostsystem3",project="0815",state="test",vccluster="cluster3",vcenter="vcenter1",virtualmachine="vm1"}'
 
-NSXTMmgtClusterStatsCollector:
-  - 'vrops_api_response{class="nsxtmmgtclusterstatscollector",target="testhost.test"}'
+NSXTMgmtClusterStatsCollector:
+  - 'vrops_api_response{class="nsxtmgmtclusterstatscollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_distributed_firewall_rules_usage_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_distributed_firewall_rules_max_supported_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
-  - 'vrops_api_response_time_seconds{class="nsxtmmgtclusterstatscollector",target="testhost.test"}'
+  - 'vrops_api_response_time_seconds{class="nsxtmgmtclusterstatscollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_distributed_firewall_rules_usage_count_percentage{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_system_wide_logical_switch_usage_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_groups_based_in_ip_usage_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
@@ -240,26 +240,26 @@ NSXTMmgtClusterStatsCollector:
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_groups_based_in_ip_max_supported_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
   - 'vrops_nsxt_mgmt_cluster_sys_capacity_groups_max_supported_count{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
 
-NSXTMmgtClusterPropertiesCollector:
-  - 'vrops_api_response{class="nsxtmmgtclusterpropertiescollector",target="testhost.test"}'
+NSXTMgmtClusterPropertiesCollector:
+  - 'vrops_api_response{class="nsxtmgmtclusterpropertiescollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_cluster_management_cluster_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",state="n/a"}'
   - 'vrops_nsxt_mgmt_cluster_controller_cluster_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",state="test"}'
   - 'vrops_nsxt_mgmt_cluster_controller_cluster_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",state="n/a"}'
   - 'vrops_nsxt_mgmt_cluster_management_cluster_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",state="test"}'
   - 'vrops_nsxt_mgmt_cluster_product_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2"}'
   - 'vrops_nsxt_mgmt_cluster_product_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",product_version="test"}'
-  - 'vrops_api_response_time_seconds{class="nsxtmmgtclusterpropertiescollector",target="testhost.test"}'
+  - 'vrops_api_response_time_seconds{class="nsxtmgmtclusterpropertiescollector",target="testhost.test"}'
 
-NSXTMmgtNodeStatsCollector:
-  - 'vrops_api_response{class="nsxtmmgtnodestatscollector",target="testhost.test"}'
-  - 'vrops_api_response_time_seconds{class="nsxtmmgtnodestatscollector",target="testhost.test"}'
+NSXTMgmtNodeStatsCollector:
+  - 'vrops_api_response{class="nsxtmgmtnodestatscollector",target="testhost.test"}'
+  - 'vrops_api_response_time_seconds{class="nsxtmgmtnodestatscollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_node_memory_total{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
   - 'vrops_nsxt_mgmt_node_memory_used{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
 
-NSXTMmgtNodePropertiesCollector:
-  - 'vrops_api_response{class="nsxtmmgtnodepropertiescollector",target="testhost.test"}'
+NSXTMgmtNodePropertiesCollector:
+  - 'vrops_api_response{class="nsxtmgmtnodepropertiescollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2",version="test"}'
-  - 'vrops_api_response_time_seconds{class="nsxtmmgtnodepropertiescollector",target="testhost.test"}'
+  - 'vrops_api_response_time_seconds{class="nsxtmgmtnodepropertiescollector",target="testhost.test"}'
   - 'vrops_nsxt_mgmt_node_connectivity_status{connectivity_status="test",nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
   - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
   - 'vrops_nsxt_mgmt_node_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'

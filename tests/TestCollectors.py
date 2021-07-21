@@ -51,8 +51,8 @@ class TestCollectors(unittest.TestCase):
         nsxt_adapter1.uuid = nsxt_adapter2.uuid = "3628-93a1-56e84634050814"
 
         Vrops.get_adapter = MagicMock(return_value=None)
-        Vrops.get_vcenter_adapter = MagicMock(return_value=([vc][0]))
-        Vrops.get_nsxt_adapter = MagicMock(return_value=([nsxt_adapter1, nsxt_adapter2]))
+        Vrops.get_vcenter_adapter = MagicMock(return_value=([vc], 200))
+        Vrops.get_nsxt_adapter = MagicMock(return_value=([nsxt_adapter1, nsxt_adapter2], 200))
 
         # test tool get_resources to create resource objects
         nsxt_mgmt_cluster1 = NSXTManagementCluster()
@@ -79,6 +79,18 @@ class TestCollectors(unittest.TestCase):
         nsxt_mgmt_node3.uuid = "7422-91h7-52s842060815"
         nsxt_mgmt_node1.resourcekind = nsxt_mgmt_node2.resourcekind = nsxt_mgmt_node3.resourcekind = "ManagementNode"
         nsxt_mgmt_node1.parent = nsxt_mgmt_node2.parent = nsxt_mgmt_node3.parent = "3628-93a1-56e84634050814"
+
+        nsxt_mgmt_service1 = NSXTManagementService()
+        nsxt_mgmt_service2 = NSXTManagementService()
+        nsxt_mgmt_service3 = NSXTManagementService()
+        nsxt_mgmt_service1.name = "nsxt_mgmt_service1"
+        nsxt_mgmt_service2.name = "nsxt_mgmt_service2"
+        nsxt_mgmt_service3.name = "nsxt_mgmt_service3"
+        nsxt_mgmt_service1.uuid = "5628-9ba1-55e847050815"
+        nsxt_mgmt_service2.uuid = "3628-93a1-56e84634050814"
+        nsxt_mgmt_service3.uuid = "7422-91h7-52s842060815"
+        nsxt_mgmt_service1.resourcekind = nsxt_mgmt_service2.resourcekind = nsxt_mgmt_service3.resourcekind = "ManagementService"
+        nsxt_mgmt_service1.parent = nsxt_mgmt_service2.parent = nsxt_mgmt_service3.parent = "3628-93a1-56e84634050814"
 
         dc1 = Datacenter()
         dc2 = Datacenter()
@@ -144,25 +156,33 @@ class TestCollectors(unittest.TestCase):
         vm1.parent = vm2.parent = vm3.parent = "7422-91h7-52s842060815"
 
         Vrops.get_nsxt_mgmt_cluster = MagicMock(
-            return_value=[nsxt_mgmt_cluster1, nsxt_mgmt_cluster2, nsxt_mgmt_cluster3])
+            return_value=([nsxt_mgmt_cluster1, nsxt_mgmt_cluster2, nsxt_mgmt_cluster3], 200))
         Vrops.get_nsxt_mgmt_nodes = MagicMock(
-            return_value=[nsxt_mgmt_node1, nsxt_mgmt_node2, nsxt_mgmt_node3])
+            return_value=([nsxt_mgmt_node1, nsxt_mgmt_node2, nsxt_mgmt_node3], 200))
+        Vrops.get_nsxt_mgmt_service = MagicMock(
+            return_value=([nsxt_mgmt_service1, nsxt_mgmt_service2, nsxt_mgmt_service3], 200))
         Vrops.get_datacenter = MagicMock(
-            return_value=[dc1, dc2, dc3])
+            return_value=([dc1, dc2, dc3], 200))
         Vrops.get_cluster = MagicMock(
-            return_value=[cl1, cl2, cl3])
+            return_value=([cl1, cl2, cl3], 200))
         Vrops.get_datastores = MagicMock(
-            return_value=[ds1, ds2, ds3])
+            return_value=([ds1, ds2, ds3], 200))
         Vrops.get_hosts = MagicMock(
-            return_value=[hs1, hs2, hs3])
+            return_value=([hs1, hs2, hs3], 200))
         Vrops.get_vms = MagicMock(
-            return_value=[vm1, vm2, vm3])
+            return_value=([vm1, vm2, vm3], 200))
 
         Vrops.get_latest_stat = MagicMock(return_value=1)
         Vrops.get_property = MagicMock(return_value="test_property")
         Vrops.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
                                                         {"7422-91h7-52s842060815": "0815"},
                                                         {"5628-9ba1-55e847050815": "internal"}])
+        Vrops.get_alertdefinitions = MagicMock(return_value={'id': 'test-id', 'name': 'test-alert',
+                                                             'symptoms': [{'name': 'test_symptom',
+                                                                           'state': 'test-state'}],
+                                                             'recommendation': [{'id': 'test-re',
+                                                                                 'description': 'test-description'}]})
+
         thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180, 300))
         thread.daemon = True
         thread.start()
