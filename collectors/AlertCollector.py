@@ -59,13 +59,10 @@ class AlertCollector(BaseCollector):
             labels.extend([resource['alertDefinitionName'],
                            resource['alertLevel'],
                            resource['status'],
-                           resource["alertImpact"],
-                           alert_labels.get("symptom_1_name", "n/a"),
-                           alert_labels.get('symptom_1_state', "n/a"),
-                           alert_labels.get("recommendation_1", "n/a"),
-                           alert_labels.get("symptom_2_name", "n/a"),
-                           alert_labels.get('symptom_2_state', "n/a"),
-                           alert_labels.get("recommendation_2", "n/a")])
+                           resource["alertImpact"]])
+            for label_name, label_value in alert_labels.items():
+                alert_metric._labelnames += (label_name,)
+                labels.append(label_value)
             alert_metric.add_metric(labels=labels, value=1)
 
         yield alert_metric
@@ -75,8 +72,8 @@ class AlertCollector(BaseCollector):
         for resource in alerts:
             alert_entry = self.alertdefinitions.get(resource.get('alertDefinitionId'))
             for i, symptom in enumerate(alert_entry.get('symptoms', [])):
-                alert_labels[f'symptom_{i+1}_name'] = symptom.get('name')
-                alert_labels[f'symptom_{i+1}_state'] = str(symptom.get('state'))
+                alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
+                alert_labels[f'symptom_{i+1}_data'] = str(symptom.get('state', 'n/a'))
             for i, recommendation in enumerate(alert_entry.get('recommendations', [])):
-                alert_labels[f'recommendation_{i+1}'] = recommendation.get('description')
+                alert_labels[f'recommendation_{i+1}'] = recommendation.get('description', 'n/a')
         return alert_labels

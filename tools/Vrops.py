@@ -120,7 +120,7 @@ class Vrops:
                                      headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return resources
+            return resources, 503
 
         if response.status_code == 200:
             try:
@@ -164,7 +164,6 @@ class Vrops:
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
-
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
             api_responding == 200 and amount_vms else 0
 
@@ -174,12 +173,15 @@ class Vrops:
             uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor * 2))))
             logger.debug(f'Chunking VM requests into {len(uuids_chunked)} chunks')
             vms = list()
+            api_responding = list()
             for uuid_list in uuids_chunked:
-                vms.extend(self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
+                vm_chunks, api_chunk_responding = self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
                                               resourcekinds=["VirtualMachine"], resource_obj=VirtualMachine,
-                                              data_receiving=True))
+                                              data_receiving=True)
+                vms.extend(vm_chunks)
+                api_responding.append(api_chunk_responding)
             logger.debug(f'Number of VMs collected: {len(vms)}')
-            return vms
+            return vms, max(api_responding)
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
                                   resource_obj=VirtualMachine, data_receiving=True)
 
