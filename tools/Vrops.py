@@ -1,6 +1,6 @@
 from urllib3 import disable_warnings
 from urllib3 import exceptions
-from tools.helper import chunk_list
+from tools.helper import chunk_list, remove_html_tags
 from threading import Thread
 from resources.Resourceskinds import *
 import requests
@@ -41,7 +41,7 @@ class Vrops:
             logger.error(f'Problem getting token from {target} : {response.text}')
             return False, response.status_code
 
-    def get_adapter(self, target: str, token: str, adapterkind: str, adapter_obj) -> list:
+    def get_adapter(self, target: str, token: str, adapterkind: str, adapter_obj) -> (list, int):
         url = f'https://{target}/suite-api/api/adapters'
         querystring = {
             "adapterKindKey": adapterkind
@@ -60,7 +60,7 @@ class Vrops:
                                     headers=headers)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return adapter
+            return adapter, 503
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
@@ -68,20 +68,19 @@ class Vrops:
                 adapter_object.name = resource["resourceKey"]["name"]
                 adapter_object.uuid = resource["id"]
                 adapter.append(adapter_object)
+            return adapter, response.status_code
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return adapter
-        return adapter
+            return adapter, response.status_code
 
     def get_vcenter_adapter(self, target, token):
-        # just one vcenter adapter supported
-        return self.get_adapter(target, token, adapterkind="VMWARE", adapter_obj=Vcenter)[0]
+        return self.get_adapter(target, token, adapterkind="VMWARE", adapter_obj=Vcenter)
 
     def get_nsxt_adapter(self, target, token):
         return self.get_adapter(target, token, adapterkind="NSXTAdapter", adapter_obj=NSXTAdapterInstance)
 
     def get_resources(self, target: str, token: str, uuids: list, adapterkind: str, resourcekinds: list, resource_obj,
-                      data_receiving=False) -> list:
+                      data_receiving=False) -> (list, int):
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
@@ -95,7 +94,6 @@ class Vrops:
                 "resourceKind": resourcekinds,
                 "resourceStatus": ["DATA_RECEIVING"]
             },
-            "PageSize": 500000,
             "hierarchyDepth": 5
         } if data_receiving else {
             "relationshipType": "DESCENDANT",
@@ -104,7 +102,6 @@ class Vrops:
                 "adapterKind": [adapterkind],
                 "resourceKind": resourcekinds
             },
-            "PageSize": 500000,
             "hierarchyDepth": 5
         }
 
@@ -135,12 +132,14 @@ class Vrops:
                     resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resource_object.parent = resource.get("relatedResources", [None])[0]
                     resources.append(resource_object)
+                return resources, response.status_code
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target}'
                              f'- Error: {e}')
+                return resources, response.status_code
         else:
             logger.error(f'Problem getting resources from {target} : {response.text}')
-        return resources
+            return resources, response.status_code
 
     def get_datacenter(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datacenter"],
@@ -151,11 +150,11 @@ class Vrops:
                                   resourcekinds=["ClusterComputeResource"], resource_obj=Cluster)
 
     def get_datastores(self, target, token, parent_uuids):
-        datastores = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datastore"],
+        datastores, api_responding = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datastore"],
                                         resource_obj=Datastore)
         for datastore in datastores:
             datastore.get_type(datastore.name)
-        return datastores
+        return datastores, api_responding
 
     def get_hosts(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["HostSystem"],
@@ -417,15 +416,10 @@ class Vrops:
         return alerts, response.status_code, response.elapsed.total_seconds()
 
     def get_definitions(self, target, token, name: str):
-        url = ''
-        if name == 'alertdefinitions':
-            url = f'https://{target}/suite-api/api/alertdefinitions'
-        if name == 'recommendations':
-            url = f'https://{target}/suite-api/api/recommendations'
-        if name == 'symptomdefinitions':
-            url = f'https://{target}/suite-api/api/symptomdefinitions'
+        url = f'https://{target}/suite-api/api/{name}'
+
         querystring = {
-            'pageSize': '100000'
+            'pageSize': '10000'
         }
         headers = {
             'Content-Type': "application/json",
@@ -449,11 +443,43 @@ class Vrops:
             logger.error(f'Problem getting symptomdefinitions {target} : {response.text}')
             return {}
 
-    def get_alertdefinitions(self, target, token):
-        return self.get_definitions(target, token, name='alertdefinitions')
-
     def get_alert_recommendations(self, target, token):
         return self.get_definitions(target, token, name='recommendations')
 
     def get_alert_symptomdefinitions(self, target, token):
         return self.get_definitions(target, token, name='symptomdefinitions')
+
+    def get_alertdefinitions(self, target, token):
+        alertdefinitions = self.get_definitions(target, token, name='alertdefinitions')
+        symptomdefinitions = self.get_alert_symptomdefinitions(target, token)
+        recommendations = self.get_alert_recommendations(target, token)
+
+        # mapping symptoms and recommendations to alerts
+        alerts = dict()
+        for alert in alertdefinitions['alertDefinitions']:
+            alert_entry = dict()
+            alert_entry['id'] = alert.get('id')
+            alert_entry['name'] = alert.get('name')
+
+            alert_entry['symptoms'] = list()
+            symptomdefinition_ids = alert.get("states", [])[0].get("base-symptom-set", {}).get(
+                "symptomDefinitionIds", [])
+            for symptom_id in symptomdefinition_ids:
+                for symptomdefinition_id in symptomdefinitions["symptomDefinitions"]:
+                    if symptom_id == symptomdefinition_id['id']:
+                        symptom_entry = dict()
+                        symptom_entry['name'] = symptomdefinition_id['name']
+                        symptom_entry['state'] = symptomdefinition_id['state']
+                        alert_entry['symptoms'].append(symptom_entry)
+
+            alert_entry['recommendations'] = list()
+            recommendation_ids = alert.get("states", [])[0].get("recommendationPriorityMap", {})
+            for recommendation in recommendation_ids:
+                for rd in recommendations["recommendations"]:
+                    if recommendation == rd["id"]:
+                        recommendation_entry = dict()
+                        recommendation_entry['id'] = rd.get("id")
+                        recommendation_entry['description'] = remove_html_tags(rd.get("description"))
+                        alert_entry['recommendations'].append(recommendation_entry)
+            alerts[alert.get('id')] = alert_entry
+        return alerts

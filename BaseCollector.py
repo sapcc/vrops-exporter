@@ -120,16 +120,6 @@ class BaseCollector(ABC):
         self.alertdefinitions = request.json() if request else {}
         return self.alertdefinitions
 
-    def get_symptomdefinitions(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/symptomdefinitions")
-        self.symptomdefinitions = request.json() if request else {}
-        return self.symptomdefinitions
-
-    def get_recommendations(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/recommendations")
-        self.recommendations = request.json() if request else {}
-        return self.recommendations
-
     def get_iteration(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
         self.iteration = request.json() if request else {}
@@ -260,8 +250,9 @@ class BaseCollector(ABC):
         return gauges
 
     def generate_alert_metrics(self, label_names: list) -> GaugeMetricFamily:
-        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact', 'symptom_name',
-                            'symptom_data', 'recommendation'])
+        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact', 'symptom_1_name',
+                            'symptom_1_data', 'recommendation_1', 'symptom_2_name', 'symptom_2_data',
+                            'recommendation_2'])
         gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter',
                                   labels=label_names)
         return gauge
@@ -271,8 +262,3 @@ class BaseCollector(ABC):
         for metric in collector_config[self.name]:
             metric_suffix = metric['metric_suffix']
             yield GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}', 'vrops-exporter')
-
-    def remove_html_tags(self, text):
-        tag_re = re.compile(r'<[^\n>-]+>')
-        text_mod = tag_re.sub('', text)
-        return re.sub("\n", "", text_mod)

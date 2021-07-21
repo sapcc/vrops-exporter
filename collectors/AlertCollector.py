@@ -9,9 +9,7 @@ class AlertCollector(BaseCollector):
 
     def __init__(self):
         super().__init__()
-        self.alertdefinitions = self.get_alertdefinitions()["alertDefinitions"]
-        self.symptomdefinitions = self.get_symptomdefinitions()["symptomDefinitions"]
-        self.recommendations = self.get_recommendations()["recommendations"]
+        self.alertdefinitions = self.get_alertdefinitions()
         self.resourcekind = list()
 
     def get_resource_uuids(self):
@@ -62,9 +60,12 @@ class AlertCollector(BaseCollector):
                            resource['alertLevel'],
                            resource['status'],
                            resource["alertImpact"],
-                           alert_labels.get("symptom_name", "n/a"),
-                           alert_labels.get('symptom_state', "n/a"),
-                           alert_labels.get("recommendation", "n/a")])
+                           alert_labels.get("symptom_1_name", "n/a"),
+                           alert_labels.get('symptom_1_state', "n/a"),
+                           alert_labels.get("recommendation_1", "n/a"),
+                           alert_labels.get("symptom_2_name", "n/a"),
+                           alert_labels.get('symptom_2_state', "n/a"),
+                           alert_labels.get("recommendation_2", "n/a")])
             alert_metric.add_metric(labels=labels, value=1)
 
         yield alert_metric
@@ -72,18 +73,10 @@ class AlertCollector(BaseCollector):
     def generate_alert_label_values(self, alerts):
         alert_labels = dict()
         for resource in alerts:
-            for alert in self.alertdefinitions:
-                if alert['id'] == resource['alertDefinitionId']:
-                    symptomdefinition_ids = alert.get("states", [])[0].get("base-symptom-set", {}).get(
-                        "symptomDefinitionIds", [])
-                    for symptom_id in symptomdefinition_ids:
-                        for symptomdefinition_id in self.symptomdefinitions:
-                            if symptom_id == symptomdefinition_id['id']:
-                                alert_labels["symptom_name"] = symptomdefinition_id['name']
-                                alert_labels['symptom_state'] = str(symptomdefinition_id['state'])
-                    recommendation_ids = alert.get("states", [])[0].get("recommendationPriorityMap", {})
-                    for recommendation in recommendation_ids:
-                        for rd in self.recommendations:
-                            if recommendation == rd["id"]:
-                                alert_labels["recommendation"] = self.remove_html_tags(rd["description"])
+            alert_entry = self.alertdefinitions.get(resource.get('alertDefinitionId'))
+            for i, symptom in enumerate(alert_entry.get('symptoms', [])):
+                alert_labels[f'symptom_{i+1}_name'] = symptom.get('name')
+                alert_labels[f'symptom_{i+1}_state'] = str(symptom.get('state'))
+            for i, recommendation in enumerate(alert_entry.get('recommendations', [])):
+                alert_labels[f'recommendation_{i+1}'] = recommendation.get('description')
         return alert_labels
