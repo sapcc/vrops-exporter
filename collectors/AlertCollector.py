@@ -53,6 +53,7 @@ class AlertCollector(BaseCollector):
 
         for resource in alerts:
             resource_id = resource.get('resourceId')
+            label_names = alert_metric._labelnames
             labels = self.get_labels(resource_id, project_ids)
             if not labels:
                 continue
@@ -61,9 +62,11 @@ class AlertCollector(BaseCollector):
                            resource['status'],
                            resource["alertImpact"]])
             for label_name, label_value in alert_labels.items():
-                alert_metric._labelnames += (label_name,)
+                if label_name not in alert_metric._labelnames:
+                    alert_metric._labelnames += (label_name,)
                 labels.append(label_value)
             alert_metric.add_metric(labels=labels, value=1)
+            alert_metric._labelnames = label_names
 
         yield alert_metric
 
