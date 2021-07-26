@@ -9,7 +9,6 @@ class AlertCollector(BaseCollector):
 
     def __init__(self):
         super().__init__()
-        self.additional_labels = ['alert_name', 'alert_level', 'status', 'alert_impact']
         self.alertdefinitions = self.get_alertdefinitions()
         self.resourcekind = list()
 
@@ -33,9 +32,7 @@ class AlertCollector(BaseCollector):
 
         # Mapping uuids to names
         self.get_resource_uuids()
-
         alert_config = self.read_collector_config()['alerts']
-        self.label_names.extend(self.additional_labels)
 
         alert_metric = self.generate_alert_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
@@ -67,9 +64,7 @@ class AlertCollector(BaseCollector):
                 alert_metric._labelnames += (label_name,)
                 labels.append(label_value)
             alert_metric.add_metric(labels=labels, value=1)
-            print(alert_metric._labelnames, "\n-----")
             alert_metric._labelnames = label_names
-            print(alert_metric._labelnames)
         yield alert_metric
 
     def generate_alert_label_values(self, alerts):
