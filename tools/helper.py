@@ -15,7 +15,12 @@ def yaml_read(path):
 
 
 def remove_html_tags(text):
+    from bs4 import BeautifulSoup
     import re
-    tag_re = re.compile(r'<[^\n>-]+>')
-    text_mod = tag_re.sub('', text)
-    return re.sub("\n", "", text_mod)
+    soup = BeautifulSoup(text, features="lxml")
+    text = soup.text
+    text = re.sub(r"\s+", " ", text)
+    text = re.sub("\n", "", text)
+    for link in soup.find_all('a'):
+        text = text + " " + link.get('href') if link.get('href') else text
+    return text

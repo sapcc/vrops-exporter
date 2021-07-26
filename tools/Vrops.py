@@ -79,32 +79,29 @@ class Vrops:
     def get_nsxt_adapter(self, target, token):
         return self.get_adapter(target, token, adapterkind="NSXTAdapter", adapter_obj=NSXTAdapterInstance)
 
-    def get_resources(self, target: str, token: str, uuids: list, adapterkind: str, resourcekinds: list, resource_obj,
-                      data_receiving=False) -> (list, int):
+    def get_resources(self, target: str, token: str,
+                      uuids: list,
+                      adapterkind: str,
+                      resourcekinds: list,  # Array of resource kind keys
+                      resource_class,  #
+                      resource_status: list = None  # Array of resource data collection stats
+                      ) -> (list, int):
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
-            'pageSize': '100000'
+            'pageSize': 10000
         }
+        resource_status_array = [] if not resource_status else resource_status
         payload = {
             "relationshipType": "DESCENDANT",
             "resourceIds": uuids,
             "resourceQuery": {
                 "adapterKind": [adapterkind],
                 "resourceKind": resourcekinds,
-                "resourceStatus": ["DATA_RECEIVING"]
-            },
-            "hierarchyDepth": 5
-        } if data_receiving else {
-            "relationshipType": "DESCENDANT",
-            "resourceIds": uuids,
-            "resourceQuery": {
-                "adapterKind": [adapterkind],
-                "resourceKind": resourcekinds
+                "resourceStatus": resource_status_array
             },
             "hierarchyDepth": 5
         }
-
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
@@ -126,7 +123,7 @@ class Vrops:
             try:
                 relations = response.json()["resourcesRelations"]
                 for resource in relations:
-                    resource_object = resource_obj()
+                    resource_object = resource_class()
                     resource_object.name = resource["resource"]["resourceKey"]["name"]
                     resource_object.uuid = resource["resource"]["identifier"]
                     resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
@@ -142,23 +139,23 @@ class Vrops:
             return resources, response.status_code
 
     def get_datacenter(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datacenter"],
-                                  resource_obj=Datacenter)
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
+                                  resourcekinds=["Datacenter"], resource_class=Datacenter)
 
     def get_cluster(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                  resourcekinds=["ClusterComputeResource"], resource_obj=Cluster)
+                                  resourcekinds=["ClusterComputeResource"], resource_class=Cluster)
 
     def get_datastores(self, target, token, parent_uuids):
-        datastores, api_responding = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["Datastore"],
-                                        resource_obj=Datastore)
+        datastores, api_responding = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
+                                                        resourcekinds=["Datastore"], resource_class=Datastore)
         for datastore in datastores:
             datastore.get_type(datastore.name)
         return datastores, api_responding
 
     def get_hosts(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["HostSystem"],
-                                  resource_obj=Host)
+        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
+                                  resourcekinds=["HostSystem"], resource_class=Host)
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid):
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
@@ -168,36 +165,40 @@ class Vrops:
             api_responding == 200 and amount_vms else 0
 
         # vrops cannot handle more than 10000 uuids in a single request
-        split_factor = int(number_of_vms / 10000) 
+        split_factor = int(number_of_vms / 10000)
         if split_factor >= 1:
-            uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor * 2))))
+            uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor + 1))))
             logger.debug(f'Chunking VM requests into {len(uuids_chunked)} chunks')
             vms = list()
             api_responding = list()
             for uuid_list in uuids_chunked:
                 vm_chunks, api_chunk_responding = self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
-                                              resourcekinds=["VirtualMachine"], resource_obj=VirtualMachine,
-                                              data_receiving=True)
+                                                                     resourcekinds=["VirtualMachine"],
+                                                                     resource_class=VirtualMachine,
+                                                                     resource_status=["DATA_RECEIVING"])
                 vms.extend(vm_chunks)
                 api_responding.append(api_chunk_responding)
             logger.debug(f'Number of VMs collected: {len(vms)}')
             return vms, max(api_responding)
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
-                                  resource_obj=VirtualMachine, data_receiving=True)
+                                  resource_class=VirtualMachine, resource_status=["DATA_RECEIVING"])
 
     def get_nsxt_mgmt_cluster(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementCluster"], resource_obj=NSXTManagementCluster)
+                                  resourcekinds=["ManagementCluster"], resource_class=NSXTManagementCluster)
 
     def get_nsxt_mgmt_nodes(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementNode"], resource_obj=NSXTManagementNode)
+                                  resourcekinds=["ManagementNode"], resource_class=NSXTManagementNode)
 
     def get_nsxt_mgmt_service(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementService"], resource_obj=NSXTManagementService)
+                                  resourcekinds=["ManagementService"], resource_class=NSXTManagementService)
 
-    def get_latest_values_multiple(self, target: str, token: str, uuids: list, keys: list, collector: str,
+    def get_latest_values_multiple(self, target: str, token: str,
+                                   uuids: list,
+                                   keys: list,
+                                   collector: str,
                                    kind: str = None) -> (list, int, float):
 
         # vrops can not handle more than 1000 uuids for stats
@@ -257,6 +258,9 @@ class Vrops:
     def _get_chunk(q, uuid_list, url, headers, keys, target, kind, collector, chunk_iteration):
         logger.debug(f'chunk: {chunk_iteration}')
 
+        querystring = {
+            "pageSize": 10000
+        }
         # Indicates whether to report only "current" stat values, i.e. skip the stat-s that haven't published any value
         # during recent collection cycles.
         current_only = True
@@ -264,18 +268,17 @@ class Vrops:
         payload = {
             "resourceId": uuid_list,
             "statKey": keys,
-            "currentOnly": current_only,
-            "PageSize": 500000
+            "currentOnly": current_only
         } if kind == 'stats' else {
             "resourceIds": uuid_list,
             "propertyKeys": keys,
-            "currentOnly": current_only,
-            "PageSize": 500000
+            "currentOnly": current_only
         }
 
         disable_warnings(exceptions.InsecureRequestWarning)
         try:
             response = requests.post(url,
+                                     params=querystring,
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
@@ -305,6 +308,9 @@ class Vrops:
 
         project_ids = list()
         url = f'https://{target}/suite-api/api/resources/bulk/relationships'
+        querystring = {
+            'pageSize': 10000
+        }
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json",
@@ -324,6 +330,7 @@ class Vrops:
         try:
             response = requests.post(url,
                                      data=json.dumps(payload),
+                                     params=querystring,
                                      verify=False,
                                      headers=headers)
         except Exception as e:
@@ -365,6 +372,9 @@ class Vrops:
 
         alerts = list()
         url = f'https://{target}/suite-api/api/alerts/query'
+        querystring = {
+            "pageSize": 10000
+        }
 
         headers = {
             'Content-Type': "application/json",
@@ -388,6 +398,7 @@ class Vrops:
         try:
             response = requests.post(url,
                                      data=json.dumps(payload),
+                                     params=querystring,
                                      verify=False,
                                      headers=headers)
         except Exception as e:
@@ -421,7 +432,7 @@ class Vrops:
         url = f'https://{target}/suite-api/api/{name}'
 
         querystring = {
-            'pageSize': '10000'
+            'pageSize': 10000
         }
         headers = {
             'Content-Type': "application/json",

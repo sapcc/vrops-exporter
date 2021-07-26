@@ -250,7 +250,6 @@ class BaseCollector(ABC):
         return gauges
 
     def generate_alert_metrics(self, label_names: list) -> GaugeMetricFamily:
-        label_names.extend(['alert_name', 'alert_level', 'status', 'alert_impact'])
         gauge = GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter',
                                   labels=label_names)
         return gauge
