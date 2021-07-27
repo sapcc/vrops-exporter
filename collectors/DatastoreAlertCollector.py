@@ -1,12 +1,13 @@
-from collectors.PropertiesCollector import PropertiesCollector
+from collectors.AlertCollector import AlertCollector
 
 
-class DatastorePropertiesCollector(PropertiesCollector):
+class DatastoreAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'datastore'
         self.label_names = [self.vrops_entity_name, 'vcenter', 'type', 'datacenter']
+        self.resourcekind = ["Datastore"]
 
     def get_resource_uuids(self):
         return self.get_datastores_by_target()

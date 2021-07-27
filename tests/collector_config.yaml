@@ -1,8 +1,8 @@
 default_collectors:
-    - 'NSXTMmgtClusterStatsCollector'
-    - 'NSXTMmgtClusterPropertiesCollector'
-    - 'NSXTMmgtNodeStatsCollector'
-    - 'NSXTMmgtNodePropertiesCollector'
+    - 'NSXTMgmtClusterStatsCollector'
+    - 'NSXTMgmtClusterPropertiesCollector'
+    - 'NSXTMgmtNodeStatsCollector'
+    - 'NSXTMgmtNodePropertiesCollector'
     - 'ClusterStatsCollector'
     - 'ClusterPropertiesCollector'
     - 'DatastoreStatsCollector'
@@ -17,6 +17,23 @@ default_collectors:
     - 'VMStatsVirtualDiskCollector'
     - 'VMStatsMemoryCollector'
     - 'VMStatsDefaultCollector'
+    #  Alerts
+    - 'NSXTAdapterAlertCollector'
+    - 'NSXTMgmtClusterAlertCollector'
+    - 'NSXTMgmtServiceAlertCollector'
+    - 'NSXTMgmtNodeAlertCollector'
+    - 'ClusterAlertCollector'
+    - 'DatastoreAlertCollector'
+    - 'HostSystemAlertCollector'
+    - 'VCenterAlertCollector'
+    - 'VMAlertCollector'
+
+alerts:
+  alertCriticality:
+    - 'CRITICAL'
+    - 'WARNING'
+    - 'IMMEDIATE'
+  activeOnly: True
 
 ClusterPropertiesCollector:
   - metric_suffix: "configuration_dasConfig_admissionControlEnabled"
@@ -339,7 +356,7 @@ VMStatsDefaultCollector:
   - metric_suffix: "guestfilesystem_percentage"
     key: "guestfilesystem:/|percentage"
 
-NSXTMmgtClusterStatsCollector:
+NSXTMgmtClusterStatsCollector:
   - metric_suffix: "sys_capacity_distributed_firewall_rules_usage_count"
     key: "System Capacity|Distributed Firewall Rules|UsageCount"
   - metric_suffix: "sys_capacity_distributed_firewall_rules_usage_count_percentage"
@@ -371,7 +388,7 @@ NSXTMmgtClusterStatsCollector:
   - metric_suffix: "sys_capacity_groups_based_in_ip_usage_count"
     key: "System Capacity|Groups Based on IP Sets|UsageCount"
 
-NSXTMmgtClusterPropertiesCollector:
+NSXTMgmtClusterPropertiesCollector:
   - metric_suffix: "product_version"
     key: "NSXTProductVersion"
   - metric_suffix: "management_cluster_connectivity_status"
@@ -381,13 +398,13 @@ NSXTMmgtClusterPropertiesCollector:
     expected: "STABLE"
     key: "ConnectivityStatus|ClusterStatus|ControllerClusterStatusProperty"
 
-NSXTMmgtNodeStatsCollector:
+NSXTMgmtNodeStatsCollector:
   - metric_suffix: "memory_used"
     key: "Memory|Used"
   - metric_suffix: "memory_total"
     key: "Memory|Total"
 
-NSXTMmgtNodePropertiesCollector:
+NSXTMgmtNodePropertiesCollector:
   - metric_suffix: "version"
     key: "NSXTManagerNodeVersion"
   - metric_suffix: "connectivity_status"

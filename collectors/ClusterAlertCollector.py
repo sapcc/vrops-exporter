@@ -1,12 +1,13 @@
-from collectors.PropertiesCollector import PropertiesCollector
+from collectors.AlertCollector import AlertCollector
 
 
-class ClusterPropertiesCollector(PropertiesCollector):
+class ClusterAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'cluster'
         self.label_names = ['vccluster', 'vcenter', 'datacenter']
+        self.resourcekind = ["ClusterComputeResource"]
 
     def get_resource_uuids(self):
         return self.get_clusters_by_target()

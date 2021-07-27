@@ -1,12 +1,13 @@
-from collectors.PropertiesCollector import PropertiesCollector
+from collectors.AlertCollector import AlertCollector
 
 
-class VMPropertiesCollector(PropertiesCollector):
+class VMAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'virtualmachine'
         self.label_names = [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem', 'project']
+        self.resourcekind = ["Virtualmachine"]
         self.project_ids = True
 
     def get_resource_uuids(self):
@@ -22,4 +23,4 @@ class VMPropertiesCollector(PropertiesCollector):
                 self.vms[resource_id]['datacenter'].lower(),
                 self.vms[resource_id]['cluster'],
                 self.vms[resource_id]['parent_host_name'],
-                project_id] if resource_id else [] if resource_id in self.vms else []
+                project_id] if resource_id in self.vms else []

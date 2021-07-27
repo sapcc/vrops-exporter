@@ -98,4 +98,15 @@ class NSXTManagementCluster:
 
 
 class NSXTManagementNode:
+
+    def __init__(self):
+        self.management_service = list()
+
+    def add_mgmt_service(self, mgmt_service):
+        self.management_service.append(mgmt_service)
+
+
+class NSXTManagementService:
     pass
+
+

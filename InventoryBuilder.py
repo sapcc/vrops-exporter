@@ -25,6 +25,7 @@ class InventoryBuilder:
         self.iterated_inventory = dict()
         self.vrops_collection_times = dict()
         self.response_codes = dict()
+        self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
         if 'LOOPBACK' in os.environ:
@@ -71,6 +72,10 @@ class InventoryBuilder:
         def vms(target, iteration):
             return self.iterated_inventory[str(iteration)]['vms'].get(target, {})
 
+        @app.route('/<target>/nsxt_adapter/<int:iteration>', methods=['GET'])
+        def nsxt_adapter(target, iteration):
+            return self.iterated_inventory[str(iteration)]['nsxt_adapter'].get(target, {})
+
         @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_cluster(target, iteration):
             return self.iterated_inventory[str(iteration)]['nsxt_mgmt_cluster'].get(target, {})
@@ -78,6 +83,14 @@ class InventoryBuilder:
         @app.route('/<target>/nsxt_mgmt_nodes/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_nodes(target, iteration):
             return self.iterated_inventory[str(iteration)]['nsxt_mgmt_nodes'].get(target, {})
+
+        @app.route('/<target>/nsxt_mgmt_service/<int:iteration>', methods=['GET'])
+        def nsxt_mgmt_service(target, iteration):
+            return self.iterated_inventory[str(iteration)]['nsxt_mgmt_service'].get(target, {})
+
+        @app.route('/alertdefinitions/', methods=['GET'])
+        def alert_alertdefinitions():
+            return self.alertdefinitions
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
@@ -142,8 +155,9 @@ class InventoryBuilder:
             logger.info(f'real run {self.iteration}')
             threads = list()
             for vrops in self.vrops_list:
+                self.response_codes[vrops] = dict()
                 vrops_short_name = vrops.split('.')[0]
-                thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name))
+                thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name, self.iteration))
                 thread.start()
                 threads.append((thread, vrops))
 
@@ -172,14 +186,16 @@ class InventoryBuilder:
                 self.vrops_collection_times[vrops] = joined_threads[vrops]
                 logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
 
-            self.expose_vcenters()
-            self.expose_datacenters()
-            self.expose_clusters()
-            self.expose_hosts()
-            self.expose_datastores()
-            self.expose_vms()
-            self.expose_nsxt_mgmt_cluster()
-            self.expose_nsxt_mgmt_nodes()
+            self.provide_vcenters()
+            self.provide_datacenters()
+            self.provide_clusters()
+            self.provide_hosts()
+            self.provide_datastores()
+            self.provide_vms()
+            self.provide_nsxt_adapter()
+            self.provide_nsxt_mgmt_cluster()
+            self.provide_nsxt_mgmt_nodes()
+            self.provide_nsxt_mgmt_service()
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -191,37 +207,47 @@ class InventoryBuilder:
                 logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
                 time.sleep(int(self.sleep))
 
-    def query_vrops(self, vrops, vrops_short_name):
-        logger.info(f'Querying {vrops}')
-        token, self.response_codes[vrops] = Vrops.get_token(target=vrops)
+    def query_vrops(self, target, vrops_short_name, iteration):
+        vrops = Vrops()
+        logger.info(f'Querying {target}')
+        token, self.response_codes[target]["token"] = Vrops.get_token(target=target)
         if not token:
-            logger.warning(f'retrying connection to {vrops} in next iteration {self.iteration + 1}')
+            logger.warning(f'retrying connection to {target} in next iteration {self.iteration + 1}')
             return False
-        self.target_tokens[vrops] = token
+        self.target_tokens[target] = token
 
         logger.info(f'##########  Collecting resources {vrops_short_name}... ##########')
 
-        vcenter = self.create_vcenter_objects(vrops, token)
-        nsxt_adapter = self.create_nsxt_objects(vrops, token)
+        vcenter = self.create_vcenter_objects(vrops, target, token)
+        nsxt_adapter = self.create_nsxt_objects(vrops, target, token)
 
         self.vcenter_dict[vrops] = vcenter
         self.nsxt_dict[vrops] = nsxt_adapter
 
+        if iteration == 1:
+            self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
         return True
 
-    def create_vcenter_objects(self, target: str, token: str):
-        vrops = Vrops()
-        vcenter_adapter = Vrops.get_vcenter_adapter(vrops, target, token)
+    def create_vcenter_objects(self, vrops, target: str, token: str):
+        vcenter_adapter, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
+        # just one vcenter adapter supported
+        vcenter_adapter = vcenter_adapter[0]
+
         if not vcenter_adapter:
             logger.critical(f'Could not get vcenter adapter!')
             return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
-        datacenter = Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid])
-        cluster = Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter])
-        datastores = Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter])
-        hosts = Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster])
-        vms = Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid)
+        datacenter, self.response_codes[target]["datacenters"] = \
+            Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid])
+        cluster, self.response_codes[target]["clusters"] = \
+            Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter])
+        datastores, self.response_codes[target]["datastores"] = \
+            Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter])
+        hosts, self.response_codes[target]["hosts"] = \
+            Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster])
+        vms, self.response_codes[target]["vms"] = \
+            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid)
 
         for dc in datacenter:
             vcenter_adapter.add_datacenter(dc)
@@ -246,9 +272,8 @@ class InventoryBuilder:
                             logger.debug(f'Collecting VM: {vm.name}')
         return vcenter_adapter
 
-    def create_nsxt_objects(self, target: str, token: str):
-        vrops = Vrops()
-        nsxt_adapter = Vrops.get_nsxt_adapter(vrops, target, token)
+    def create_nsxt_objects(self, vrops, target: str, token: str):
+        nsxt_adapter, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter:
             return False
 
@@ -257,8 +282,12 @@ class InventoryBuilder:
             logger.debug(f'Collecting NSX-T adapter: {adapter.name}')
             nsxt_mgmt_plane.add_adapter(adapter)
 
-        nsxt_mgmt_cluster = Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter])
-        nsxt_mgmt_nodes = Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
+        nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
+            Vrops.get_nsxt_mgmt_cluster(vrops, target,token,[a.uuid for a in nsxt_adapter])
+        nsxt_mgmt_nodes, self.response_codes[target]["nsxt_mgmt_nodes"] = \
+            Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
+        nsxt_mgmt_service, self.response_codes[target]["nsxt_mgmt_services"] = \
+            Vrops.get_nsxt_mgmt_service(vrops, target, token, [n.uuid for n in nsxt_mgmt_nodes])
 
         for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
             for mgmt_cluster in nsxt_mgmt_cluster:
@@ -269,10 +298,15 @@ class InventoryBuilder:
                 for mgmt_node in nsxt_mgmt_nodes:
                     mgmt_cluster_object.add_mgmt_node(mgmt_node)
                     logger.debug(f'Collecting NSX-T management node: {mgmt_node.name}')
+                for nsxt_mgmt_node in mgmt_cluster_object.management_nodes:
+                    for mgmt_service_instance in nsxt_mgmt_service:
+                        if mgmt_service_instance.parent == nsxt_mgmt_node.uuid:
+                            nsxt_mgmt_node.add_mgmt_service(mgmt_service_instance)
+                            logger.debug(f'Collecting NSX-T management service: {mgmt_service_instance.name}')
 
         return nsxt_mgmt_plane
 
-    def expose_vcenters(self) -> dict:
+    def provide_vcenters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -285,14 +319,13 @@ class InventoryBuilder:
                     'name': vcenter.name,
                     'kind_dc_name': dc.name,
                     'kind_dc_uuid': dc.uuid,
-                    'vcenter': vcenter.name,
                     'target': vcenter.target,
                     'token': vcenter.token,
                 }
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 
-    def expose_datacenters(self) -> dict:
+    def provide_datacenters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -312,7 +345,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
 
-    def expose_datastores(self) -> dict:
+    def provide_datastores(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -334,7 +367,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
 
-    def expose_clusters(self) -> dict:
+    def provide_clusters(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -355,7 +388,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
 
-    def expose_hosts(self) -> dict:
+    def provide_hosts(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -378,7 +411,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
 
-    def expose_vms(self) -> dict:
+    def provide_vms(self) -> dict:
         tree = dict()
         for vcenter_entry in self.vcenter_dict:
             vcenter = self.vcenter_dict[vcenter_entry]
@@ -403,7 +436,24 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree
 
-    def expose_nsxt_mgmt_cluster(self) -> dict:
+    def provide_nsxt_adapter(self) -> dict:
+        tree = dict()
+        for nsxt_entry in self.nsxt_dict:
+            nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+            if not nsxt_mgmt_plane:
+                continue
+            tree[nsxt_mgmt_plane.target] = dict()
+            for nsxt_adapter in nsxt_mgmt_plane.adapter:
+                tree[nsxt_mgmt_plane.target][nsxt_adapter.uuid] = {
+                    'uuid': nsxt_adapter.uuid,
+                    'name': nsxt_adapter.name,
+                    'target': nsxt_mgmt_plane.target,
+                    'token': nsxt_mgmt_plane.token,
+                }
+        self.iterated_inventory[str(self.iteration)]['nsxt_adapter'] = tree
+        return tree
+
+    def provide_nsxt_mgmt_cluster(self) -> dict:
         tree = dict()
         for nsxt_entry in self.nsxt_dict:
             nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
@@ -423,7 +473,7 @@ class InventoryBuilder:
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_cluster'] = tree
         return tree
 
-    def expose_nsxt_mgmt_nodes(self) -> dict:
+    def provide_nsxt_mgmt_nodes(self) -> dict:
         tree = dict()
         for nsxt_entry in self.nsxt_dict:
             nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
@@ -444,4 +494,30 @@ class InventoryBuilder:
                             'token': nsxt_mgmt_plane.token,
                         }
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_nodes'] = tree
+        return tree
+
+    def provide_nsxt_mgmt_service(self) -> dict:
+        tree = dict()
+        for nsxt_entry in self.nsxt_dict:
+            nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+            if not nsxt_mgmt_plane:
+                continue
+            tree[nsxt_mgmt_plane.target] = dict()
+            for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
+                for mgmt_cluster in nsxt_adapter_object.management_cluster:
+                    for mgmt_node in mgmt_cluster.management_nodes:
+                        for mgmt_service in mgmt_node.management_service:
+                            tree[nsxt_mgmt_plane.target][mgmt_service.uuid] = {
+                                'uuid': mgmt_service.uuid,
+                                'name': mgmt_service.name,
+                                'nsxt_adapter_name': nsxt_adapter_object.name,
+                                'nsxt_adapter_uuid': nsxt_adapter_object.uuid,
+                                'mgmt_cluster_name': mgmt_cluster.name,
+                                'mgmt_cluster_uuid': mgmt_cluster.uuid,
+                                'mgmt_node_name': mgmt_node.name,
+                                'mgmt_node_uuid': mgmt_node.uuid,
+                                'target': nsxt_mgmt_plane.target,
+                                'token': nsxt_mgmt_plane.token,
+                            }
+        self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_service'] = tree
         return tree

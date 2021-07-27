@@ -1,12 +1,13 @@
-from collectors.PropertiesCollector import PropertiesCollector
+from collectors.AlertCollector import AlertCollector
 
 
-class VCenterPropertiesCollector(PropertiesCollector):
+class VCenterAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'vcenter'
         self.label_names = [self.vrops_entity_name, 'datacenter']
+        self.resourcekind = ["VMwareAdapter Instance"]
 
     def get_resource_uuids(self):
         return self.get_vcenters_by_target()
