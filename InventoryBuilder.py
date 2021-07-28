@@ -296,8 +296,9 @@ class InventoryBuilder:
                     logger.debug(f'Collecting NSX-T management cluster: {mgmt_cluster.name}')
             for mgmt_cluster_object in nsxt_adapter_object.management_cluster:
                 for mgmt_node in nsxt_mgmt_nodes:
-                    mgmt_cluster_object.add_mgmt_node(mgmt_node)
-                    logger.debug(f'Collecting NSX-T management node: {mgmt_node.name}')
+                    if mgmt_node.parent == mgmt_cluster_object.uuid:
+                        mgmt_cluster_object.add_mgmt_node(mgmt_node)
+                        logger.debug(f'Collecting NSX-T management node: {mgmt_node.name}')
                 for nsxt_mgmt_node in mgmt_cluster_object.management_nodes:
                     for mgmt_service_instance in nsxt_mgmt_service:
                         if mgmt_service_instance.parent == nsxt_mgmt_node.uuid:
