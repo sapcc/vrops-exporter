@@ -253,13 +253,14 @@ NSXTMgmtClusterPropertiesCollector:
 NSXTMgmtNodeStatsCollector:
   - 'vrops_api_response{class="nsxtmgmtnodestatscollector",target="testhost.test"}'
   - 'vrops_api_response_time_seconds{class="nsxtmgmtnodestatscollector",target="testhost.test"}'
-  - 'vrops_nsxt_mgmt_node_memory_total{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
-  - 'vrops_nsxt_mgmt_node_memory_used{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+  - 'vrops_nsxt_mgmt_node_memory_used{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+  - 'vrops_nsxt_mgmt_node_memory_total{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2"}'
 
 NSXTMgmtNodePropertiesCollector:
   - 'vrops_api_response{class="nsxtmgmtnodepropertiescollector",target="testhost.test"}'
-  - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2",version="test"}'
   - 'vrops_api_response_time_seconds{class="nsxtmgmtnodepropertiescollector",target="testhost.test"}'
-  - 'vrops_nsxt_mgmt_node_connectivity_status{connectivity_status="test",nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
-  - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
-  - 'vrops_nsxt_mgmt_node_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster3",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+  - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2",version="test"}'
+  - 'vrops_nsxt_mgmt_node_connectivity_status{connectivity_status="test",nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+  - 'vrops_nsxt_mgmt_node_connectivity_status{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+  - 'vrops_nsxt_mgmt_node_version{nsxt_adapter="nsxt_adapter2",nsxt_mgmt_cluster="nsxt_mgmt_cluster2",nsxt_mgmt_node="nsxt_mgmt_node2"}'
+
