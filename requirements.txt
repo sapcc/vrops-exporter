@@ -7,3 +7,4 @@ Flask==1.1.1
 gevent
 cffi
 beautifulsoup4==4.9.3
+lxml

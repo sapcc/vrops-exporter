@@ -10,6 +10,8 @@ class AlertCollector(BaseCollector):
     def __init__(self):
         super().__init__()
         self.alertdefinitions = self.get_alertdefinitions()
+        if not self.alertdefinitions:
+            logger.critical(f'{self.name} could not get the alertdefinitions from inventory. No mapping available.')
         self.resourcekind = list()
 
     def get_resource_uuids(self):
@@ -70,7 +72,7 @@ class AlertCollector(BaseCollector):
     def generate_alert_label_values(self, alerts):
         alert_labels = dict()
         for resource in alerts:
-            alert_entry = self.alertdefinitions.get(resource.get('alertDefinitionId'))
+            alert_entry = self.alertdefinitions.get(resource.get('alertDefinitionId', {}), {})
             for i, symptom in enumerate(alert_entry.get('symptoms', [])):
                 alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
                 alert_labels[f'symptom_{i+1}_data'] = str(symptom.get('state', 'n/a'))
