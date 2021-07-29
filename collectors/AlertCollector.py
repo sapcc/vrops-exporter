@@ -1,6 +1,7 @@
 from BaseCollector import BaseCollector
 from prometheus_client.core import GaugeMetricFamily
 import logging
+import time
 
 logger = logging.getLogger('vrops-exporter')
 
@@ -10,8 +11,11 @@ class AlertCollector(BaseCollector):
     def __init__(self):
         super().__init__()
         self.alertdefinitions = self.get_alertdefinitions()
-        if not self.alertdefinitions:
-            logger.critical(f'{self.name} could not get the alertdefinitions from inventory. No mapping available.')
+        while not self.alertdefinitions:
+            t = 60
+            logger.critical(f'{self.name} could not get the alertdefinitions from inventory.'
+                            f'Retrying in {t}s')
+            time.sleep(t)
         self.resourcekind = list()
 
     def get_resource_uuids(self):
