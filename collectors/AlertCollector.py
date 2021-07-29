@@ -16,6 +16,7 @@ class AlertCollector(BaseCollector):
             logger.critical(f'{self.name} could not get the alertdefinitions from inventory.'
                             f'Retrying in {t}s')
             time.sleep(t)
+            self.alertdefinitions = self.get_alertdefinitions()
         self.resourcekind = list()
 
     def get_resource_uuids(self):
