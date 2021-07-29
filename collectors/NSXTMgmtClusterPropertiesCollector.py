@@ -13,4 +13,4 @@ class NSXTMgmtClusterPropertiesCollector(PropertiesCollector):
 
     def get_labels(self, resource_id, project_ids):
         return [self.nsxt_mgmt_cluster[resource_id]['name'],
-                self.nsxt_mgmt_cluster[resource_id]['nsxt_adapter_name']] if resource_id else []
+                self.nsxt_mgmt_cluster[resource_id]['nsxt_adapter_name']] if resource_id in self.nsxt_mgmt_cluster else []

@@ -16,4 +16,4 @@ class NSXTMgmtServiceAlertCollector(AlertCollector):
         return [self.nsxt_mgmt_service[resource_id]['mgmt_cluster_name'],
                 self.nsxt_mgmt_service[resource_id]['nsxt_adapter_name'],
                 self.nsxt_mgmt_service[resource_id]['mgmt_node_name'],
-                self.nsxt_mgmt_service[resource_id]['name']] if resource_id else []
+                self.nsxt_mgmt_service[resource_id]['name']] if resource_id in self.nsxt_mgmt_service else []

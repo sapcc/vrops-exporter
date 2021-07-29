@@ -13,4 +13,4 @@ class VCenterPropertiesCollector(PropertiesCollector):
 
     def get_labels(self, resource_id, project_ids):
         return [self.vcenters[resource_id]['name'],
-                self.vcenters[resource_id]['kind_dc_name'].lower()] if resource_id else []
+                self.vcenters[resource_id]['kind_dc_name'].lower()] if resource_id in self.vcenters else []

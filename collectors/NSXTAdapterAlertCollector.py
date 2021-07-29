@@ -13,4 +13,4 @@ class NSXTAdapterAlertCollector(AlertCollector):
         return self.get_nsxt_adapter_by_target()
 
     def get_labels(self, resource_id, project_ids):
-        return [self.nsxt_adapter[resource_id]['name']] if resource_id else []
+        return [self.nsxt_adapter[resource_id]['name']] if resource_id in self.nsxt_adapter else []

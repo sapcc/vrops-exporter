@@ -73,6 +73,7 @@ class AlertCollector(BaseCollector):
         alert_labels = dict()
         for resource in alerts:
             alert_entry = self.alertdefinitions.get(resource.get('alertDefinitionId', {}), {})
+            alert_labels['description'] = alert_entry.get('description')
             for i, symptom in enumerate(alert_entry.get('symptoms', [])):
                 alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
                 alert_labels[f'symptom_{i+1}_data'] = str(symptom.get('state', 'n/a'))

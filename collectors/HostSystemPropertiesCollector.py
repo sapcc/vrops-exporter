@@ -15,4 +15,4 @@ class HostSystemPropertiesCollector(PropertiesCollector):
         return [self.hosts[resource_id]['name'],
                 self.hosts[resource_id]['vcenter'],
                 self.hosts[resource_id]['datacenter'].lower(),
-                self.hosts[resource_id]['parent_cluster_name']] if resource_id else []
+                self.hosts[resource_id]['parent_cluster_name']] if resource_id in self.hosts else []

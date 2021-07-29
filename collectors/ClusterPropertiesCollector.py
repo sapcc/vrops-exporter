@@ -14,4 +14,4 @@ class ClusterPropertiesCollector(PropertiesCollector):
     def get_labels(self, resource_id, project_ids):
         return [self.clusters[resource_id]['name'],
                 self.clusters[resource_id]['vcenter'],
-                self.clusters[resource_id]['parent_dc_name'].lower()] if resource_id else []
+                self.clusters[resource_id]['parent_dc_name'].lower()] if resource_id in self.clusters else []
