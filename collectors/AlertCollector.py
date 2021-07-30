@@ -1,5 +1,5 @@
 from BaseCollector import BaseCollector
-from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import InfoMetricFamily
 import logging
 import time
 
@@ -26,7 +26,7 @@ class AlertCollector(BaseCollector):
         raise NotImplementedError("Please Implement this method")
 
     def describe(self):
-        yield GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter', )
+        yield InfoMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter', )
 
     def collect(self):
         logger.info(f'{self.name} starts with collecting the alerts')
