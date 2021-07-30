@@ -15,4 +15,4 @@ class DatastorePropertiesCollector(PropertiesCollector):
         return [self.datastores[resource_id]['name'],
                 self.datastores[resource_id]['vcenter'],
                 self.datastores[resource_id]['type'],
-                self.datastores[resource_id]['parent_dc_name'].lower()] if resource_id else []
+                self.datastores[resource_id]['parent_dc_name'].lower()] if resource_id in self.datastores else []

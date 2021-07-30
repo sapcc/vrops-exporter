@@ -14,4 +14,4 @@ class NSXTMgmtNodeStatsCollector(StatsCollector):
     def get_labels(self, resource_id, project_ids):
         return [self.nsxt_mgmt_nodes[resource_id]['mgmt_cluster_name'],
                 self.nsxt_mgmt_nodes[resource_id]['nsxt_adapter_name'],
-                self.nsxt_mgmt_nodes[resource_id]['name']] if resource_id else []
+                self.nsxt_mgmt_nodes[resource_id]['name']] if resource_id in self.nsxt_mgmt_nodes else []

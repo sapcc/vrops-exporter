@@ -453,7 +453,7 @@ class Vrops:
             return response.json()
 
         else:
-            logger.error(f'Problem getting symptomdefinitions {target} : {response.text}')
+            logger.error(f'Problem getting {name} {target} : {response.text}')
             return {}
 
     def get_alert_recommendations(self, target, token):
@@ -473,7 +473,7 @@ class Vrops:
             alert_entry = dict()
             alert_entry['id'] = alert.get('id')
             alert_entry['name'] = alert.get('name')
-
+            alert_entry['description'] = alert.get('description', 'n/a')
             alert_entry['symptoms'] = list()
             symptomdefinition_ids = alert.get("states", [])[0].get("base-symptom-set", {}).get(
                 "symptomDefinitionIds", [])
