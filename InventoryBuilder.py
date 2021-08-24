@@ -221,8 +221,8 @@ class InventoryBuilder:
         vcenter = self.create_vcenter_objects(vrops, target, token)
         nsxt_adapter = self.create_nsxt_objects(vrops, target, token)
 
-        self.vcenter_dict[vrops] = vcenter
-        self.nsxt_dict[vrops] = nsxt_adapter
+        self.vcenter_dict[vrops_short_name] = vcenter
+        self.nsxt_dict[vrops_short_name] = nsxt_adapter
 
         if iteration == 1:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
