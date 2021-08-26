@@ -71,7 +71,7 @@ class AlertCollector(BaseCollector):
     def generate_alert_label_values(self, alert):
         alert_labels = dict()
         alert_entry = self.alertdefinitions.get(alert.get('alertDefinitionId', {}), {})
-        alert_labels['description'] = alert_entry.get('description')
+        alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
             alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
             alert_labels[f'symptom_{i+1}_data'] = str(symptom.get('state', 'n/a'))

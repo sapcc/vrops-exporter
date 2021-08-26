@@ -50,43 +50,43 @@ class InventoryBuilder:
 
         @app.route('/<target>/vcenters/<int:iteration>', methods=['GET'])
         def vcenters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['vcenters'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('vcenters').get(target, {})
 
         @app.route('/<target>/datacenters/<int:iteration>', methods=['GET'])
         def datacenters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['datacenters'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('datacenters').get(target, {})
 
         @app.route('/<target>/clusters/<int:iteration>', methods=['GET'])
         def clusters(target, iteration):
-            return self.iterated_inventory[str(iteration)]['clusters'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('clusters').get(target, {})
 
         @app.route('/<target>/hosts/<int:iteration>', methods=['GET'])
         def hosts(target, iteration):
-            return self.iterated_inventory[str(iteration)]['hosts'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('hosts').get(target, {})
 
         @app.route('/<target>/datastores/<int:iteration>', methods=['GET'])
         def datastores(target, iteration):
-            return self.iterated_inventory[str(iteration)]['datastores'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('datastores').get(target, {})
 
         @app.route('/<target>/vms/<int:iteration>', methods=['GET'])
         def vms(target, iteration):
-            return self.iterated_inventory[str(iteration)]['vms'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('vms').get(target, {})
 
         @app.route('/<target>/nsxt_adapter/<int:iteration>', methods=['GET'])
         def nsxt_adapter(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_adapter'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('nsxt_adapter').get(target, {})
 
         @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_cluster(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_mgmt_cluster'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('nsxt_mgmt_cluster').get(target, {})
 
         @app.route('/<target>/nsxt_mgmt_nodes/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_nodes(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_mgmt_nodes'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('nsxt_mgmt_nodes').get(target, {})
 
         @app.route('/<target>/nsxt_mgmt_service/<int:iteration>', methods=['GET'])
         def nsxt_mgmt_service(target, iteration):
-            return self.iterated_inventory[str(iteration)]['nsxt_mgmt_service'].get(target, {})
+            return self.iterated_inventory.get(str(iteration)).get('nsxt_mgmt_service').get(target, {})
 
         @app.route('/alertdefinitions/', methods=['GET'])
         def alert_alertdefinitions():
