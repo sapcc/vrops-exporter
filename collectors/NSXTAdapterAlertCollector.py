@@ -7,7 +7,7 @@ class NSXTAdapterAlertCollector(AlertCollector):
         super().__init__()
         self.vrops_entity_name = 'nsxt_adapter'
         self.label_names = [self.vrops_entity_name]
-        self.resourcekind = ["NSXTAdapter Instance"]
+        self.resourcekind = ["NSXTAdapterInstance"]
 
     def get_resource_uuids(self):
         return self.get_nsxt_adapter_by_target()
