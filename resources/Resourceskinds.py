@@ -92,9 +92,13 @@ class NSXTManagementCluster:
 
     def __init__(self):
         self.management_nodes = list()
+        self.transport_zones = list()
 
     def add_mgmt_node(self, mgmt_node):
         self.management_nodes.append(mgmt_node)
+
+    def add_transport_zone(self, transport_zone):
+        self.transport_zones.append(transport_zone)
 
 
 class NSXTManagementNode:
@@ -109,4 +113,16 @@ class NSXTManagementNode:
 class NSXTManagementService:
     pass
 
+
+class NSXTTransportZone:
+
+    def __init__(self):
+        self.transport_nodes = list()
+
+    def add_transport_node(self, transport_node):
+        self.transport_nodes.append(transport_node)
+
+
+class NSXTTransportNode:
+    pass
 

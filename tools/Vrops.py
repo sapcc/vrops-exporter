@@ -195,6 +195,14 @@ class Vrops:
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
                                   resourcekinds=["ManagementService"], resource_class=NSXTManagementService)
 
+    def get_nsxt_transport_zone(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
+                                  resourcekinds=["TransportZone"], resource_class=NSXTTransportZone)
+
+    def get_nsxt_transport_node(self, target, token, parent_uuids):
+        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
+                                  resourcekinds=["TransportNode"], resource_class=NSXTTransportNode)
+
     def get_latest_values_multiple(self, target: str, token: str,
                                    uuids: list,
                                    keys: list,

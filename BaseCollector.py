@@ -115,6 +115,14 @@ class BaseCollector(ABC):
         self.nsxt_mgmt_service = request.json() if request else {}
         return self.nsxt_mgmt_service
 
+    def get_nsxt_transport_nodes(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/nsxt_transport_nodes/{}".format(current_iteration)
+        request = requests.get(url)
+        self.nsxt_transport_nodes = request.json() if request else {}
+        return self.nsxt_transport_nodes
+
     def get_alertdefinitions(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions")
         self.alertdefinitions = request.json() if request else {}
@@ -190,6 +198,12 @@ class BaseCollector(ABC):
         nsxt_mgmt_service_dict = self.get_nsxt_mgmt_service(self.target)
         self.target_nsxt_mgmt_service = [nsxt_mgmt_service_dict[uuid]['uuid'] for uuid in nsxt_mgmt_service_dict]
         return self.target_nsxt_mgmt_service
+
+    def get_nsxt_transport_nodes_by_target(self):
+        nsxt_transport_nodes_dict = self.get_nsxt_transport_nodes(self.target)
+        self.target_nsxt_transport_nodes = [nsxt_transport_nodes_dict[uuid]['uuid'] for uuid in
+                                            nsxt_transport_nodes_dict]
+        return self.target_nsxt_transport_nodes
 
     def get_project_ids_by_target(self):
         try:
