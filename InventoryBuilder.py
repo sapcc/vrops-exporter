@@ -88,6 +88,10 @@ class InventoryBuilder:
         def nsxt_mgmt_service(target, iteration):
             return self.iterated_inventory.get(str(iteration)).get('nsxt_mgmt_service').get(target, {})
 
+        @app.route('/<target>/nsxt_transport_nodes/<int:iteration>', methods=['GET'])
+        def nsxt_transport_nodes(target, iteration):
+            return self.iterated_inventory.get(str(iteration)).get('nsxt_transport_nodes').get(target, {})
+
         @app.route('/alertdefinitions/', methods=['GET'])
         def alert_alertdefinitions():
             return self.alertdefinitions
@@ -196,6 +200,7 @@ class InventoryBuilder:
             self.provide_nsxt_mgmt_cluster()
             self.provide_nsxt_mgmt_nodes()
             self.provide_nsxt_mgmt_service()
+            self.provide_nsxt_transport_nodes()
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -283,11 +288,15 @@ class InventoryBuilder:
             nsxt_mgmt_plane.add_adapter(adapter)
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
-            Vrops.get_nsxt_mgmt_cluster(vrops, target,token,[a.uuid for a in nsxt_adapter])
+            Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter])
         nsxt_mgmt_nodes, self.response_codes[target]["nsxt_mgmt_nodes"] = \
             Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
         nsxt_mgmt_service, self.response_codes[target]["nsxt_mgmt_services"] = \
             Vrops.get_nsxt_mgmt_service(vrops, target, token, [n.uuid for n in nsxt_mgmt_nodes])
+        nsxt_transport_zones, self.response_codes[target]["nsxt_transport_zones"] = \
+            Vrops.get_nsxt_transport_zone(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
+        nsxt_transport_nodes, self.response_codes[target]["nsxt_transport_nodes"] = \
+            Vrops.get_nsxt_transport_node(vrops, target, token, [t.uuid for t in nsxt_transport_zones])
 
         for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
             for mgmt_cluster in nsxt_mgmt_cluster:
@@ -304,6 +313,15 @@ class InventoryBuilder:
                         if mgmt_service_instance.parent == nsxt_mgmt_node.uuid:
                             nsxt_mgmt_node.add_mgmt_service(mgmt_service_instance)
                             logger.debug(f'Collecting NSX-T management service: {mgmt_service_instance.name}')
+                for transport_zone in nsxt_transport_zones:
+                    if transport_zone.parent == mgmt_cluster_object.uuid:
+                        mgmt_cluster_object.add_transport_zone(transport_zone)
+                        logger.debug(f'Collecting NSX-T transport zone: {transport_zone.name}')
+                for nsxt_transport_zone in mgmt_cluster_object.transport_zones:
+                    for transport_node in nsxt_transport_nodes:
+                        if transport_node.parent == nsxt_transport_zone.uuid:
+                            nsxt_transport_zone.add_transport_node(transport_node)
+                            logger.debug(f'Collecting NSX-T transport node: {transport_node.name}')
 
         return nsxt_mgmt_plane
 
@@ -521,4 +539,30 @@ class InventoryBuilder:
                                 'token': nsxt_mgmt_plane.token,
                             }
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_service'] = tree
+        return tree
+
+    def provide_nsxt_transport_nodes(self) -> dict:
+        tree = dict()
+        for nsxt_entry in self.nsxt_dict:
+            nsxt_mgmt_plane = self.nsxt_dict[nsxt_entry]
+            if not nsxt_mgmt_plane:
+                continue
+            tree[nsxt_mgmt_plane.target] = dict()
+            for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
+                for mgmt_cluster in nsxt_adapter_object.management_cluster:
+                    for transport_zone in mgmt_cluster.transport_zones:
+                        for transport_node in transport_zone.transport_nodes:
+                            tree[nsxt_mgmt_plane.target][transport_node.uuid] = {
+                                'uuid': transport_node.uuid,
+                                'name': transport_node.name,
+                                'nsxt_adapter_name': nsxt_adapter_object.name,
+                                'nsxt_adapter_uuid': nsxt_adapter_object.uuid,
+                                'mgmt_cluster_name': mgmt_cluster.name,
+                                'mgmt_cluster_uuid': mgmt_cluster.uuid,
+                                'transport_zone_name': transport_zone.name,
+                                'transport_zone_uuid': transport_zone.uuid,
+                                'target': nsxt_mgmt_plane.target,
+                                'token': nsxt_mgmt_plane.token,
+                            }
+        self.iterated_inventory[str(self.iteration)]['nsxt_transport_nodes'] = tree
         return tree

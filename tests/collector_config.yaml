@@ -3,6 +3,7 @@ default_collectors:
     - 'NSXTMgmtClusterPropertiesCollector'
     - 'NSXTMgmtNodeStatsCollector'
     - 'NSXTMgmtNodePropertiesCollector'
+    - 'NSXTTransportNodePropertiesCollector'
     - 'ClusterStatsCollector'
     - 'ClusterPropertiesCollector'
     - 'DatastoreStatsCollector'
@@ -22,6 +23,7 @@ default_collectors:
     - 'NSXTMgmtClusterAlertCollector'
     - 'NSXTMgmtServiceAlertCollector'
     - 'NSXTMgmtNodeAlertCollector'
+    - 'NSXTTransportNodeAlertCollector'
     - 'ClusterAlertCollector'
     - 'DatastoreAlertCollector'
     - 'HostSystemAlertCollector'
@@ -409,3 +411,7 @@ NSXTMgmtNodePropertiesCollector:
     key: "NSXTManagerNodeVersion"
   - metric_suffix: "connectivity_status"
     key: "ConnectivityStatus|ManagerConnectivityProperty"
+
+NSXTTransportNodePropertiesCollector:
+  - metric_suffix: "connectivity_status"
+    key: "ConnectivityStatus|TransportNodeState"

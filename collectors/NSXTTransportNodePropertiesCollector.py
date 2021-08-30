@@ -1,13 +1,12 @@
-from collectors.AlertCollector import AlertCollector
+from collectors.PropertiesCollector import PropertiesCollector
 
 
-class NSXTTransportNodeAlertCollector(AlertCollector):
+class NSXTTransportNodePropertiesCollector(PropertiesCollector):
 
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'nsxt_transport_node'
         self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter', 'transport_zone_name', 'nsxt_transport_node']
-        self.resourcekind = ["TransportNode"]
 
     def get_resource_uuids(self):
         return self.get_nsxt_transport_nodes_by_target()
