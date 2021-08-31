@@ -355,6 +355,7 @@ class InventoryBuilder:
                 tree[vcenter.target][dc.uuid] = {
                     'uuid': dc.uuid,
                     'name': dc.name,
+                    'internal_name': dc.internal_name,
                     'parent_vcenter_uuid': vcenter.uuid,
                     'parent_vcenter_name': vcenter.name,
                     'vcenter': vcenter.name,
@@ -376,6 +377,7 @@ class InventoryBuilder:
                     tree[vcenter.target][datastore.uuid] = {
                         'uuid': datastore.uuid,
                         'name': datastore.name,
+                        'internal_name': datastore.internal_name,
                         'parent_dc_uuid': dc.uuid,
                         'parent_dc_name': dc.name,
                         'type': datastore.type,
@@ -398,6 +400,7 @@ class InventoryBuilder:
                     tree[vcenter.target][cluster.uuid] = {
                         'uuid': cluster.uuid,
                         'name': cluster.name,
+                        'internal_name': cluster.internal_name,
                         'parent_dc_uuid': dc.uuid,
                         'parent_dc_name': dc.name,
                         'vcenter': vcenter.name,
@@ -420,6 +423,7 @@ class InventoryBuilder:
                         tree[vcenter.target][host.uuid] = {
                             'uuid': host.uuid,
                             'name': host.name,
+                            'internal_name': host.internal_name,
                             'parent_cluster_uuid': cluster.uuid,
                             'parent_cluster_name': cluster.name,
                             'datacenter': dc.name,
@@ -444,6 +448,7 @@ class InventoryBuilder:
                             tree[vcenter.target][vm.uuid] = {
                                 'uuid': vm.uuid,
                                 'name': vm.name,
+                                'internal_name': vm.internal_name,
                                 'parent_host_uuid': host.uuid,
                                 'parent_host_name': host.name,
                                 'cluster': cluster.name,
