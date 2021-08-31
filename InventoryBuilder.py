@@ -296,7 +296,7 @@ class InventoryBuilder:
         nsxt_transport_zones, self.response_codes[target]["nsxt_transport_zones"] = \
             Vrops.get_nsxt_transport_zone(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster])
         nsxt_transport_nodes, self.response_codes[target]["nsxt_transport_nodes"] = \
-            Vrops.get_nsxt_transport_node(vrops, target, token, [t.uuid for t in nsxt_transport_zones])
+            Vrops.get_nsxt_transport_node(vrops, target, token, [z.uuid for z in nsxt_transport_zones])
 
         for nsxt_adapter_object in nsxt_mgmt_plane.adapter:
             for mgmt_cluster in nsxt_mgmt_cluster:
