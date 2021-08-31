@@ -128,6 +128,13 @@ class Vrops:
                     resource_object.uuid = resource["resource"]["identifier"]
                     resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resource_object.parent = resource.get("relatedResources", [None])[0]
+                    resource_identifiers = resource.get('resource').get('resourceKey').get('resourceIdentifiers')
+                    resource_object.internal_name = None
+                    internal_name = list(filter(lambda identifier_type:
+                                                identifier_type.get('identifierType').get('name')
+                                                == 'VMEntityObjectID', resource_identifiers))
+                    if internal_name:
+                        resource_object.internal_name = internal_name[0].get('value')
                     resources.append(resource_object)
                 return resources, response.status_code
             except json.decoder.JSONDecodeError as e:
