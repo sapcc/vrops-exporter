@@ -84,8 +84,8 @@ class Vrops:
                       adapterkind: str,
                       resourcekinds: list,  # Array of resource kind keys
                       resource_class,  #
-                      resource_status: list = None, # Array of resource data collection stats
-                      resource_health: list = None # Array of resource health
+                      resource_status: list = None,  # Array of resource data collection stats
+                      resource_health: list = None  # Array of resource health
                       ) -> (list, int):
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
@@ -131,8 +131,8 @@ class Vrops:
                     resource_object.uuid = resource["resource"]["identifier"]
                     resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resource_object.parent = resource.get("relatedResources", [None])[0]
-                    resource_identifiers = resource.get('resource', {}).get('resourceKey', {})\
-                                                                       .get('resourceIdentifiers')
+                    resource_identifiers = resource.get('resource', {}).get('resourceKey', {}) \
+                        .get('resourceIdentifiers')
                     resource_object.internal_name = None
                     internal_name = list(filter(lambda identifier_type:
                                                 identifier_type.get('identifierType', {}).get('name')
@@ -187,12 +187,10 @@ class Vrops:
                                                                      resourcekinds=["VirtualMachine"],
                                                                      resource_class=VirtualMachine,
                                                                      resource_status=[
-                                                                         "DATA_RECEIVING",
-                                                                         "UNKNOWN"],
-                                                                     resource_health=["GREEN", "YELLOW",
-                                                                                      "ORANGE", "GREY"]
+                                                                         "DATA_RECEIVING", "UNKNOWN"],
+                                                                     resource_health=[
+                                                                         "GREEN", "YELLOW", "ORANGE", "RED", "GREY"]
                                                                      )
-
                 vms.extend(vm_chunks)
                 api_responding.append(api_chunk_responding)
             logger.debug(f'Number of VMs collected: {len(vms)}')
