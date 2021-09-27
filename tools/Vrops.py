@@ -196,7 +196,8 @@ class Vrops:
             logger.debug(f'Number of VMs collected: {len(vms)}')
             return vms, max(api_responding)
         return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
-                                  resource_class=VirtualMachine, resource_status=["DATA_RECEIVING"])
+                                  resource_class=VirtualMachine, resource_status=["DATA_RECEIVING", "UNKNOWN"],
+                                  resource_health=["GREEN", "YELLOW", "ORANGE", "RED", "GREY"])
 
     def get_nsxt_mgmt_cluster(self, target, token, parent_uuids):
         return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
