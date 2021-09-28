@@ -129,27 +129,28 @@ class BaseCollector(ABC):
         return self.alertdefinitions
 
     def get_iteration(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/iteration")
-        self.iteration = request.json() if request else {}
+        self.iteration = self.do_request(url="http://" + os.environ['INVENTORY'] + "/iteration")
         return self.iteration
 
     def get_collection_times(self):
         self.wait_for_inventory_data()
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/collection_times")
-        self.collection_times = request.json() if request else {}
+        self.collection_times = self.do_request(url="http://" + os.environ['INVENTORY'] + "/collection_times")
         return self.collection_times
 
     def get_inventory_api_responses(self):
         self.wait_for_inventory_data()
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
-        self.api_responses = request.json() if request else {}
+        self.api_responses = self.do_request(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
         return self.api_responses
 
     def get_target_tokens(self):
+        self.target_tokens = self.do_request(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
+        return self.target_tokens
+
+    def do_request(self, url):
         try:
-            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
-            self.target_tokens = request.json() if request else {}
-            return self.target_tokens
+            request = requests.get(url)
+            response = request.json() if request else {}
+            return response
         except requests.exceptions.ConnectionError as e:
             logger.critical(f'No connection to inventory: {os.environ["INVENTORY"]} - Error: {e}')
             return {}
