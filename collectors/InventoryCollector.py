@@ -1,6 +1,6 @@
 from BaseCollector import BaseCollector
 
-from prometheus_client.core import GaugeMetricFamily
+from prometheus_client.core import GaugeMetricFamily, CounterMetricFamily
 import logging
 
 logger = logging.getLogger('vrops-exporter')
@@ -16,7 +16,7 @@ class InventoryCollector(BaseCollector):
     def describe(self):
         for resourcekind in self.resourcekinds:
             yield GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory')
-        yield GaugeMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
+        yield CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
         yield GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory')
         yield GaugeMetricFamily('vrops_api_response', 'vrops-exporter')
 
@@ -47,7 +47,7 @@ class InventoryCollector(BaseCollector):
         return gauges
 
     def iteration_metric(self, target):
-        iteration_gauge = GaugeMetricFamily('vrops_inventory_iteration', 'vrops_inventory', labels=["target"])
+        iteration_gauge = CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory', labels=["target"])
         iteration = self.get_iteration()
         if not iteration:
             return iteration_gauge
