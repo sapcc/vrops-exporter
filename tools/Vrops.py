@@ -87,6 +87,9 @@ class Vrops:
                       resource_status: list = None,  # Array of resource data collection stats
                       resource_health: list = None  # Array of resource health
                       ) -> (list, int):
+        if not uuids:
+            logger.debug(f'No parent resources for {resourcekinds} from {target}')
+            return [], 200
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
