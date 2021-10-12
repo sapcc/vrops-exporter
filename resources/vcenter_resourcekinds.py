@@ -126,3 +126,14 @@ class NSXTTransportZone:
 class NSXTTransportNode:
     pass
 
+
+class VCenterOperationsAdapterInstance:
+
+    def __init__(self, target, token):
+        self.target = target
+        self.token = token
+
+
+class SelfMonitoringInstance:
+    pass
+
