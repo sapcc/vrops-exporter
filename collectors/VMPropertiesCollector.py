@@ -7,7 +7,7 @@ class VMPropertiesCollector(PropertiesCollector):
         super().__init__()
         self.vrops_entity_name = 'virtualmachine'
         self.label_names = [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
-                            'resource_uuid', 'project']
+                            'resource_uuid', 'internal_name', 'project']
         self.project_ids = True
 
     def get_resource_uuids(self):
@@ -24,4 +24,5 @@ class VMPropertiesCollector(PropertiesCollector):
                 self.vms[resource_id]['cluster'],
                 self.vms[resource_id]['parent_host_name'],
                 self.vms[resource_id]['uuid'],
+                self.vms[resource_id]['internal_name'],
                 project_id] if resource_id else [] if resource_id in self.vms else []
