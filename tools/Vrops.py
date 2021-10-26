@@ -57,7 +57,8 @@ class Vrops:
             response = requests.get(url,
                                     params=querystring,
                                     verify=False,
-                                    headers=headers)
+                                    headers=headers,
+                                    timeout=60)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return adapter, 503
@@ -120,7 +121,8 @@ class Vrops:
                                      data=json.dumps(payload),
                                      params=querystring,
                                      verify=False,
-                                     headers=headers)
+                                     headers=headers,
+                                     timeout=60)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return resources, 503
@@ -359,7 +361,8 @@ class Vrops:
                                      data=json.dumps(payload),
                                      params=querystring,
                                      verify=False,
-                                     headers=headers)
+                                     headers=headers,
+                                     timeout=60)
         except Exception as e:
             logger.error(f'Problem getting project folder - Error: {e}')
             return [], 503
@@ -427,7 +430,8 @@ class Vrops:
                                      data=json.dumps(payload),
                                      params=querystring,
                                      verify=False,
-                                     headers=headers)
+                                     headers=headers,
+                                     timeout=60)
         except Exception as e:
             logger.error(f'Problem getting project folder - Error: {e}')
             return [], 503
@@ -471,7 +475,8 @@ class Vrops:
             response = requests.get(url,
                                     params=querystring,
                                     verify=False,
-                                    headers=headers)
+                                    headers=headers,
+                                    timeout=60)
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return {}
