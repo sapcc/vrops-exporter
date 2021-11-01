@@ -31,6 +31,9 @@ class Vrops:
                                      verify=False,
                                      headers=headers,
                                      timeout=10)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request to {url} timed out. Error: {e}')
+            return False, 504
         except Exception as e:
             logger.error(f'Problem connecting to {target}. Error: {e}')
             return False, 503
@@ -58,7 +61,10 @@ class Vrops:
                                     params=querystring,
                                     verify=False,
                                     headers=headers,
-                                    timeout=60)
+                                    timeout=30)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request to {url} timed out. Error: {e}')
+            return adapter, 504
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return adapter, 503
@@ -122,7 +128,10 @@ class Vrops:
                                      params=querystring,
                                      verify=False,
                                      headers=headers,
-                                     timeout=60)
+                                     timeout=30)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request to {url} timed out. Error: {e}')
+            return resources, 504
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return resources, 503
@@ -312,6 +321,10 @@ class Vrops:
                                      verify=False,
                                      headers=headers,
                                      timeout=60)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'{collector} has timed out getting latest data from: {target} - Error: {e}')
+            q.put([[], 504, 999])
+            return
         except Exception as e:
             logger.error(f'{collector} has problems getting latest data from: {target} - Error: {e}')
             q.put([[], 503, 999])
@@ -362,7 +375,10 @@ class Vrops:
                                      params=querystring,
                                      verify=False,
                                      headers=headers,
-                                     timeout=60)
+                                     timeout=30)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request for getting project folder timed out - Error: {e}')
+            return [], 504
         except Exception as e:
             logger.error(f'Problem getting project folder - Error: {e}')
             return [], 503
@@ -431,7 +447,10 @@ class Vrops:
                                      params=querystring,
                                      verify=False,
                                      headers=headers,
-                                     timeout=60)
+                                     timeout=30)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request for getting project folder timed out - Error: {e}')
+            return [], 504
         except Exception as e:
             logger.error(f'Problem getting project folder - Error: {e}')
             return [], 503
@@ -476,7 +495,10 @@ class Vrops:
                                     params=querystring,
                                     verify=False,
                                     headers=headers,
-                                    timeout=60)
+                                    timeout=30)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request to {url} timed out. Error: {e}')
+            return {}
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return {}
