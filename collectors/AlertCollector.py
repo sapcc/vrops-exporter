@@ -18,6 +18,7 @@ class AlertCollector(BaseCollector):
             time.sleep(t)
             self.alertdefinitions = self.get_alertdefinitions()
         self.resourcekind = list()
+        self.adapterkind = list()
 
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
@@ -47,7 +48,9 @@ class AlertCollector(BaseCollector):
             self.vrops.get_alerts(self.target, token,
                                   resourcekinds=self.resourcekind,
                                   alert_criticality=[a for a in alert_config.get('alertCriticality')],
-                                  active_only=alert_config.get('activeOnly'))
+                                  active_only=alert_config.get('activeOnly'),
+                                  adapterkinds=self.adapterkind if self.adapterkind else [])
+
         yield self.create_api_response_code_metric(self.name, api_responding)
         yield self.create_api_response_time_metric(self.name, api_response_time)
 

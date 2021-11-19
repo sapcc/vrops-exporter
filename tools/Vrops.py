@@ -2,12 +2,12 @@ from urllib3 import disable_warnings
 from urllib3 import exceptions
 from tools.helper import chunk_list, remove_html_tags
 from threading import Thread
-from resources.Resourceskinds import *
 import requests
 import json
 import os
 import queue
 import logging
+import re
 
 logger = logging.getLogger('vrops-exporter')
 
@@ -44,7 +44,7 @@ class Vrops:
             logger.error(f'Problem getting token from {target} : {response.text}')
             return False, response.status_code
 
-    def get_adapter(self, target: str, token: str, adapterkind: str, adapter_obj) -> (list, int):
+    def get_adapter(self, target: str, token: str, adapterkind: str) -> (list, int):
         url = f'https://{target}/suite-api/api/adapters'
         querystring = {
             "adapterKindKey": adapterkind
@@ -71,9 +71,17 @@ class Vrops:
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
-                adapter_object = adapter_obj(target, token)
-                adapter_object.name = resource["resourceKey"]["name"]
-                adapter_object.uuid = resource["id"]
+                resourcekindkey = resource["resourceKey"]["resourceKindKey"]
+                resourcekindkey = re.sub("[^a-zA-Z]+", "", resourcekindkey)
+
+                adapter_object = type(resourcekindkey, (object,), {
+                    "name": resource["resourceKey"]["name"],
+                    "uuid": resource["id"],
+                    "adapterkind": adapterkind,
+                    "resourcekindkey": resourcekindkey,
+                    "target": target,
+                    "token": token
+                })
                 adapter.append(adapter_object)
             return adapter, response.status_code
         else:
@@ -81,37 +89,46 @@ class Vrops:
             return adapter, response.status_code
 
     def get_vcenter_adapter(self, target, token):
-        return self.get_adapter(target, token, adapterkind="VMWARE", adapter_obj=Vcenter)
+        return self.get_adapter(target, token, adapterkind="VMWARE")
 
     def get_nsxt_adapter(self, target, token):
-        return self.get_adapter(target, token, adapterkind="NSXTAdapter", adapter_obj=NSXTAdapterInstance)
+        return self.get_adapter(target, token, adapterkind="NSXTAdapter")
 
-    def get_resources(self, target: str, token: str,
-                      uuids: list,
+    def get_vcenter_operations_adapter_intance(self, target, token):
+        return self.get_adapter(target, token, adapterkind="vCenter Operations Adapter")
+
+    def get_sddc_health_adapter_intance(self, target, token):
+        return self.get_adapter(target, token, adapterkind="SDDCHealthAdapter")
+
+    def get_resources(self, target: str,
+                      token: str,
                       adapterkind: str,
                       resourcekinds: list,  # Array of resource kind keys
-                      resource_class,  #
-                      resource_status: list = None,  # Array of resource data collection stats
-                      resource_health: list = None  # Array of resource health
+                      uuids: list,  # Array of parent uuids
+                      query_specs: dict,  # Dict of query specifications
                       ) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
             return [], 200
-        logger.debug(f'Getting {resourcekinds} from {target}')
+        logger.debug(f'Getting {resourcekinds} from {target}, query specs: {query_specs}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
         querystring = {
             'pageSize': 10000
         }
-        resource_status_array = [] if not resource_status else resource_status
-        resource_health_array = [] if not resource_health else resource_health
+
+        r_status_list = [rs for rs in query_specs.get('resourceStatus', [])]
+        r_health_list = [rh for rh in query_specs.get('resourceHealth', [])]
+        r_states_list = [rst for rst in query_specs.get('resourceStates', [])]
+
         payload = {
             "relationshipType": "DESCENDANT",
             "resourceIds": uuids,
             "resourceQuery": {
                 "adapterKind": [adapterkind],
                 "resourceKind": resourcekinds,
-                "resourceStatus": resource_status_array,
-                "resourceHealth": resource_health_array
+                "resourceStatus": r_status_list,
+                "resourceHealth": r_health_list,
+                "resourceState": r_states_list
             },
             "hierarchyDepth": 5
         }
@@ -140,19 +157,22 @@ class Vrops:
             try:
                 relations = response.json()["resourcesRelations"]
                 for resource in relations:
-                    resource_object = resource_class()
-                    resource_object.name = resource["resource"]["resourceKey"]["name"]
-                    resource_object.uuid = resource["resource"]["identifier"]
-                    resource_object.resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
-                    resource_object.parent = resource.get("relatedResources", [None])[0]
+                    resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
+                    resourcekind = re.sub("[^a-zA-Z]+", "", resourcekind)
                     resource_identifiers = resource.get('resource', {}).get('resourceKey', {}) \
                         .get('resourceIdentifiers')
-                    resource_object.internal_name = None
                     internal_name = list(filter(lambda identifier_type:
                                                 identifier_type.get('identifierType', {}).get('name')
                                                 == 'VMEntityObjectID', resource_identifiers))
-                    if internal_name:
-                        resource_object.internal_name = internal_name[0].get('value')
+                    internal_name = internal_name[0].get('value') if internal_name else None
+
+                    resource_object = type(resourcekind, (object,), {
+                        "name": resource["resource"]["resourceKey"]["name"],
+                        "uuid": resource["resource"]["identifier"],
+                        "resourcekind": resourcekind,
+                        "parent": resource.get("relatedResources", )[0],
+                        "internal_name": internal_name
+                    })
                     resources.append(resource_object)
                 return resources, response.status_code
             except json.decoder.JSONDecodeError as e:
@@ -163,26 +183,42 @@ class Vrops:
             logger.error(f'Problem getting resources from {target} : {response.text}')
             return resources, response.status_code
 
-    def get_datacenter(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                  resourcekinds=["Datacenter"], resource_class=Datacenter)
+    def get_datacenter(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["Datacenter"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_cluster(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                  resourcekinds=["ClusterComputeResource"], resource_class=Cluster)
+    def get_cluster(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["ClusterComputeResource"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_datastores(self, target, token, parent_uuids):
-        datastores, api_responding = self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                                        resourcekinds=["Datastore"], resource_class=Datastore)
+    def get_datastores(self, target, token, parent_uuids, query_specs):
+        datastores, api_responding = self.get_resources(target, token, adapterkind="VMWARE",
+                                                        resourcekinds=["Datastore"], uuids=parent_uuids,
+                                                        query_specs=query_specs)
         for datastore in datastores:
-            datastore.get_type(datastore.name)
+            if "p_ssd" in datastore.name:
+                datastore.type = "vmfs_p_ssd"
+            elif "s_hdd" in datastore.name:
+                datastore.type = "vmfs_s_hdd"
+            elif "eph" in datastore.name:
+                datastore.type = "ephemeral"
+            elif "Management" in datastore.name:
+                datastore.type = "Management"
+            elif "vVOL" in datastore.name:
+                datastore.type = "vVOL"
+            elif "local" in datastore.name:
+                datastore.type = "local"
+            elif "swap" in datastore.name:
+                datastore.type = "NVMe"
+            else:
+                datastore.type = "other"
         return datastores, api_responding
 
-    def get_hosts(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE",
-                                  resourcekinds=["HostSystem"], resource_class=Host)
+    def get_hosts(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["HostSystem"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_vms(self, target, token, parent_uuids, vcenter_uuid):
+    def get_vms(self, target, token, parent_uuids, vcenter_uuid, query_specs):
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
@@ -197,41 +233,53 @@ class Vrops:
             vms = list()
             api_responding = list()
             for uuid_list in uuids_chunked:
-                vm_chunks, api_chunk_responding = self.get_resources(target, token, uuid_list, adapterkind="VMWARE",
+                vm_chunks, api_chunk_responding = self.get_resources(target, token, adapterkind="VMWARE",
                                                                      resourcekinds=["VirtualMachine"],
-                                                                     resource_class=VirtualMachine,
-                                                                     resource_status=[
-                                                                         "DATA_RECEIVING", "UNKNOWN"],
-                                                                     resource_health=[
-                                                                         "GREEN", "YELLOW", "ORANGE", "RED", "GREY"]
-                                                                     )
+                                                                     uuids=uuid_list, query_specs=query_specs)
                 vms.extend(vm_chunks)
                 api_responding.append(api_chunk_responding)
             logger.debug(f'Number of VMs collected: {len(vms)}')
             return vms, max(api_responding)
-        return self.get_resources(target, token, parent_uuids, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
-                                  resource_class=VirtualMachine, resource_status=["DATA_RECEIVING", "UNKNOWN"],
-                                  resource_health=["GREEN", "YELLOW", "ORANGE", "RED", "GREY"])
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["VirtualMachine"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_nsxt_mgmt_cluster(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementCluster"], resource_class=NSXTManagementCluster)
+    def get_dis_virtual_switch(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["VmwareDistributedVirtualSwitch"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_nsxt_mgmt_nodes(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementNode"], resource_class=NSXTManagementNode)
+    def get_nsxt_mgmt_cluster(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["ManagementCluster"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_nsxt_mgmt_service(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["ManagementService"], resource_class=NSXTManagementService)
+    def get_nsxt_mgmt_nodes(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["ManagementNode"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_nsxt_transport_zone(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["TransportZone"], resource_class=NSXTTransportZone)
+    def get_nsxt_mgmt_service(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["ManagementService"],
+                                  uuids=parent_uuids, query_specs=query_specs)
 
-    def get_nsxt_transport_node(self, target, token, parent_uuids):
-        return self.get_resources(target, token, parent_uuids, adapterkind="NSXTAdapter",
-                                  resourcekinds=["TransportNode"], resource_class=NSXTTransportNode)
+    def get_nsxt_transport_zone(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["TransportZone"],
+                                  uuids=parent_uuids, query_specs=query_specs)
+
+    def get_nsxt_transport_node(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["TransportNode"],
+                                  uuids=parent_uuids, query_specs=query_specs)
+
+    def get_nsxt_logical_switch(self, target, token, parent_uuids, query_specs):
+        return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=["LogicalSwitch"],
+                                  uuids=parent_uuids, query_specs=query_specs)
+
+    def get_vcops_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
+        return self.get_resources(target, token, adapterkind="vCenter Operations Adapter",
+                                  resourcekinds=resourcekinds,
+                                  uuids=parent_uuids, query_specs=query_specs)
+
+    def get_sddc_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
+        return self.get_resources(target, token, adapterkind="SDDCHealthAdapter",
+                                  resourcekinds=resourcekinds,
+                                  uuids=parent_uuids, query_specs=query_specs)
 
     def get_latest_values_multiple(self, target: str, token: str,
                                    uuids: list,
@@ -528,6 +576,8 @@ class Vrops:
             alert_entry['id'] = alert.get('id')
             alert_entry['name'] = alert.get('name')
             alert_entry['description'] = alert.get('description', 'n/a')
+            alert_entry['adapterKindKey'] = alert.get('adapterKindKey', 'n/a')
+            alert_entry['resourceKindKey'] = alert.get('resourceKindKey', 'n/a')
             alert_entry['symptoms'] = list()
             symptomdefinition_ids = alert.get("states", [])[0].get("base-symptom-set", {}).get(
                 "symptomDefinitionIds", [])

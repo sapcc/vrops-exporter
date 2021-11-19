@@ -5,13 +5,12 @@ class VcopsSelfMonitoringAlertCollector(AlertCollector):
 
     def __init__(self):
         super().__init__()
-        self.vrops_entity_name = 'self_vcops'
+        self.vrops_entity_name = 'self_object'
         self.label_names = [self.vrops_entity_name, "target"]
         self.resourcekind = []
         self.adapterkind = ["vCenter Operations Adapter"]
 
     def get_resource_uuids(self):
-        print(self.get_vcops_self_monitoring_objects_by_target())
         return self.get_vcops_self_monitoring_objects_by_target()
 
     def get_labels(self, resource_id, project_ids):

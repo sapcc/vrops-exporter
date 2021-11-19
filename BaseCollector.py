@@ -83,6 +83,14 @@ class BaseCollector(ABC):
         self.vms = request.json() if request else {}
         return self.vms
 
+    def get_distributed_vswitches(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/dvs/{}".format(current_iteration)
+        request = requests.get(url)
+        self.dvs = request.json() if request else {}
+        return self.dvs
+
     def get_nsxt_adapter(self, target):
         self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
@@ -122,6 +130,32 @@ class BaseCollector(ABC):
         request = requests.get(url)
         self.nsxt_transport_nodes = request.json() if request else {}
         return self.nsxt_transport_nodes
+
+    def get_nsxt_logical_switches(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/nsxt_logical_switches/{}".format(current_iteration)
+        request = requests.get(url)
+        self.nsxt_logical_switches = request.json() if request else {}
+        return self.nsxt_logical_switches
+
+    def get_vcops_self_monitoring_objects(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcops_self_monitoring_objects/{}".format(
+            current_iteration)
+        request = requests.get(url)
+        self.vcops_self_monitoring_objects = request.json() if request else {}
+        return self.vcops_self_monitoring_objects
+
+    def get_sddc_health_objects(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/sddc_health_objects/{}".format(
+            current_iteration)
+        request = requests.get(url)
+        self.sddc_health_objects = request.json() if request else {}
+        return self.sddc_health_objects
 
     def get_alertdefinitions(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions")
@@ -180,6 +214,11 @@ class BaseCollector(ABC):
         self.target_vms = [vms_dict[uuid]['uuid'] for uuid in vms_dict]
         return self.target_vms
 
+    def get_dvs_by_target(self):
+        dvs_dict = self.get_distributed_vswitches(self.target)
+        self.target_dvs = [dvs_dict[uuid]['uuid'] for uuid in dvs_dict]
+        return self.target_dvs
+
     def get_nsxt_adapter_by_target(self):
         nsxt_adapter_dict = self.get_nsxt_adapter(self.target)
         self.target_nsxt_adapter = [nsxt_adapter_dict[uuid]['uuid'] for uuid in nsxt_adapter_dict]
@@ -205,6 +244,24 @@ class BaseCollector(ABC):
         self.target_nsxt_transport_nodes = [nsxt_transport_nodes_dict[uuid]['uuid'] for uuid in
                                             nsxt_transport_nodes_dict]
         return self.target_nsxt_transport_nodes
+
+    def get_nsxt_logical_switches_by_target(self):
+        nsxt_logical_switches_dict = self.get_nsxt_logical_switches(self.target)
+        self.target_nsxt_logical_switches = [nsxt_logical_switches_dict[uuid]['uuid'] for uuid in
+                                             nsxt_logical_switches_dict]
+        return self.target_nsxt_logical_switches
+
+    def get_vcops_self_monitoring_objects_by_target(self):
+        vcops_self_monitoring_objects_dict = self.get_vcops_self_monitoring_objects(self.target)
+        self.target_vcops_self_monitoring_objects = [vcops_self_monitoring_objects_dict[uuid]['uuid'] for uuid in
+                                                     vcops_self_monitoring_objects_dict]
+        return self.target_vcops_self_monitoring_objects
+
+    def get_sddc_health_objects_by_target(self):
+        sddc_health_objects_dict = self.get_sddc_health_objects(self.target)
+        self.target_sddc_health_objects = [sddc_health_objects_dict[uuid]['uuid'] for uuid in
+                                           sddc_health_objects_dict]
+        return self.target_sddc_health_objects
 
     def get_project_ids_by_target(self):
         try:
