@@ -18,6 +18,8 @@ def parse_params(logger):
     parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
     parser.add_option("-o", "--port", help="specify inventory port", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas configfile", action="store", dest="atlas")
+    parser.add_option("-m", "--config", help="Path to the configuration to set properties of the resources kept in "
+                                             "the inventory", action="store", dest="config")
     parser.add_option("-v", "--v", help="logging all level except debug", action="store_true", dest="info",
                       default=False)
     parser.add_option("-d", "--vv", help="logging all level including debug", action="store_true", dest="debug",
@@ -52,6 +54,8 @@ def parse_params(logger):
         os.environ['PORT'] = options.port
     if options.atlas:
         os.environ['ATLAS'] = options.atlas
+    if options.config:
+        os.environ['CONFIG'] = options.config
     if options.sleep:
         os.environ['SLEEP'] = options.sleep
     if not options.sleep and 'SLEEP' not in os.environ:
@@ -74,6 +78,9 @@ def parse_params(logger):
         sys.exit(0)
     if "ATLAS" not in os.environ and not options.atlas:
         logger.error('Cannot start, please specify ATLAS path with ENV or -a')
+        sys.exit(0)
+    if "CONFIG" not in os.environ and not options.config:
+        logger.error('Cannot start, please specify inventory config with ENV or -m')
         sys.exit(0)
 
     return options

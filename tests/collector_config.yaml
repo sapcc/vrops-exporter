@@ -6,6 +6,7 @@ default_collectors:
     - 'NSXTTransportNodePropertiesCollector'
     - 'ClusterStatsCollector'
     - 'ClusterPropertiesCollector'
+    - 'DistributedvSwitchPropertiesCollector'
     - 'DatastoreStatsCollector'
     - 'DatastorePropertiesCollector'
     - 'HostSystemStatsCollector'
@@ -18,17 +19,20 @@ default_collectors:
     - 'VMStatsVirtualDiskCollector'
     - 'VMStatsMemoryCollector'
     - 'VMStatsDefaultCollector'
-    #  Alerts
+#    Alerts
     - 'NSXTAdapterAlertCollector'
     - 'NSXTMgmtClusterAlertCollector'
     - 'NSXTMgmtServiceAlertCollector'
     - 'NSXTMgmtNodeAlertCollector'
     - 'NSXTTransportNodeAlertCollector'
+    - 'NSXTLogicalSwitchAlertCollector'
     - 'ClusterAlertCollector'
     - 'DatastoreAlertCollector'
     - 'HostSystemAlertCollector'
     - 'VCenterAlertCollector'
     - 'VMAlertCollector'
+    - 'VcopsSelfMonitoringAlertCollector'
+    - 'SDDCAlertCollector'
 
 alerts:
   alertCriticality:
@@ -357,6 +361,10 @@ VMStatsDefaultCollector:
     key: "guestfilesystem:/|capacity"
   - metric_suffix: "guestfilesystem_percentage"
     key: "guestfilesystem:/|percentage"
+
+DistributedvSwitchPropertiesCollector:
+  - metric_suffix: "summary_version"
+    key: "summary|version"
 
 NSXTMgmtClusterStatsCollector:
   - metric_suffix: "sys_capacity_distributed_firewall_rules_usage_count"
