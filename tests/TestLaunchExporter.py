@@ -28,7 +28,7 @@ class TestLaunchExporter(TestCase):
         parse_params(logger)
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
-        self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
+        self.assertEqual(os.getenv('COLLECTOR_CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
         self.assertEqual(logger.level, 10)
 
@@ -40,7 +40,7 @@ class TestLaunchExporter(TestCase):
         parse_params(logger)
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
-        self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
+        self.assertEqual(os.getenv('COLLECTOR_CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
         self.assertEqual(logger.level, 30)
 
@@ -49,13 +49,13 @@ class TestLaunchExporter(TestCase):
                     'tests/collector_config.yaml', '-t', 'testhost.test', '-v']
         os.environ['PORT'] = '1123'
         os.environ['INVENTORY'] = 'inventory.wedontwantthis.url'
-        os.environ['CONFIG'] = 'tests/other_config.yaml'
+        os.environ['COLLECTOR_CONFIG'] = 'tests/other_config.yaml'
         os.environ['TARGET'] = 'Othertesthost.test'
         parse_params(logger)
         # cli params preferred
         self.assertEqual(os.getenv('PORT'), '1234', 'The port was not set correctly!')
         self.assertEqual(os.getenv('INVENTORY'), 'inventory.some.url', 'Inventory was not set correctly')
-        self.assertEqual(os.getenv('CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
+        self.assertEqual(os.getenv('COLLECTOR_CONFIG'), 'tests/collector_config.yaml', 'Config was not set')
         self.assertEqual(os.getenv('TARGET'), 'testhost.test', 'Target was not set')
         self.assertEqual(logger.level, 20)
 
@@ -94,7 +94,7 @@ class TestLaunchExporter(TestCase):
         sys.argv = ['prog']
         with self.assertRaises(KeyError) as e:
             parse_params(logger)
-        self.assertEqual(str(e.exception.args), "('CONFIG',)", 'no collector config file provided!')
+        self.assertEqual(str(e.exception.args), "('COLLECTOR_CONFIG',)", 'no collector config file provided!')
 
 
 if __name__ == '__main__':

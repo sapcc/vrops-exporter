@@ -423,3 +423,16 @@ NSXTMgmtNodePropertiesCollector:
 NSXTTransportNodePropertiesCollector:
   - metric_suffix: "connectivity_status"
     key: "ConnectivityStatus|TransportNodeState"
+
+VcopsSelfMonitoringStatsCollector:
+  - metric_suffix: "primary_objects_count"
+    key: "PrimaryResourcesCount"
+  - metric_suffix: "primary_metrics_count"
+    key: "PrimaryMetricsCount"
+
+VcopsSelfMonitoringPropertiesCollector:
+  - metric_suffix: "build_number"
+    key: "build_number"
+  - metric_suffix: "cluster_state"
+    expected: "ONLINE"
+    key: "ClusterState"
