@@ -23,7 +23,8 @@ class TestCollectors(unittest.TestCase):
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
-        self.assertTrue(os.getenv('COLLECTOR_CONFIG'), 'no collector CONFIG set')
+        self.assertTrue(os.getenv('COLLECTOR_CONFIG'), 'no collector COLLECTOR CONFIG set')
+        self.assertTrue(os.getenv('INVENTORY_CONFIG'), 'no collector INVENTORY CONFIG set')
         self.assertTrue(os.getenv('TARGET'), 'no target set')
 
     def test_collector_metrics(self):
