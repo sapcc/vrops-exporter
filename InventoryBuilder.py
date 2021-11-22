@@ -155,7 +155,7 @@ class InventoryBuilder:
             logger.error(f'TypeError: {e}')
 
     def read_inventory_config(self):
-        config_file = yaml_read(os.environ['CONFIG'])
+        config_file = yaml_read(os.environ['INVENTORY_CONFIG'])
         return config_file
 
     def get_vrops(self):

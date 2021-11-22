@@ -23,12 +23,12 @@ class TestCollectors(unittest.TestCase):
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
         self.assertTrue(os.getenv('PASSWORD'), 'no dummy PASSWORD set')
-        self.assertTrue(os.getenv('CONFIG'), 'no collector CONFIG set')
+        self.assertTrue(os.getenv('COLLECTOR_CONFIG'), 'no collector CONFIG set')
         self.assertTrue(os.getenv('TARGET'), 'no target set')
 
     def test_collector_metrics(self):
         self.metrics_yaml = yaml_read('tests/metrics.yaml')
-        self.collector_config = yaml_read(os.environ['CONFIG'])
+        self.collector_config = yaml_read(os.environ['COLLECTOR_CONFIG'])
         self.target = os.getenv('TARGET')
         self.token = '2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234'
         # every collector got to be tested in here

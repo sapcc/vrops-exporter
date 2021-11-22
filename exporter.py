@@ -12,7 +12,7 @@ from tools.helper import yaml_read
 
 
 def default_collectors():
-    collector_config = yaml_read(os.environ['CONFIG']).get('default_collectors')
+    collector_config = yaml_read(os.environ['COLLECTOR_CONFIG']).get('default_collectors')
     return [collector for collector in collector_config] if collector_config else None
 
 
@@ -55,7 +55,7 @@ def parse_params(logger):
     if options.port:
         os.environ['PORT'] = options.port
     if options.config:
-        os.environ['CONFIG'] = options.config
+        os.environ['COLLECTOR_CONFIG'] = options.config
     if not options.collectors:
         logger.debug('Exporter using default collectors from config')
         options.collectors = default_collectors()
@@ -72,7 +72,7 @@ def parse_params(logger):
     if "INVENTORY" not in os.environ and not options.inventory:
         logger.error('Cannot start, please specify inventory with ENV or -i')
         sys.exit(0)
-    if "CONFIG" not in os.environ and not options.config:
+    if "COLLECTOR_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify collector config with ENV or -m')
         sys.exit(0)
     if not options.collectors:

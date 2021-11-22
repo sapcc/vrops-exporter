@@ -28,8 +28,8 @@ def parse_params(logger):
                       action="store_true", dest="loopback")
     parser.add_option("-s", "--sleep", help="specifiy sleep time for inventory builder, default: 1800", action="store",
                       dest="sleep")
-    parser.add_option("-t", "--timeout", help="specifiy timeout for fetching data from vROps, default: 600", action="store",
-                      dest="timeout")
+    parser.add_option("-t", "--timeout", help="specifiy timeout for fetching data from vROps, default: 600",
+                      action="store", dest="timeout")
     (options, args) = parser.parse_args()
 
     if options.user:
@@ -55,7 +55,7 @@ def parse_params(logger):
     if options.atlas:
         os.environ['ATLAS'] = options.atlas
     if options.config:
-        os.environ['CONFIG'] = options.config
+        os.environ['INVENTORY_CONFIG'] = options.config
     if options.sleep:
         os.environ['SLEEP'] = options.sleep
     if not options.sleep and 'SLEEP' not in os.environ:
@@ -79,7 +79,7 @@ def parse_params(logger):
     if "ATLAS" not in os.environ and not options.atlas:
         logger.error('Cannot start, please specify ATLAS path with ENV or -a')
         sys.exit(0)
-    if "CONFIG" not in os.environ and not options.config:
+    if "INVENTORY_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify inventory config with ENV or -m')
         sys.exit(0)
 

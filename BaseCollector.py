@@ -32,7 +32,7 @@ class BaseCollector(ABC):
         pass
 
     def read_collector_config(self):
-        config_file = yaml_read(os.environ['CONFIG'])
+        config_file = yaml_read(os.environ['COLLECTOR_CONFIG'])
         return config_file
 
     def get_vcenters(self, target):
