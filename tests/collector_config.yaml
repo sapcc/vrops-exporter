@@ -1,6 +1,7 @@
 default_collectors:
     - 'NSXTMgmtClusterStatsCollector'
     - 'NSXTMgmtClusterPropertiesCollector'
+    - 'NSXTLogicalSwitchPropertiesCollector'
     - 'NSXTMgmtNodeStatsCollector'
     - 'NSXTMgmtNodePropertiesCollector'
     - 'NSXTTransportNodePropertiesCollector'
@@ -19,6 +20,9 @@ default_collectors:
     - 'VMStatsVirtualDiskCollector'
     - 'VMStatsMemoryCollector'
     - 'VMStatsDefaultCollector'
+    - 'VcopsSelfMonitoringPropertiesCollector'
+    - 'VcopsSelfMonitoringStatsCollector'
+
 #    Alerts
     - 'NSXTAdapterAlertCollector'
     - 'NSXTMgmtClusterAlertCollector'
@@ -423,6 +427,11 @@ NSXTMgmtNodePropertiesCollector:
 NSXTTransportNodePropertiesCollector:
   - metric_suffix: "connectivity_status"
     key: "ConnectivityStatus|TransportNodeState"
+
+NSXTLogicalSwitchPropertiesCollector:
+  - metric_suffix: "state"
+    expected: "SUCCESS"
+    key: "summary|LogicalSwitchStateProperty"
 
 VcopsSelfMonitoringStatsCollector:
   - metric_suffix: "primary_objects_count"

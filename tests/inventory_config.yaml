@@ -60,7 +60,7 @@ query_specs:
 #      - "REMOVING"
 #      - "NOT_EXISTING"
       - "UNKNOWN"
-      -
+
   default:
     resourceHealth:
       - "GREEN"
