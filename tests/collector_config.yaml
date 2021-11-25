@@ -37,6 +37,12 @@ alerts:
     - 'IMMEDIATE'
   activeOnly: True
 
+CustomInfoMetricsGenerator:
+  - metric: 'vrops_virtualmachine_guest_tools_target_version'
+    values_dict:
+      # A dict with label: label_values
+      guest_tools_target_version: '10.2.0'
+
 ClusterPropertiesCollector:
   - metric_suffix: "configuration_dasConfig_admissionControlEnabled"
     expected: "true"
