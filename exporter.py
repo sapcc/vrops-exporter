@@ -111,11 +111,12 @@ def get_targets(inventory):
     attempt = 1
     while attempt <= 5:
         try:
-            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
+            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list", timeout=30)
             targets = request.json()
+            logger.debug(f'Found targets: {targets}')
             return targets
-        except requests.exceptions.ConnectionError as e:
-            logger.critical(f'No connection to {inventory} - Error: {e}')
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+            logger.critical(f'Connection error to {inventory} - Error: {e}')
             logger.critical(f'Trying again in 2sec.')
             time.sleep(2)
             attempt += 1
