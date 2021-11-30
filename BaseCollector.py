@@ -182,11 +182,11 @@ class BaseCollector(ABC):
 
     def do_request(self, url):
         try:
-            request = requests.get(url)
+            request = requests.get(url, timeout=60)
             response = request.json() if request else {}
             return response
-        except requests.exceptions.ConnectionError as e:
-            logger.critical(f'No connection to inventory: {os.environ["INVENTORY"]} - Error: {e}')
+        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
+            logger.critical(f'Connection error to inventory: {os.environ["INVENTORY"]} - Error: {e}')
             return {}
 
     def get_vcenters_by_target(self):
