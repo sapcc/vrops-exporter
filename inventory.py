@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 from InventoryBuilder import InventoryBuilder
 from optparse import OptionParser
 import sys
