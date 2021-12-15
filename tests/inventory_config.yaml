@@ -113,5 +113,3 @@ resourcekinds:
       - "NSXControllerService"
       - "SDDCHealth Instance"
       - "vCenterBackupJob"
-      - "vCenterBackupJobs"
-

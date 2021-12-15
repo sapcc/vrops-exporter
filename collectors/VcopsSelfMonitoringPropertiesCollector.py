@@ -12,6 +12,5 @@ class VcopsSelfMonitoringPropertiesCollector(PropertiesCollector):
         return self.get_vcops_self_monitoring_objects_by_target()
 
     def get_labels(self, resource_id, project_ids):
-        return [self.vcops_self_monitoring_objects[resource_id]['name'],
-                self.vcops_self_monitoring_objects[resource_id]['target']] if \
-            resource_id in self.vcops_self_monitoring_objects else []
+        return [self.vcops_objects[resource_id]['name'],
+                self.vcops_objects[resource_id]['target']] if resource_id in self.vcops_objects else []
