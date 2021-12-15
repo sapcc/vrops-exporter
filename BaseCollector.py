@@ -139,23 +139,23 @@ class BaseCollector(ABC):
         self.nsxt_logical_switches = request.json() if request else {}
         return self.nsxt_logical_switches
 
-    def get_vcops_self_monitoring_objects(self, target):
+    def get_vcops_objects(self, target):
         self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcops_self_monitoring_objects/{}".format(
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/vcops_objects/{}".format(
             current_iteration)
         request = requests.get(url)
-        self.vcops_self_monitoring_objects = request.json() if request else {}
-        return self.vcops_self_monitoring_objects
+        self.vcops_objects = request.json() if request else {}
+        return self.vcops_objects
 
-    def get_sddc_health_objects(self, target):
+    def get_sddc_objects(self, target):
         self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
-        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/sddc_health_objects/{}".format(
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/sddc_objects/{}".format(
             current_iteration)
         request = requests.get(url)
-        self.sddc_health_objects = request.json() if request else {}
-        return self.sddc_health_objects
+        self.sddc_objects = request.json() if request else {}
+        return self.sddc_objects
 
     def get_alertdefinitions(self):
         request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions")
@@ -165,6 +165,11 @@ class BaseCollector(ABC):
     def get_iteration(self):
         self.iteration = self.do_request(url="http://" + os.environ['INVENTORY'] + "/iteration")
         return self.iteration
+
+    def get_amount_resources(self):
+        self.wait_for_inventory_data()
+        self.amount_resources = self.do_request(url="http://" + os.environ['INVENTORY'] + "/amount_resources")
+        return self.amount_resources
 
     def get_collection_times(self):
         self.wait_for_inventory_data()
@@ -251,17 +256,17 @@ class BaseCollector(ABC):
                                              nsxt_logical_switches_dict]
         return self.target_nsxt_logical_switches
 
-    def get_vcops_self_monitoring_objects_by_target(self):
-        vcops_self_monitoring_objects_dict = self.get_vcops_self_monitoring_objects(self.target)
-        self.target_vcops_self_monitoring_objects = [vcops_self_monitoring_objects_dict[uuid]['uuid'] for uuid in
-                                                     vcops_self_monitoring_objects_dict]
-        return self.target_vcops_self_monitoring_objects
+    def get_vcops_objects_by_target(self):
+        vcops_objects_dict = self.get_vcops_objects(self.target)
+        self.target_vcops_objects = [vcops_objects_dict[uuid]['uuid'] for uuid in
+                                     vcops_objects_dict]
+        return self.target_vcops_objects
 
-    def get_sddc_health_objects_by_target(self):
-        sddc_health_objects_dict = self.get_sddc_health_objects(self.target)
-        self.target_sddc_health_objects = [sddc_health_objects_dict[uuid]['uuid'] for uuid in
-                                           sddc_health_objects_dict]
-        return self.target_sddc_health_objects
+    def get_sddc_objects_by_target(self):
+        sddc_objects_dict = self.get_sddc_objects(self.target)
+        self.target_sddc_objects = [sddc_objects_dict[uuid]['uuid'] for uuid in
+                                    sddc_objects_dict]
+        return self.target_sddc_objects
 
     def get_project_ids_by_target(self):
         try:

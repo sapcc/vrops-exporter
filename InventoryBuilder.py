@@ -14,7 +14,6 @@ logger = logging.getLogger('vrops-exporter')
 class InventoryBuilder:
     def __init__(self, atlas_config, port, sleep, timeout):
         self.atlas_config = atlas_config
-        self.inventory_config = self.read_inventory_config()
         self.port = int(port)
         self.sleep = sleep
         self.timeout = int(timeout)
@@ -26,6 +25,7 @@ class InventoryBuilder:
         self.sddc_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
+        self.amount_resources = dict()
         self.vrops_collection_times = dict()
         self.response_codes = dict()
         self.alertdefinitions = dict()
@@ -104,14 +104,14 @@ class InventoryBuilder:
         def nsxt_logical_switches(target, iteration):
             return self.iterated_inventory.get(str(iteration), {}).get('nsxt_logical_switches', {}).get(target, {})
 
-        @app.route('/<target>/vcops_self_monitoring_objects/<int:iteration>', methods=['GET'])
+        @app.route('/<target>/vcops_objects/<int:iteration>', methods=['GET'])
         def vcops_self_monitoring_objects(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('vcops_self_monitoring_objects', {}).get(target,
+            return self.iterated_inventory.get(str(iteration), {}).get('vcops_objects', {}).get(target,
                                                                                                                 {})
 
-        @app.route('/<target>/sddc_health_objects/<int:iteration>', methods=['GET'])
+        @app.route('/<target>/sddc_objects/<int:iteration>', methods=['GET'])
         def sddc_health_objects(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('sddc_health_objects', {}).get(target, {})
+            return self.iterated_inventory.get(str(iteration), {}).get('sddc_objects', {}).get(target, {})
 
         @app.route('/alertdefinitions/', methods=['GET'])
         def alert_alertdefinitions():
@@ -121,6 +121,11 @@ class InventoryBuilder:
         def iteration():
             return_iteration = self.successful_iteration_list[-1]
             return str(return_iteration)
+
+        @app.route('/amount_resources', methods=['GET'])
+        def amount_resources():
+            amount_resources = self.amount_resources
+            return json.dumps(amount_resources)
 
         @app.route('/collection_times', methods=['GET'])
         def collection_times():
@@ -155,8 +160,7 @@ class InventoryBuilder:
             logger.error(f'TypeError: {e}')
 
     def read_inventory_config(self):
-        config_file = yaml_read(os.environ['INVENTORY_CONFIG'])
-        return config_file
+        return yaml_read(os.environ['INVENTORY_CONFIG'])
 
     def get_vrops(self):
         with open(self.atlas_config) as json_file:
@@ -186,6 +190,7 @@ class InventoryBuilder:
             threads = list()
             for vrops in self.vrops_list:
                 self.response_codes[vrops] = dict()
+                self.amount_resources[vrops] = dict()
                 vrops_short_name = vrops.split('.')[0]
                 thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name, self.iteration))
                 thread.start()
@@ -229,8 +234,8 @@ class InventoryBuilder:
             self.provide_nsxt_mgmt_service()
             self.provide_nsxt_transport_nodes()
             self.provide_nsxt_logical_switches()
-            self.provide_vcops_self_monitoring_objects()
-            self.provide_sddc_health_objects()
+            self.provide_vcops_objects()
+            self.provide_sddc_objects()
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -253,10 +258,12 @@ class InventoryBuilder:
 
         logger.info(f'##########  Collecting resources {vrops_short_name}... ##########')
 
-        vcenter = self.create_vcenter_objects(vrops, target, token)
-        nsxt_adapter = self.create_nsxt_objects(vrops, target, token)
-        vcops_adapter = self.create_vcops_objects(vrops, target, token)
-        sddc_adapter = self.create_sddc_health_objects(vrops, target, token)
+        inventory_config = self.read_inventory_config()
+
+        vcenter = self.create_vcenter_objects(vrops, target, token, inventory_config)
+        nsxt_adapter = self.create_nsxt_objects(vrops, target, token, inventory_config)
+        vcops_adapter = self.create_vcops_objects(vrops, target, token, inventory_config)
+        sddc_adapter = self.create_sddc_health_objects(vrops, target, token, inventory_config)
 
         self.vcenter_dict[target] = vcenter
         self.nsxt_dict[target] = nsxt_adapter
@@ -267,7 +274,7 @@ class InventoryBuilder:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
         return True
 
-    def create_vcenter_objects(self, vrops, target: str, token: str):
+    def create_vcenter_objects(self, vrops, target: str, token: str, inventory_config: dict):
         vcenter_adapter, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
         # just one vcenter adapter supported
         vcenter_adapter = vcenter_adapter[0]
@@ -277,7 +284,7 @@ class InventoryBuilder:
             return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
-        query_specs = self.inventory_config.get('query_specs', {})
+        query_specs = inventory_config.get('query_specs', {})
 
         datacenter, self.response_codes[target]["datacenters"] = \
             Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid],
@@ -334,13 +341,13 @@ class InventoryBuilder:
                     logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
         return vcenter_adapter
 
-    def create_nsxt_objects(self, vrops, target: str, token: str):
+    def create_nsxt_objects(self, vrops, target: str, token: str, inventory_config: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter_list:
             logger.critical(f'Could not get any nsxt adapter!')
             return False
 
-        query_specs = self.inventory_config.get('query_specs', {})
+        query_specs = inventory_config.get('query_specs', {})
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
             Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter_list],
@@ -400,7 +407,7 @@ class InventoryBuilder:
 
         return nsxt_adapter_list
 
-    def create_vcops_objects(self, vrops, target: str, token: str):
+    def create_vcops_objects(self, vrops, target: str, token: str, inventory_config: dict):
         vcops_adapter_instance, self.response_codes[target]["vcops_adapter"] = \
             Vrops.get_vcenter_operations_adapter_intance(vrops, target, token)
         vcops_adapter_instance = vcops_adapter_instance[0]
@@ -408,31 +415,31 @@ class InventoryBuilder:
             logger.critical(f'Could not get vcops adapter!')
             return False
 
-        resourcekinds = [rk for rk in self.inventory_config.get('resourcekinds', {}).get('vcops_resourcekinds', [])]
-        query_specs = self.inventory_config.get('query_specs', {})
+        resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('vcops_resourcekinds', [])]
+        query_specs = inventory_config.get('query_specs', {})
 
         vcops_objects, self.response_codes[target]["vcops_self_monitoring_objects"] = \
             Vrops.get_vcops_instances(vrops, target, token, parent_uuids=[vcops_adapter_instance.uuid],
-                                      resourcekinds=resourcekinds, query_specs=query_specs)
+                                      resourcekinds=resourcekinds, query_specs=query_specs.get('default', {}))
         vcops_adapter_instance.vcops_objects = list()
         for vcops_object in vcops_objects:
             vcops_adapter_instance.vcops_objects.append(vcops_object)
 
         return vcops_adapter_instance
 
-    def create_sddc_health_objects(self, vrops, target: str, token: str):
+    def create_sddc_health_objects(self, vrops, target: str, token: str, inventory_config: dict):
         sddc_adapter_instances, self.response_codes[target]["sddc_health_adapter"] = \
             Vrops.get_sddc_health_adapter_intance(vrops, target, token)
 
         if not sddc_adapter_instances:
             return False
 
-        resourcekinds = [rk for rk in self.inventory_config.get('resourcekinds', {}).get('sddc_resourcekinds', [])]
-        query_specs = self.inventory_config.get('query_specs', {})
+        resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('sddc_resourcekinds', [])]
+        query_specs = inventory_config.get('query_specs', {})
 
         sddc_objects, self.response_codes[target]["sddc_health_objects"] = \
             Vrops.get_sddc_instances(vrops, target, token, parent_uuids=[s.uuid for s in sddc_adapter_instances],
-                                     resourcekinds=resourcekinds, query_specs=query_specs)
+                                     resourcekinds=resourcekinds, query_specs=query_specs.get('default', {}))
 
         for sddc_adapter in sddc_adapter_instances:
             logger.debug(f'Collecting SDDC adapter: {sddc_adapter.name}')
@@ -460,6 +467,7 @@ class InventoryBuilder:
                     'target': vcenter.target,
                     'token': vcenter.token,
                 }
+            self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 
@@ -481,6 +489,7 @@ class InventoryBuilder:
                     'target': vcenter.target,
                     'token': vcenter.token,
                 }
+            self.amount_resources[target]['datacenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
 
@@ -504,6 +513,7 @@ class InventoryBuilder:
                         'target': vcenter.target,
                         'token': vcenter.token,
                     }
+            self.amount_resources[target]['datastores'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
 
@@ -526,6 +536,7 @@ class InventoryBuilder:
                         'target': vcenter.target,
                         'token': vcenter.token,
                     }
+            self.amount_resources[target]['clusters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
 
@@ -550,6 +561,7 @@ class InventoryBuilder:
                             'target': vcenter.target,
                             'token': vcenter.token,
                         }
+            self.amount_resources[target]['hosts'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
 
@@ -577,6 +589,7 @@ class InventoryBuilder:
                                 'target': vcenter.target,
                                 'token': vcenter.token,
                             }
+            self.amount_resources[target]['vms'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree
 
@@ -598,6 +611,7 @@ class InventoryBuilder:
                         'target': vcenter.target,
                         'token': vcenter.token,
                     }
+            self.amount_resources[target]['distributed_virtual_switches'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['distributed_virtual_switches'] = tree
         return tree
 
@@ -615,6 +629,7 @@ class InventoryBuilder:
                     'target': nsxt_adapter.target,
                     'token': nsxt_adapter.token,
                 }
+            self.amount_resources[target]['nsxt_adapter'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_adapter'] = tree
         return tree
 
@@ -635,6 +650,7 @@ class InventoryBuilder:
                         'target': nsxt_adapter.target,
                         'token': nsxt_adapter.token,
                     }
+            self.amount_resources[target]['nsxt_mgmt_cluster'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_cluster'] = tree
         return tree
 
@@ -658,6 +674,7 @@ class InventoryBuilder:
                             'target': nsxt_adapter.target,
                             'token': nsxt_adapter.token,
                         }
+            self.amount_resources[target]['nsxt_mgmt_nodes'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_nodes'] = tree
         return tree
 
@@ -684,6 +701,7 @@ class InventoryBuilder:
                                 'target': nsxt_adapter.target,
                                 'token': nsxt_adapter.token,
                             }
+            self.amount_resources[target]['nsxt_mgmt_service'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_mgmt_service'] = tree
         return tree
 
@@ -710,6 +728,7 @@ class InventoryBuilder:
                                 'target': nsxt_adapter.target,
                                 'token': nsxt_adapter.token,
                             }
+            self.amount_resources[target]['nsxt_transport_nodes'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_transport_nodes'] = tree
         return tree
 
@@ -733,10 +752,11 @@ class InventoryBuilder:
                             'target': nsxt_adapter.target,
                             'token': nsxt_adapter.token,
                         }
+            self.amount_resources[target]['nsxt_logical_switches'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['nsxt_logical_switches'] = tree
         return tree
 
-    def provide_vcops_self_monitoring_objects(self) -> dict:
+    def provide_vcops_objects(self) -> dict:
         tree = dict()
         for target in self.vcops_dict:
             vcops_adapter = self.vcops_dict[target]
@@ -750,10 +770,10 @@ class InventoryBuilder:
                     'resourcekind': vcops_object.resourcekind,
                     'target': target
                 }
-        self.iterated_inventory[str(self.iteration)]['vcops_self_monitoring_objects'] = tree
+        self.iterated_inventory[str(self.iteration)]['vcops_objects'] = tree
         return tree
 
-    def provide_sddc_health_objects(self) -> dict:
+    def provide_sddc_objects(self) -> dict:
         tree = dict()
         for target in self.sddc_dict:
             sddc_adapter_instances = self.sddc_dict[target]
@@ -768,5 +788,5 @@ class InventoryBuilder:
                         'resourcekind': sddc_object.resourcekind,
                         'target': target
                     }
-        self.iterated_inventory[str(self.iteration)]['sddc_health_objects'] = tree
+        self.iterated_inventory[str(self.iteration)]['sddc_objects'] = tree
         return tree

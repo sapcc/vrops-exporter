@@ -11,10 +11,9 @@ class InventoryCollector(BaseCollector):
     def __init__(self):
         super().__init__()
         self.name = self.__class__.__name__
-        self.resourcekinds = ["vcenters", "datacenters", "clusters", "hosts", "datastores", "vms"]
 
     def describe(self):
-        for resourcekind in self.resourcekinds:
+        for resourcekind in self.get_amount_resources()[self.target]:
             yield GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory')
         yield CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
         yield GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory')
@@ -36,12 +35,9 @@ class InventoryCollector(BaseCollector):
 
     def amount_inventory_resources(self, target):
         gauges = list()
-        for resourcekind in self.resourcekinds:
+        for resourcekind, amount in self.get_amount_resources()[target].items():
             gauge = GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory',
                                       labels=["target"])
-
-            type_method = getattr(BaseCollector, f'get_{resourcekind}')
-            amount = len(type_method(self, target))
             gauge.add_metric(labels=[target], value=amount)
             gauges.append(gauge)
         return gauges
