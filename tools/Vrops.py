@@ -105,21 +105,24 @@ class Vrops:
                       adapterkind: str,
                       resourcekinds: list,  # Array of resource kind keys
                       uuids: list,  # Array of parent uuids
-                      query_specs: dict,  # Dict of query specifications
+                      query_specs: dict,  # Dict of resource query specifications
                       ) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
             return [], 200
-        logger.debug(f'Getting {resourcekinds} from {target}, query specs: {query_specs}')
+        logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
+
+        # If there is a config for the resourcekind in question, use it, otherwise give back the default.
+        q_spec = query_specs.get(resourcekinds[0]) if query_specs.get(resourcekinds[0]) else query_specs.get('default')
+        logger.debug(f'Using resource query specs: {q_spec}')
+        r_status_list = [rs for rs in q_spec.get('resourceStatus', [])]
+        r_health_list = [rh for rh in q_spec.get('resourceHealth', [])]
+        r_states_list = [rst for rst in q_spec.get('resourceStates', [])]
+
         querystring = {
             'pageSize': 10000
         }
-
-        r_status_list = [rs for rs in query_specs.get('resourceStatus', [])]
-        r_health_list = [rh for rh in query_specs.get('resourceHealth', [])]
-        r_states_list = [rst for rst in query_specs.get('resourceStates', [])]
-
         payload = {
             "relationshipType": "DESCENDANT",
             "resourceIds": uuids,
