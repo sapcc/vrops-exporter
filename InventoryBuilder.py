@@ -287,23 +287,17 @@ class InventoryBuilder:
         query_specs = inventory_config.get('query_specs', {})
 
         datacenter, self.response_codes[target]["datacenters"] = \
-            Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid],
-                                 query_specs=query_specs.get('default', {}))
+            Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid], query_specs=query_specs)
         cluster, self.response_codes[target]["clusters"] = \
-            Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter],
-                              query_specs=query_specs.get('default', {}))
+            Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         datastores, self.response_codes[target]["datastores"] = \
-            Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter],
-                                 query_specs=query_specs.get('default', {}))
+            Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         hosts, self.response_codes[target]["hosts"] = \
-            Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster],
-                            query_specs=query_specs.get('hostsystems', {}))
+            Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster], query_specs=query_specs)
         vms, self.response_codes[target]["vms"] = \
-            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid,
-                          query_specs=query_specs.get('virtual_machines', {}))
+            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
         distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"] = \
-            Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter],
-                                         query_specs=query_specs.get('default', {}))
+            Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
 
         vcenter_adapter.datacenter = list()
         for dc in datacenter:
@@ -351,22 +345,22 @@ class InventoryBuilder:
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
             Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter_list],
-                                        query_specs=query_specs.get('default', {}))
+                                        query_specs=query_specs)
         nsxt_mgmt_nodes, self.response_codes[target]["nsxt_mgmt_nodes"] = \
             Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
-                                      query_specs=query_specs.get('default', {}))
+                                      query_specs=query_specs)
         nsxt_mgmt_service, self.response_codes[target]["nsxt_mgmt_services"] = \
             Vrops.get_nsxt_mgmt_service(vrops, target, token, [n.uuid for n in nsxt_mgmt_nodes],
-                                        query_specs=query_specs.get('default', {}))
+                                        query_specs=query_specs)
         nsxt_transport_zones, self.response_codes[target]["nsxt_transport_zones"] = \
             Vrops.get_nsxt_transport_zone(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
-                                          query_specs=query_specs.get('default', {}))
+                                          query_specs=query_specs)
         nsxt_transport_nodes, self.response_codes[target]["nsxt_transport_nodes"] = \
             Vrops.get_nsxt_transport_node(vrops, target, token, [z.uuid for z in nsxt_transport_zones],
-                                          query_specs=query_specs.get('default', {}))
+                                          query_specs=query_specs)
         nsxt_logical_switches, self.response_codes[target]["nsxt_logical_switches"] = \
             Vrops.get_nsxt_logical_switch(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
-                                          query_specs=query_specs.get('default', {}))
+                                          query_specs=query_specs)
 
         for nsxt_adapter in nsxt_adapter_list:
             logger.debug(f'Collecting NSX-T adapter: {nsxt_adapter.name}')
@@ -420,7 +414,7 @@ class InventoryBuilder:
 
         vcops_objects, self.response_codes[target]["vcops_self_monitoring_objects"] = \
             Vrops.get_vcops_instances(vrops, target, token, parent_uuids=[vcops_adapter_instance.uuid],
-                                      resourcekinds=resourcekinds, query_specs=query_specs.get('default', {}))
+                                      resourcekinds=resourcekinds, query_specs=query_specs)
         vcops_adapter_instance.vcops_objects = list()
         for vcops_object in vcops_objects:
             vcops_adapter_instance.vcops_objects.append(vcops_object)
@@ -439,7 +433,7 @@ class InventoryBuilder:
 
         sddc_objects, self.response_codes[target]["sddc_health_objects"] = \
             Vrops.get_sddc_instances(vrops, target, token, parent_uuids=[s.uuid for s in sddc_adapter_instances],
-                                     resourcekinds=resourcekinds, query_specs=query_specs.get('default', {}))
+                                     resourcekinds=resourcekinds, query_specs=query_specs)
 
         for sddc_adapter in sddc_adapter_instances:
             logger.debug(f'Collecting SDDC adapter: {sddc_adapter.name}')
