@@ -159,19 +159,23 @@ class Vrops:
                 for resource in relations:
                     resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resourcekind = re.sub("[^a-zA-Z]+", "", resourcekind)
-                    resource_identifiers = resource.get('resource', {}).get('resourceKey', {}) \
-                        .get('resourceIdentifiers')
+                    resource_identifiers = resource["resource"]["resourceKey"]["resourceIdentifiers"]
                     internal_name = list(filter(lambda identifier_type:
-                                                identifier_type.get('identifierType', {}).get('name')
+                                                identifier_type['identifierType']['name']
                                                 == 'VMEntityObjectID', resource_identifiers))
                     internal_name = internal_name[0].get('value') if internal_name else None
+                    instance_uuid = list(filter(lambda identifier_type:
+                                                identifier_type['identifierType']['name']
+                                                == 'VMEntityInstanceUUID', resource_identifiers))
+                    instance_uuid = instance_uuid[0].get('value') if instance_uuid else None
 
                     resource_object = type(resourcekind, (object,), {
                         "name": resource["resource"]["resourceKey"]["name"],
                         "uuid": resource["resource"]["identifier"],
                         "resourcekind": resourcekind,
                         "parent": resource.get("relatedResources", )[0],
-                        "internal_name": internal_name
+                        "internal_name": internal_name,
+                        "instance_uuid": instance_uuid
                     })
                     resources.append(resource_object)
                 return resources, response.status_code
