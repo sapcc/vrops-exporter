@@ -568,6 +568,7 @@ class InventoryBuilder:
                                 'uuid': vm.uuid,
                                 'name': vm.name,
                                 'internal_name': vm.internal_name,
+                                'instance_uuid': vm.instance_uuid,
                                 'parent_host_uuid': host.uuid,
                                 'parent_host_name': host.name,
                                 'cluster': cluster.name,

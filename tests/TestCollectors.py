@@ -71,8 +71,8 @@ class TestCollectors(unittest.TestCase):
                     "uuid": uuids[i],
                     "resourcekind": resourcekind,
                     "parent": uuids[0],
-                    "internal_name": f'{resourcekind.lower()}_1234'
-
+                    "internal_name": f'{resourcekind.lower()}_1234',
+                    "instance_uuid": f'{resourcekind.lower()}_12345678'
                 })
                 object_list.append(resource_object)
             return object_list
