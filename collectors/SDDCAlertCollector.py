@@ -11,7 +11,7 @@ class SDDCAlertCollector(AlertCollector):
         self.adapterkind = ["SDDCHealthAdapter"]
 
     def get_resource_uuids(self):
-        return self.get_sddc_health_objects_by_target()
+        return self.get_sddc_objects_by_target()
 
     def get_labels(self, resource_id, project_ids):
         return [self.sddc_objects[resource_id]['name'],

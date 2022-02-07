@@ -9,7 +9,7 @@ class VcopsSelfMonitoringPropertiesCollector(PropertiesCollector):
         self.label_names = [self.vrops_entity_name, 'target']
 
     def get_resource_uuids(self):
-        return self.get_vcops_self_monitoring_objects_by_target()
+        return self.get_vcops_objects_by_target()
 
     def get_labels(self, resource_id, project_ids):
         return [self.vcops_objects[resource_id]['name'],
