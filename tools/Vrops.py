@@ -186,22 +186,19 @@ class Vrops:
 
     def get_datacenter(self, target, token, parent_uuids, query_specs):
         resourcekind = 'Datacenter'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_cluster(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ClusterComputeResource'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_datastores(self, target, token, parent_uuids, query_specs):
         resourcekind = 'Datastore'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         datastores, api_responding = self.get_resources(target, token, adapterkind="VMWARE",
                                                         resourcekinds=["Datastore"], uuids=parent_uuids,
-                                                        query_specs=q_specs)
+                                                        query_specs=self._set_query_specs(query_specs, resourcekind))
         for datastore in datastores:
             if "p_ssd" in datastore.name:
                 datastore.type = "vmfs_p_ssd"
@@ -223,13 +220,12 @@ class Vrops:
 
     def get_hosts(self, target, token, parent_uuids, query_specs):
         resourcekind = 'HostSystem'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid, query_specs):
         resourcekind = 'VirtualMachine'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
+        q_specs = self._set_query_specs(query_specs, resourcekind)
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
@@ -258,45 +254,38 @@ class Vrops:
 
     def get_dis_virtual_switch(self, target, token, parent_uuids, query_specs):
         resourcekind = 'VmwareDistributedVirtualSwitch'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_mgmt_cluster(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementCluster'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_mgmt_nodes(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementNode'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_mgmt_service(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementService'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_transport_zone(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportZone'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_transport_node(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportNode'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_nsxt_logical_switch(self, target, token, parent_uuids, query_specs):
         resourcekind = 'LogicalSwitch'
-        q_specs = query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=q_specs)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_vcops_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
         return self.get_resources(target, token, adapterkind="vCenter Operations Adapter",
@@ -307,6 +296,9 @@ class Vrops:
         return self.get_resources(target, token, adapterkind="SDDCHealthAdapter",
                                   resourcekinds=resourcekinds, uuids=parent_uuids,
                                   query_specs=query_specs.get('default', {}))
+
+    def _set_query_specs(self, query_specs, resourcekind):
+        return query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
 
     def get_latest_values_multiple(self, target: str, token: str,
                                    uuids: list,
