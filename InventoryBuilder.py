@@ -259,9 +259,10 @@ class InventoryBuilder:
         logger.info(f'##########  Collecting resources {vrops_short_name}... ##########')
 
         inventory_config = self.read_inventory_config()
+        query_specs = inventory_config.get('query_specs', {})
 
-        vcenter = self.create_vcenter_objects(vrops, target, token, inventory_config)
-        nsxt_adapter = self.create_nsxt_objects(vrops, target, token, inventory_config)
+        vcenter = self.create_vcenter_objects(vrops, target, token, query_specs)
+        nsxt_adapter = self.create_nsxt_objects(vrops, target, token, query_specs)
         vcops_adapter = self.create_vcops_objects(vrops, target, token, inventory_config)
         sddc_adapter = self.create_sddc_health_objects(vrops, target, token, inventory_config)
 
@@ -274,7 +275,7 @@ class InventoryBuilder:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
         return True
 
-    def create_vcenter_objects(self, vrops, target: str, token: str, inventory_config: dict):
+    def create_vcenter_objects(self, vrops, target: str, token: str, query_specs: dict):
         vcenter_adapter, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
         # just one vcenter adapter supported
         vcenter_adapter = vcenter_adapter[0]
@@ -283,8 +284,6 @@ class InventoryBuilder:
             logger.critical(f'Could not get vcenter adapter!')
             return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
-
-        query_specs = inventory_config.get('query_specs', {})
 
         datacenter, self.response_codes[target]["datacenters"] = \
             Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid], query_specs=query_specs)
@@ -335,13 +334,11 @@ class InventoryBuilder:
                     logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
         return vcenter_adapter
 
-    def create_nsxt_objects(self, vrops, target: str, token: str, inventory_config: dict):
+    def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter_list:
-            logger.critical(f'Could not get any nsxt adapter!')
+            logger.critical(f'Could not get any nsxt adapter from {target}!')
             return False
-
-        query_specs = inventory_config.get('query_specs', {})
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
             Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter_list],
