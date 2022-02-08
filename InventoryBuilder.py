@@ -3,6 +3,7 @@ from gevent.pywsgi import WSGIServer
 from threading import Thread
 from tools.Vrops import Vrops
 from tools.helper import yaml_read
+from collections import defaultdict
 import time
 import json
 import os
@@ -25,9 +26,9 @@ class InventoryBuilder:
         self.sddc_dict = dict()
         self.target_tokens = dict()
         self.iterated_inventory = dict()
-        self.amount_resources = dict()
+        self.amount_resources = defaultdict(dict)
         self.vrops_collection_times = dict()
-        self.response_codes = dict()
+        self.response_codes = defaultdict(dict)
         self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
@@ -189,8 +190,6 @@ class InventoryBuilder:
             logger.info(f'real run {self.iteration}')
             threads = list()
             for vrops in self.vrops_list:
-                self.response_codes[vrops] = dict()
-                self.amount_resources[vrops] = dict()
                 vrops_short_name = vrops.split('.')[0]
                 thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name, self.iteration))
                 thread.start()
