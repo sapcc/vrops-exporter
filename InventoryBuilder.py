@@ -177,7 +177,7 @@ class InventoryBuilder:
             self.read_inventory_config()
             # get vrops targets every run in case we have new targets appearing
             self.get_vrops()
-            if len(self.successful_iteration_list) > 3:
+            if len(self.successful_iteration_list) > 2:
                 iteration_to_be_deleted = self.successful_iteration_list.pop(0)
                 # initial case, since 0 is never filled in iterated_inventory
                 if iteration_to_be_deleted == 0:
