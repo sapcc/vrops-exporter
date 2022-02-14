@@ -8,7 +8,7 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 ## Supported adapters and objects
 
-####VMware vCenter Server
+#### VMware vCenter Server
 
 Resourcekind relationship:
 ```shell
@@ -21,20 +21,20 @@ VMwareAdapter Instance:
                 Virtualmachine
 ```
 
-####VMware NSX-T Adapter
+#### VMware NSX-T Adapter
 
 Resourcekind relationship:
 ```shell
-    NSXTAdapter:
-        ManagementCluster:
-            ManagementNode:
-                ManagementService
-            TransportZone:
-                TransportNode
-            LogicalSwitch
+NSXTAdapter:
+    ManagementCluster:
+        ManagementNode:
+            ManagementService
+        TransportZone:
+            TransportNode
+        LogicalSwitch
 ```
 
-####SDDC (Software-Defined Data Center) Health Adapter
+#### SDDC (Software-Defined Data Center) Health Adapter
 
 SDDC resourcekinds can be defined in [inventory-config](tests/inventory_config.yaml):
 
@@ -53,7 +53,7 @@ resourcekinds:
       - "vCenterBackupJob"
 ```
 
-####VCOPS (vCenter Operations) Adapter
+#### VCOPS (vCenter Operations) Adapter
 
 VCOPS resourcekinds can be defined in [inventory-config](tests/inventory_config.yaml):
 
@@ -73,14 +73,14 @@ resourcekinds:
 
 For the REST queries of values, the resource-uuids (unique unit identifier) processed in the vROps must be used. For this purpose, the exporter was divided into two main components. 
 
-####inventory
+#### inventory
 
 The inventory collects all supported resourcekinds in their hierarchical relation, and makes them available at an internal API. The resourcekinds are updated by a continuous cycle that can be configured with `--sleep`.
 To have more control over the resources to be collected, they can be filtered by _resourcestatus_, _resourcehealth_ and _resourcestate_ in [inventory-config](tests/inventory_config.yaml).
 
 Multiple vROps can be processed concurrently. This is implemented with threads.
 
-######inventory endpoints
+###### inventory endpoints
 ```shell
 GET
 
@@ -93,7 +93,7 @@ GET
 /api_response_codes                               # HTTP response codes per resourcekind GET request
 /target_tokens                                    # dict with vrops: auth token
 ```
-####exporter
+#### exporter
 
 The second component are the collectors that exist for each resourcekind as well as for metrics, properties and alerts. Each collector is responsible for only one task per resourcekind and one type of values. First, the resourcekinds in question are queried at the inventory's internal API. In the second step, the desired values, properties or alerts are queried. Each collector performs only one task - one resourcekind and one type from the three different values. First, the resourcekinds in question are queried at the inventory's internal API. In the second step, the values, properties or alarms are queried. From these, the Prometheus metrics are generated. To complete the picture, the metrics are enriched with the labels from the resourcekind relationships created in the inventory.
 
@@ -107,7 +107,7 @@ To avoid multiple implementations of functionality, the collectors follow an inh
 
 #### **inventory**
 
-    The inventory retrieves all VMware resources by `name` and `uuid` from the vROps application interface, preserving the original parent-child relationships.         Likewise, it reads the atlas config file to know all the DNS names of the vrops targets. 
+The inventory retrieves all VMware resources by `name` and `uuid` from the vROps application interface, preserving the original parent-child relationships.         Likewise, it reads the atlas config file to know all the DNS names of the vrops targets. 
     
   * `--user`: specifiy user to log in
   * `--password`: specify password to log in
@@ -137,7 +137,7 @@ In case the WSGI server can't be connected you might want to try `--loopback` to
 
 #### **exporter**
 
-    The exporter can be started with a specific `target` and/or a specific `collector` and/or specific `rubric` (rubrics defined in the collector config). This is important to provide smaller and also faster exporters in the landscape.
+The exporter can be started with a specific `target` and/or a specific `collector` and/or specific `rubric` (rubrics defined in the collector config). This is important to provide smaller and also faster exporters in the landscape.
     
   * `--port`: specify exporter port
   * `--inventory`: inventory service address
@@ -220,4 +220,3 @@ checks whether these are present.
 
 The test generates dummy return values for the queries to vROps and checks the functionality of the collectors. 
 It compares whether the metrics as a result of the collector match the expected metrics in `metrics.yaml`. 
-
