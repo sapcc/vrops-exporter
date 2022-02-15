@@ -35,6 +35,8 @@ class PropertiesCollector(BaseCollector):
                                                                                           self.name)
         yield self.create_api_response_code_metric(self.name, api_responding)
         yield self.create_api_response_time_metric(self.name, response_time)
+        yield self.number_of_metrics_to_collect(self.name, len(metrics))
+        yield self.number_of_resources(self.name, len(uuids))
 
         if not values:
             logger.warning(f'No values in the response for {self.name}. API code: {api_responding}')
@@ -87,7 +89,11 @@ class PropertiesCollector(BaseCollector):
         created_metrics = self.generate_metrics_enriched_by_api(no_match_in_config, label_names=self.label_names)
 
         for metric in metrics:
+            yield self.number_of_metric_samples_generated(self.name, metrics[metric]['gauge'].name,
+                                                          len(metrics[metric]['gauge'].samples))
             yield metrics[metric]['gauge']
         for metric in created_metrics:
+            yield self.number_of_metric_samples_generated(self.name, created_metrics[metric].name,
+                                                          len(created_metrics[metric].samples))
             logger.info(f'Created metrics enriched by API in {self.name}: {created_metrics[metric].name}')
             yield created_metrics[metric]
