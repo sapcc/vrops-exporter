@@ -159,6 +159,27 @@ The exporter can be started with a specific `target` and/or a specific `collecto
   Prometheus:
  [Prometheus | Metric and label naming](https://prometheus.io/docs/practices/naming/)
  
+In addition, vrops-exporter is able to fetch active alerts from supported resource types and wrap them in an info metric containing all symptoms and recommendations as labels. 
+
+```javascript
+vrops_hostsystem_alert_info{
+    alert_impact="HEALTH", 
+    alert_level="CRITICAL", 
+    alert_name="The host has lost connectivity to a dvPort", 
+    datacenter="datacenter1", 
+    description="One or more portgroups in the host lost connectivity to the dvPort. As a result, the services associated with the affected dvPorts are         
+        disconnected from the associated physical networks. All physical connections to the dvPort from the associated switch will become unavailable.", 
+    hostsystem="node001-prod1", 
+    recommendation_1="Replace the physical adapter or reset the physical switch. The alert will be canceled when connectivity is restored to the dvPort.",      
+    status="ACTIVE", 
+    symptom_1_data="{'condition': {'faultEvents': ['esx.problem.net.dvport.connectivity.lost'], 'faultKey': 'fault|dvp|conn', 'type': 'CONDITION_FAULT'}, 
+        'severity': 'CRITICAL'}", 
+    symptom_1_name="Lost network connectivity to DVPorts", 
+    vccluster="prod-cluster1", 
+    vcenter="vcenter1"
+    }
+```
+ 
 
 ###### **1. Build**
 To build the container simply run `make` and get the locally created docker container.
