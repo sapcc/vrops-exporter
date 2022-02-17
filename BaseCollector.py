@@ -302,6 +302,25 @@ class BaseCollector(ABC):
         gauge.add_metric(labels=[self.target, collector.lower()], value=response_time)
         return gauge
 
+    def number_of_metric_samples_generated(self, collector: str, metric_name: str,
+                                           number_of_metric_samples_generated: int) -> GaugeMetricFamily:
+        gauge = GaugeMetricFamily('vrops_collector_metric_samples_generated_number', 'vrops-exporter',
+                                  labels=['target', 'class', 'metric_name'])
+        gauge.add_metric(labels=[self.target, collector.lower(), metric_name], value=number_of_metric_samples_generated)
+        return gauge
+
+    def number_of_metrics_to_collect(self, collector: str, number_of_metrics: int) -> GaugeMetricFamily:
+        gauge = GaugeMetricFamily('vrops_collector_metrics_number', 'vrops-exporter',
+                                  labels=['target', 'class'])
+        gauge.add_metric(labels=[self.target, collector.lower()], value=number_of_metrics)
+        return gauge
+
+    def number_of_resources(self, collector: str, number_of_resources: int) -> GaugeMetricFamily:
+        gauge = GaugeMetricFamily('vrops_collector_resources_number', 'vrops-exporter',
+                                  labels=['target', 'class'])
+        gauge.add_metric(labels=[self.target, collector.lower()], value=number_of_resources)
+        return gauge
+
     def generate_metrics(self, label_names: list) -> dict:
         collector_config = self.read_collector_config()
         metrics = {m['key']: {'metric_suffix': m['metric_suffix'],
