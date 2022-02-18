@@ -87,7 +87,7 @@ resourcekinds:
 ## Design
 
 The exporter is divided in two main components, [inventory](#inventory) and [exporter](#exporter). 
-The inventory is providing the resource-uuids (unique unit identifier) from vROps via a REST interface to the exporter
+The inventory is providing the resource-uuids (unique unit identifier) from vROps via a REST interface to the exporter.
 
 #### inventory
 
