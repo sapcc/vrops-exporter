@@ -6,17 +6,17 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 ###### Tested and compatible with vROPs 6.5 up to vROps v8.6.2
 
-###Table of Contents
+### Table of Contents
 
-[Supported adapters and objects](#Supported adapters and objects)
+[Supported adapters and objects](#supported-adapters-and-objects)
 
-[Design](#Design)
+[Design](#design)
 
-[Running the software](#Running the software)
+[Running the software](#running-the-software)
 
-[Running in Kubernetes](#Running in Kubernetes)
+[Running in Kubernetes](#running-in-kubernetes)
 
-[Test](#Test)
+[Test](#test)
 
 
 ## Supported adapters and objects
