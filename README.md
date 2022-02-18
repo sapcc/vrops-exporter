@@ -8,9 +8,9 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 ### Table of Contents
 
-[Supported adapters and objects](#supported-adapters-and-objects)
-
 [Design](#design)
+
+[Supported adapters and objects](#supported-adapters-and-objects)
 
 [Running the software](#running-the-software)
 
@@ -18,6 +18,48 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 [Test](#test)
 
+## Design
+
+The exporter is divided in two main components, [inventory](#inventory) and [exporter](#exporter). 
+The inventory is providing the resource-uuids (unique unit identifier) from vROps via a REST interface to the exporter
+
+#### inventory
+
+The inventory collects all supported resourcekinds in their hierarchical relation, and makes them available at an internal API. 
+The resourcekinds are updated by a continuous cycle that can be configured with `--sleep`. The inventory preserves data through iterations. 
+The last two iterations for these cycles are always provided via the endpoints and in order to know which iteration to fetch, 
+latest iteration needs to be queried first.
+
+To have more control over the resources to be collected, they can be filtered by _resourcestatus_, _resourcehealth_ and _resourcestate_ in [inventory-config](tests/inventory_config.yaml).
+
+Additionally, multiple vROps can be processed concurrently. This is implemented with threads.
+
+###### inventory endpoints
+```shell
+GET
+
+/vrops_list                                       # list of one or multiple vrops
+/<target>/<resourcekind>/<int:iteration>          # path for each resourcekind
+/alertdefinitions/                                # vrops pre-defined alertdefinitions
+/iteration                                        # current inventory iteration
+/amount_resources                                 # amount of resources for each resourcekind
+/collection_times                                 # measured time for a inventory run per vrops
+/api_response_codes                               # HTTP response codes per resourcekind GET request
+/target_tokens                                    # dict with vrops: auth token
+```
+#### exporter
+
+The second component are the collectors that exist for each resourcekind as well as for metrics, properties and alerts. 
+Each collector performs only one task - one resourcekind and one type from the three different values. First, the resourcekinds in question are 
+queried at the inventory's internal API. In the second step, the values, properties or alarms are queried. From these, 
+the Prometheus metrics are generated. To complete the picture, the metrics are enriched with the labels from the resourcekind relationships 
+created in the inventory.
+
+![](images/architecture.png)
+
+To avoid multiple implementations of functionality, the collectors follow an inheritance structure.
+
+![](images/collectors.png)
 
 ## Supported adapters and objects
 
@@ -84,48 +126,6 @@ resourcekinds:
       - "vC-Ops-Watchdog"
 ```
 
-## Design
-
-The exporter is divided in two main components, [inventory](#inventory) and [exporter](#exporter). 
-The inventory is providing the resource-uuids (unique unit identifier) from vROps via a REST interface to the exporter
-
-#### inventory
-
-The inventory collects all supported resourcekinds in their hierarchical relation, and makes them available at an internal API. 
-The resourcekinds are updated by a continuous cycle that can be configured with `--sleep`. The inventory preserves data through iterations. 
-The last two iterations for these cycles are always provided via the endpoints and in order to know which iteration to fetch, 
-latest iteration needs to be queried first.
-
-To have more control over the resources to be collected, they can be filtered by _resourcestatus_, _resourcehealth_ and _resourcestate_ in [inventory-config](tests/inventory_config.yaml).
-
-Additionally, multiple vROps can be processed concurrently. This is implemented with threads.
-
-###### inventory endpoints
-```shell
-GET
-
-/vrops_list                                       # list of one or multiple vrops
-/<target>/<resourcekind>/<int:iteration>          # path for each resourcekind
-/alertdefinitions/                                # vrops pre-defined alertdefinitions
-/iteration                                        # current inventory iteration
-/amount_resources                                 # amount of resources for each resourcekind
-/collection_times                                 # measured time for a inventory run per vrops
-/api_response_codes                               # HTTP response codes per resourcekind GET request
-/target_tokens                                    # dict with vrops: auth token
-```
-#### exporter
-
-The second component are the collectors that exist for each resourcekind as well as for metrics, properties and alerts. 
-Each collector performs only one task - one resourcekind and one type from the three different values. First, the resourcekinds in question are 
-queried at the inventory's internal API. In the second step, the values, properties or alarms are queried. From these, 
-the Prometheus metrics are generated. To complete the picture, the metrics are enriched with the labels from the resourcekind relationships 
-created in the inventory.
-
-![](images/architecture.png)
-
-To avoid multiple implementations of functionality, the collectors follow an inheritance structure.
-
-![](images/collectors.png)
 
 ## Running the software
 
