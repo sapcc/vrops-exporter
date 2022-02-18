@@ -6,7 +6,7 @@ class NSXTMgmtClusterAlertCollector(AlertCollector):
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'nsxt_mgmt_cluster'
-        self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter']
+        self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter', 'target']
         self.resourcekind = ["ManagementCluster"]
 
     def get_resource_uuids(self):
@@ -14,4 +14,5 @@ class NSXTMgmtClusterAlertCollector(AlertCollector):
 
     def get_labels(self, resource_id, project_ids):
         return [self.nsxt_mgmt_cluster[resource_id]['name'],
-                self.nsxt_mgmt_cluster[resource_id]['nsxt_adapter_name']] if resource_id in self.nsxt_mgmt_cluster else []
+                self.nsxt_mgmt_cluster[resource_id]['nsxt_adapter_name'],
+                self.nsxt_mgmt_cluster[resource_id]['target']] if resource_id in self.nsxt_mgmt_cluster else []

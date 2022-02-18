@@ -10,7 +10,9 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 [Design](#design)
 
+
 [Supported adapters and resourcekinds](#supported-adapters-and-resourcekinds)
+
 
 [Running the software](#running-the-software)
 
@@ -60,6 +62,7 @@ created in the inventory.
 To avoid multiple implementations of functionality, the collectors follow an inheritance structure.
 
 ![](images/collectors.png)
+
 
 ## Supported adapters and resourcekinds
 
@@ -126,6 +129,7 @@ resourcekinds:
       - "vC-Ops-Watchdog"
 ```
 
+
 ## Running the software
 
 #### **inventory**
@@ -140,6 +144,7 @@ resourcekinds:
   * `--loopback`: use 127.0.0.1 address instead of listen to 0.0.0.0 (for test purpose)
   * `--sleep`: how often the resources are updated, default: 1800s
   * `--timeout`: specifies timeout for fetching data from vROps, default: 600s
+  * 
 
   The inventory reads the atlas config file to know all the DNS names of the vrops targets. [Atlas](https://github.com/sapcc/atlas) 
   refers to our netbox extractor, which is in the end providing netbox data as a configmap in Kubernetes. 
