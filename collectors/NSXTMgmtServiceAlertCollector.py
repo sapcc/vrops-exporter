@@ -6,7 +6,7 @@ class NSXTMgmtServiceAlertCollector(AlertCollector):
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'nsxt_mgmt_service'
-        self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter', 'nsxt_mgmt_node', 'nsxt_mgmt_service']
+        self.label_names = ['nsxt_mgmt_cluster', 'nsxt_adapter', 'nsxt_mgmt_node', 'nsxt_mgmt_service', 'target']
         self.resourcekind = ["ManagementService"]
 
     def get_resource_uuids(self):
@@ -16,4 +16,5 @@ class NSXTMgmtServiceAlertCollector(AlertCollector):
         return [self.nsxt_mgmt_service[resource_id]['mgmt_cluster_name'],
                 self.nsxt_mgmt_service[resource_id]['nsxt_adapter_name'],
                 self.nsxt_mgmt_service[resource_id]['mgmt_node_name'],
-                self.nsxt_mgmt_service[resource_id]['name']] if resource_id in self.nsxt_mgmt_service else []
+                self.nsxt_mgmt_service[resource_id]['name'],
+                self.nsxt_mgmt_service[resource_id]['target']] if resource_id in self.nsxt_mgmt_service else []
