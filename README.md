@@ -10,7 +10,7 @@ Prometheus exporter for VMware vRealize Operations Manager
 
 [Design](#design)
 
-[Supported adapters and objects](#supported-adapters-and-objects)
+[Supported adapters and resourcekinds](#supported-adapters-and-resourcekinds)
 
 [Running the software](#running-the-software)
 
@@ -61,7 +61,7 @@ To avoid multiple implementations of functionality, the collectors follow an inh
 
 ![](images/collectors.png)
 
-## Supported adapters and objects
+## Supported adapters and resourcekinds
 
 This sections shows how vROps internal resourcekind relationsships are used in the exporter as a hierarchical tree.
 
