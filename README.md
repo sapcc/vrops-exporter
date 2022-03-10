@@ -153,7 +153,12 @@ resourcekinds:
              "server_name": "VROPS_DNS_ADDRESS"
          }
      },
-     { }
+     {
+         "labels": {
+             "job": "another_vrops",
+             "server_name": "ANOTHER_VROPS_DNS_ADDRESS"
+         }
+     }
    ]
    ```
 In case the WSGI server can't be connected you might want to try `--loopback` to hook up the loopback interface (127.0.0.1). This is sometimes needed for local debugging.
