@@ -45,7 +45,7 @@ class TestCollectors(unittest.TestCase):
             object_list = list()
             for i, _ in enumerate(uuids):
                 resource_object = type(adapterkind.capitalize(), (object,), {
-                    "name": f'{adapterkind.lower()}_{i+1}',
+                    "name": f'{adapterkind.lower()}_{i + 1}',
                     "uuid": uuids[0],
                     "target": self.target,
                     "token": self.token
@@ -67,7 +67,7 @@ class TestCollectors(unittest.TestCase):
             object_list = list()
             for i, _ in enumerate(uuids):
                 resource_object = type(resourcekind.capitalize(), (object,), {
-                    "name": f'{resourcekind.capitalize()}_{i+1}',
+                    "name": f'{resourcekind.capitalize()}_{i + 1}',
                     "uuid": uuids[i],
                     "resourcekind": resourcekind,
                     "parent": uuids[0],
@@ -104,7 +104,10 @@ class TestCollectors(unittest.TestCase):
                                                              'recommendation': [{'id': 'test-re',
                                                                                  'description': 'test-description'}]})
 
-        thread = Thread(target=InventoryBuilder, args=('./tests/test.json', 8000, 180, 300))
+        InventoryBuilder.vrops_list = MagicMock(return_value=(["testhost.test"]))
+        InventoryBuilder.get_vrops = InventoryBuilder.vrops_list
+
+        thread = Thread(target=InventoryBuilder, args=('http://<path_to_netbox_sd_endpoint>/sd/netbox', 8000, 180, 300))
         thread.daemon = True
         thread.start()
 
