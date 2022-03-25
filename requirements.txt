@@ -9,3 +9,4 @@ cffi
 beautifulsoup4==4.9.3
 lxml
 itsdangerous==1.1.0
+jinja2==3.0.3
