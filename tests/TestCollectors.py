@@ -104,8 +104,8 @@ class TestCollectors(unittest.TestCase):
                                                              'recommendation': [{'id': 'test-re',
                                                                                  'description': 'test-description'}]})
 
-        InventoryBuilder.vrops_list = MagicMock(return_value=(["testhost.test"]))
-        InventoryBuilder.get_vrops = InventoryBuilder.vrops_list
+        InventoryBuilder.vrops_list = ["testhost.test"]
+        InventoryBuilder.get_vrops = MagicMock(return_value=None)
 
         thread = Thread(target=InventoryBuilder, args=('http://<path_to_netbox_sd_endpoint>/sd/netbox', 8000, 180, 300))
         thread.daemon = True
