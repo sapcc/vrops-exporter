@@ -8,13 +8,14 @@ import time
 import json
 import os
 import logging
+import requests
 
 logger = logging.getLogger('vrops-exporter')
 
 
 class InventoryBuilder:
-    def __init__(self, atlas_config, port, sleep, timeout):
-        self.atlas_config = atlas_config
+    def __init__(self, atlas, port, sleep, timeout):
+        self.atlas = atlas
         self.port = int(port)
         self.sleep = sleep
         self.timeout = int(timeout)
@@ -164,8 +165,8 @@ class InventoryBuilder:
         return yaml_read(os.environ['INVENTORY_CONFIG'])
 
     def get_vrops(self):
-        with open(self.atlas_config) as json_file:
-            netbox_json = json.load(json_file)
+        response = requests.get(url=f'http://{self.atlas}:8080/service_discovery/netbox')
+        netbox_json = response.json()
         self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
                            target['labels']['job'] == "vrops"]
 
