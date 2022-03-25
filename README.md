@@ -141,8 +141,8 @@ resourcekinds:
   * `--sleep`: how often the resources are updated, default: 1800s
   * `--timeout`: specifies timeout for fetching data from vROps, default: 600s
 
-  The inventory reads the atlas config file to know all the DNS names of the vrops targets. [Atlas](https://github.com/sapcc/atlas) 
-  refers to our netbox extractor, which is in the end providing netbox data as a configmap in Kubernetes. 
+  The inventory queries the atlas service discovery endpoint to know all the DNS names of the vrops targets. [Atlas](https://github.com/sapcc/atlas)
+  refers to our netbox extractor, which is in the end providing netbox data as a service endpoint in Kubernetes.
   You don't have to use it, a json file with the following structure would be sufficient, too.
 
    ```json
