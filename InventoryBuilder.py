@@ -16,6 +16,7 @@ logger = logging.getLogger('vrops-exporter')
 class InventoryBuilder:
     def __init__(self, atlas_path, port, sleep, timeout):
         self.atlas_path = atlas_path
+        self.vrops_list = None
         self.port = int(port)
         self.sleep = sleep
         self.timeout = int(timeout)
@@ -165,10 +166,15 @@ class InventoryBuilder:
         return yaml_read(os.environ['INVENTORY_CONFIG'])
 
     def get_vrops(self):
-        response = requests.get(url=self.atlas_path)
-        netbox_json = response.json()
-        self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
-                           target['labels']['job'] == "vrops"]
+        if not self.atlas_path and not self.vrops_list:
+            self.vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets', [])
+        elif self.atlas_path:
+            response = requests.get(url=self.atlas_path)
+            netbox_json = response.json()
+            self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
+                               target['labels']['job'] == "vrops"]
+        else:
+            return
 
     def query_inventory_permanent(self):
         # first iteration to fill is 1. while this is not ready,

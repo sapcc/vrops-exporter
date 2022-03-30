@@ -1,3 +1,7 @@
+vrops_targets:
+  - vrops1.target.url.com
+  - vrops2.target.url.com
+
 query_specs:
   # to create specific resource query specs for a resourcekind, stick to one of the following keys:
   # vCenter Adapter: [Datacenter, ClusterComputeResource, Datastore, HostSystem, VmwareDistributedVirtualSwitch]

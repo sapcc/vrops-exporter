@@ -33,6 +33,7 @@ latest iteration needs to be queried first.
 To have more control over the resources to be collected, they can be filtered by _resourcestatus_, _resourcehealth_ and _resourcestate_ in [inventory-config](tests/inventory_config.yaml).
 
 Additionally, multiple vROps can be processed concurrently. This is implemented with threads.
+*NOTE*: currently only once vCenter per vROps is supported.
 
 ###### inventory endpoints
 ```shell
@@ -133,7 +134,7 @@ resourcekinds:
   * `--user`: specifiy user to log in
   * `--password`: specify password to log in
   * `--port`: specify inventory port
-  * `--atlas`: path to atlas config file
+  * `--atlas`: path to atlas config file [OPTIONAL]
   * `--config`: path to inventory config to set query filters (and resourcekinds - SDDC & VCOPS only)
   * `--v`: logging all level except debug
   * `--vv`: logging all level including debug
@@ -141,27 +142,30 @@ resourcekinds:
   * `--sleep`: how often the resources are updated, default: 1800s
   * `--timeout`: specifies timeout for fetching data from vROps, default: 600s
 
-  The inventory queries the atlas service discovery endpoint to know all the DNS names of the vrops targets. [Atlas](https://github.com/sapcc/atlas)
-  refers to our netbox extractor, which is in the end providing netbox data as a service endpoint in Kubernetes.
-  You don't have to use it, a json file with the following structure would be sufficient, too.
+  There are two ways to configure your target vROps instances to be queried:
+  * in the [inventory-config](tests/inventory_config.yaml) as `vrops_targets`
+  * as an http endpoint providing an [Atlas](https://github.com/sapcc/atlas) compatible format.
+    The inventory queries the atlas service discovery endpoint to know all the DNS names of the vrops targets.
+    It refers to our netbox extractor, which is in the end providing netbox data as a service endpoint in Kubernetes.
+    The format provided via this endpoint looks like this, you can also provide your own tooling:
+    ```json
+    [
+      {
+          "labels": {
+              "job": "vrops",
+              "server_name": "VROPS_DNS_ADDRESS"
+          }
+      },
+      {
+          "labels": {
+              "job": "another_vrops",
+              "server_name": "ANOTHER_VROPS_DNS_ADDRESS"
+          }
+      }
+    ]
+    ```
 
-   ```json
-   [
-     {
-         "labels": {
-             "job": "vrops",
-             "server_name": "VROPS_DNS_ADDRESS"
-         }
-     },
-     {
-         "labels": {
-             "job": "another_vrops",
-             "server_name": "ANOTHER_VROPS_DNS_ADDRESS"
-         }
-     }
-   ]
-   ```
-In case the WSGI server can't be connected you might want to try `--loopback` to hook up the loopback interface (127.0.0.1). This is sometimes needed for local debugging.
+Remark for local testing: In case the WSGI server can't be connected you might want to try `--loopback` to hook up the loopback interface (127.0.0.1). This is sometimes needed for local debugging.
 
 #### **exporter**
 

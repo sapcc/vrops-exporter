@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from InventoryBuilder import InventoryBuilder
 from optparse import OptionParser
+from tools.helper import yaml_read
 import sys
 import os
 import logging
@@ -76,12 +77,14 @@ def parse_params(logger):
     if "PASSWORD" not in os.environ and not options.password:
         logger.error('Cannot start, please specify PASSWORD with ENV or -p')
         sys.exit(0)
-    if "ATLAS" not in os.environ and not options.atlas:
-        logger.error('Cannot start, please specify ATLAS path with ENV or -a')
-        sys.exit(0)
     if "INVENTORY_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify inventory config with ENV or -m')
         sys.exit(0)
+    if "ATLAS" not in os.environ and not options.atlas:
+        vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets')
+        if not vrops_list:
+            logger.error('Cannot start, please declare vrops_targets in inventory config or ATLAS path with ENV or -a')
+            sys.exit(0)
 
     return options
 
@@ -89,4 +92,4 @@ def parse_params(logger):
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')
     options = parse_params(logger)
-    InventoryBuilder(os.environ['ATLAS'], os.environ['PORT'], os.environ['SLEEP'], os.environ['TIMEOUT'])
+    InventoryBuilder(os.environ.get('ATLAS'), os.environ['PORT'], os.environ['SLEEP'], os.environ['TIMEOUT'])
