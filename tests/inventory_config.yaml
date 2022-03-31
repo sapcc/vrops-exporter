@@ -1,6 +1,5 @@
 vrops_targets:
-  - vrops1.target.url.com
-  - vrops2.target.url.com
+  - testhost.test
 
 query_specs:
   # to create specific resource query specs for a resourcekind, stick to one of the following keys:
