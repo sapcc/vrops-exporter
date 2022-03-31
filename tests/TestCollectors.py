@@ -104,10 +104,8 @@ class TestCollectors(unittest.TestCase):
                                                              'recommendation': [{'id': 'test-re',
                                                                                  'description': 'test-description'}]})
 
-        InventoryBuilder.vrops_list = ["testhost.test"]
-        InventoryBuilder.get_vrops = MagicMock(return_value=None)
-
-        thread = Thread(target=InventoryBuilder, args=('http://<path_to_netbox_sd_endpoint>/sd/netbox', 8000, 180, 300))
+        # testing the non atlas sd case here, as we don't have a service to reply in the test case anyway. First param is None as it would be passed in from inventory.py
+        thread = Thread(target=InventoryBuilder, args=(None, 8000, 180, 300))
         thread.daemon = True
         thread.start()
 
