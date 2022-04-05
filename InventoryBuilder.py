@@ -293,7 +293,7 @@ class InventoryBuilder:
         vcenter_adapter = vcenter_adapter[0]
 
         if not vcenter_adapter:
-            logger.warning(f'Could not get vcenter adapter!')
+            logger.critical(f'Could not get vcenter adapter!')
             return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
@@ -349,7 +349,7 @@ class InventoryBuilder:
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter_list:
-            logger.critical(f'Could not get any nsxt adapter from {target}!')
+            logger.warning(f'Could not get any nsxt adapter from {target}!')
             return False
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
