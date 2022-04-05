@@ -1,3 +1,4 @@
+import urllib3.exceptions
 from flask import Flask
 from gevent.pywsgi import WSGIServer
 from threading import Thread
@@ -169,10 +170,15 @@ class InventoryBuilder:
         if not self.atlas_path and not self.vrops_list:
             self.vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets', [])
         elif self.atlas_path:
-            response = requests.get(url=self.atlas_path)
-            netbox_json = response.json()
-            self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
-                               target['labels']['job'] == "vrops"]
+            try:
+                response = requests.get(url=self.atlas_path)
+                netbox_json = response.json()
+                self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
+                                   target['labels']['job'] == "vrops"]
+            except (urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError,
+                    urllib3.exceptions.NewConnectionError):
+                logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s')
+                logger.info(f'continue with the old vrops_list')
         else:
             return
 
@@ -287,7 +293,7 @@ class InventoryBuilder:
         vcenter_adapter = vcenter_adapter[0]
 
         if not vcenter_adapter:
-            logger.critical(f'Could not get vcenter adapter!')
+            logger.warning(f'Could not get vcenter adapter!')
             return False
         logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
