@@ -5,19 +5,21 @@ from threading import Thread
 from tools.Vrops import Vrops
 from tools.helper import yaml_read
 from collections import defaultdict
+from types import SimpleNamespace
 import time
 import json
 import os
 import logging
 import requests
 
+import pudb
 logger = logging.getLogger('vrops-exporter')
 
 
 class InventoryBuilder:
     def __init__(self, atlas_path, port, sleep, timeout):
         self.atlas_path = atlas_path
-        self.vrops_list = None
+        self.vrops_list = list()
         self.port = int(port)
         self.sleep = sleep
         self.timeout = int(timeout)
@@ -167,20 +169,22 @@ class InventoryBuilder:
         return yaml_read(os.environ['INVENTORY_CONFIG'])
 
     def get_vrops(self):
+        vrops_list = list()
         if not self.atlas_path and not self.vrops_list:
-            self.vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets', [])
+            vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets', [])
         elif self.atlas_path:
             try:
                 response = requests.get(url=self.atlas_path)
                 netbox_json = response.json()
-                self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
+                vrops_list = [target['labels']['server_name'] for target in netbox_json if
                                    target['labels']['job'] == "vrops"]
             except (urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError,
                     urllib3.exceptions.NewConnectionError):
                 logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s')
-                logger.info(f'continue with the old vrops_list')
-        else:
-            return
+                logger.info('continue with the old vrops_list')
+
+        #initate vrops skel
+        [self.vrops_list.append(SimpleNamespace(vc=dict(), name=vrops, handle=None)) for vrops in vrops_list]
 
     def query_inventory_permanent(self):
         # first iteration to fill is 1. while this is not ready,
@@ -202,11 +206,10 @@ class InventoryBuilder:
             self.iterated_inventory[str(self.iteration)] = dict()
             logger.info(f'real run {self.iteration}')
             threads = list()
-            for vrops in self.vrops_list:
-                vrops_short_name = vrops.split('.')[0]
-                thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name, self.iteration))
+            for vrops_skel in self.vrops_list:
+                thread = Thread(target=self.query_vrops, args=(vrops_skel, self.iteration))
                 thread.start()
-                threads.append((thread, vrops))
+                threads.append((thread, vrops_skel.name))
 
             timeout = self.timeout
             timeout_reached = False
@@ -229,25 +232,26 @@ class InventoryBuilder:
                     logger.info(f"Timeout {timeout}s reached for fetching {running_thread[1]}")
                     running_thread[0].join(0)
                     timeout_reached = True
-            for vrops in joined_threads:
-                self.vrops_collection_times[vrops] = joined_threads[vrops]
-                logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
+            for vrops_name in joined_threads:
+                self.vrops_collection_times[vrops_name] = joined_threads[vrops_name]
+                logger.info(f"Fetched {vrops_name} in {joined_threads[vrops_name]}")
 
             self.provide_vcenters()
-            self.provide_datacenters()
-            self.provide_clusters()
-            self.provide_hosts()
-            self.provide_datastores()
-            self.provide_vms()
-            self.provide_distributed_vswitches()
-            self.provide_nsxt_adapter()
-            self.provide_nsxt_mgmt_cluster()
-            self.provide_nsxt_mgmt_nodes()
-            self.provide_nsxt_mgmt_service()
-            self.provide_nsxt_transport_nodes()
-            self.provide_nsxt_logical_switches()
-            self.provide_vcops_objects()
-            self.provide_sddc_objects()
+            pu.db
+            # self.provide_datacenters()
+            # self.provide_clusters()
+            # self.provide_hosts()
+            # self.provide_datastores()
+            # self.provide_vms()
+            # self.provide_distributed_vswitches()
+            # self.provide_nsxt_adapter()
+            # self.provide_nsxt_mgmt_cluster()
+            # self.provide_nsxt_mgmt_nodes()
+            # self.provide_nsxt_mgmt_service()
+            # self.provide_nsxt_transport_nodes()
+            # self.provide_nsxt_logical_switches()
+            # self.provide_vcops_objects()
+            # self.provide_sddc_objects()
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -259,92 +263,124 @@ class InventoryBuilder:
                 logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
                 time.sleep(int(self.sleep))
 
-    def query_vrops(self, target, vrops_short_name, iteration):
-        vrops = Vrops()
-        logger.info(f'Querying {target}')
-        token, self.response_codes[target]["token"] = Vrops.get_token(target=target)
+    def query_vrops(self, vrops_skel, iteration):
+        target = vrops_skel.name
+        vrops_skel.handle = Vrops()
+        logger.info(f'Querying {vrops_skel.name}')
+        token, self.response_codes[vrops_skel.name]["token"] = Vrops.get_token(vrops_skel.name)
         if not token:
-            logger.warning(f'retrying connection to {target} in next iteration {self.iteration + 1}')
+            logger.warning(f'retrying connection to {vrops_skel.name} in next iteration {self.iteration + 1}')
             return False
-        self.target_tokens[target] = token
+        self.target_tokens[vrops_skel.name] = token
 
+        vrops_short_name = vrops_skel.name.split('.')[0]
         logger.info(f'##########  Collecting resources {vrops_short_name}... ##########')
 
         inventory_config = self.read_inventory_config()
         query_specs = inventory_config.get('query_specs', {})
 
-        vcenter = self.create_vcenter_objects(vrops, target, token, query_specs)
-        nsxt_adapter = self.create_nsxt_objects(vrops, target, token, query_specs)
-        vcops_adapter = self.create_vcops_objects(vrops, target, token, inventory_config)
-        sddc_adapter = self.create_sddc_health_objects(vrops, target, token, inventory_config)
 
-        self.vcenter_dict[target] = vcenter
-        self.nsxt_dict[target] = nsxt_adapter
-        self.vcops_dict[target] = vcops_adapter
-        self.sddc_dict[target] = sddc_adapter
+        # creates all vcenter objects including nsxt & co kg
+        vrops_skel = self.create_vcenter_objects(vrops_skel, token, query_specs)
+        # self.create_nsxt_objects(vrops_skel, token, query_specs)
+        # self.create_vcops_objects(vrops_skel, token, inventory_config)
+        # self.create_sddc_health_objects(vrops_skel, token, inventory_config)
+
+        # vcenter = self.create_vcenter_objects(vrops_skel, token, query_specs)
+        # nsxt_adapter = self.create_nsxt_objects(vrops_skel, token, query_specs)
+        # vcops_adapter = self.create_vcops_objects(vrops_skel, token, inventory_config)
+        # sddc_adapter = self.create_sddc_health_objects(vrops_skel, token, inventory_config)
+
+        # TODO: to be done
+        # self.vcenter_dict[target] = vcenter
+        # self.nsxt_dict[target] = nsxt_adapter
+        # self.vcops_dict[target] = vcops_adapter
+        # self.sddc_dict[target] = sddc_adapter
 
         if iteration == 1:
-            self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
+            self.alertdefinitions = Vrops.get_alertdefinitions(vrops_skel.handle, vrops_skel.name, token)
         return True
 
-    def create_vcenter_objects(self, vrops, target: str, token: str, query_specs: dict):
-        vcenter_adapter, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
+    def create_vcenter_objects(self, vrops_skel: object, token: str, query_specs: dict):
+        vcenter_adapter, self.response_codes[vrops_skel.name]["vcenter"] = \
+                Vrops.get_vcenter_adapter(vrops_skel.handle, vrops_skel.name, token)
+
         # just one vcenter adapter supported
-        vcenter_adapter = vcenter_adapter[0]
+        # vcenter_adapter = vcenter_adapter[0]
 
         if not vcenter_adapter:
-            logger.critical(f'Could not get vcenter adapter!')
+            logger.critical('Could not get any vcenter adapter!')
             return False
-        logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
 
-        datacenter, self.response_codes[target]["datacenters"] = \
-            Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid], query_specs=query_specs)
-        cluster, self.response_codes[target]["clusters"] = \
-            Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        datastores, self.response_codes[target]["datastores"] = \
-            Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        hosts, self.response_codes[target]["hosts"] = \
-            Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster], query_specs=query_specs)
-        vms, self.response_codes[target]["vms"] = \
-            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
-        distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"] = \
-            Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
+        for vcenter in vcenter_adapter:
+            logger.debug(f'Collecting vcenter: {vcenter.name}')
+            vrops_skel.vc[vcenter.name] = SimpleNamespace(
+                vcenter                       = vcenter,
+                datacenter                    = list(),
+                cluster                       = list(),
+                hosts                         = list(),
+                datastores                    = list(),
+                vms                           = list(),
+                distributed_virtual_switches  = list(),
+                nsxt_adapter                  = list(),
+                nsxt_mgmt_cluster             = list(),
+                nsxt_mgmt_nodes               = list(),
+                nsxt_mgmt_service             = list(),
+                nsxt_transport_nodes          = list(),
+                nsxt_logical_switches         = list(),
+                vcops_objects                 = list(),
+                sddc_objects                  = list(),
+                )
 
-        vcenter_adapter.datacenter = list()
-        for dc in datacenter:
-            vcenter_adapter.datacenter.append(dc)
-            logger.debug(f'Collecting datacenter: {dc.name}')
+            vrops_skel.vc[vcenter.name].datacenter, self.response_codes[vrops_skel.name]["datacenters"] = \
+                Vrops.get_datacenter(vrops_skel.handle, vrops_skel.name, token, [vcenter.uuid], query_specs=query_specs)
+            vrops_skel.vc[vcenter.name].cluster, self.response_codes[vrops_skel.name]["clusters"] = \
+                Vrops.get_cluster(vrops_skel.handle, vrops_skel.name, token, [dc.uuid for dc in vrops_skel.vc[vcenter.name].datacenter], query_specs=query_specs)
+            vrops_skel.vc[vcenter.name].datastores, self.response_codes[vrops_skel.name]["datastores"] = \
+                Vrops.get_datastores(vrops_skel.handle, vrops_skel.name, token, [dc.uuid for dc in vrops_skel.vc[vcenter.name].datacenter], query_specs=query_specs)
+            vrops_skel.vc[vcenter.name].hosts, self.response_codes[vrops_skel.name]["hosts"] = \
+                Vrops.get_hosts(vrops_skel.handle, vrops_skel.name, token, [cl.uuid for cl in vrops_skel.vc[vcenter.name].cluster], query_specs=query_specs)
+            vrops_skel.vc[vcenter.name].vms, self.response_codes[vrops_skel.name]["vms"] = \
+                Vrops.get_vms(vrops_skel.handle, vrops_skel.name, token, [hs.uuid for hs in vrops_skel.vc[vcenter.name].hosts], vcenter.uuid, query_specs=query_specs)
+            vrops_skel.vc[vcenter.name].distributed_virtual_switches, self.response_codes[vrops_skel.name]["distributed_virtual_switch"] = \
+                Vrops.get_dis_virtual_switch(vrops_skel.handle, vrops_skel.name, token, [dc.uuid for dc in vrops_skel.vc[vcenter.name].datacenter], query_specs=query_specs)
 
-        for dc_object in vcenter_adapter.datacenter:
-            dc_object.datastores = list()
-            dc_object.clusters = list()
-            dc_object.dvss = list()
+            # vcenter_adapter.datacenter = list()
+            # i call them sanity checks
+            # for dc in datacenter:
+                # vcenter_adapter.datacenter.append(dc)
+                # logger.debug(f'Collecting datacenter: {dc.name}')
 
-            for ds in datastores:
-                if ds.parent == dc_object.uuid:
-                    dc_object.datastores.append(ds)
-                    logger.debug(f'Collecting datastore: {ds.name}')
-            for cl in cluster:
-                if cl.parent == dc_object.uuid:
-                    dc_object.clusters.append(cl)
-                    logger.debug(f'Collecting cluster: {cl.name}')
-            for cl_object in dc_object.clusters:
-                cl_object.hosts = list()
-                for hs in hosts:
-                    if hs.parent == cl_object.uuid:
-                        cl_object.hosts.append(hs)
-                        logger.debug(f'Collecting host: {hs.name}')
-                for hs_object in cl_object.hosts:
-                    hs_object.vms = list()
-                    for vm in vms:
-                        if vm.parent == hs_object.uuid:
-                            hs_object.vms.append(vm)
-                            logger.debug(f'Collecting VM: {vm.name}')
-            for dvs in distributed_virtual_switchs:
-                if dvs.parent == dc_object.uuid:
-                    dc_object.dvss.append(dvs)
-                    logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
-        return vcenter_adapter
+            # for dc_object in vcenter_adapter.datacenter:
+                # dc_object.datastores = list()
+                # dc_object.clusters = list()
+                # dc_object.dvss = list()
+
+                # for ds in datastores:
+                    # if ds.parent == dc_object.uuid:
+                        # dc_object.datastores.append(ds)
+                        # logger.debug(f'Collecting datastore: {ds.name}')
+                # for cl in cluster:
+                    # if cl.parent == dc_object.uuid:
+                        # dc_object.clusters.append(cl)
+                        # logger.debug(f'Collecting cluster: {cl.name}')
+                # for cl_object in dc_object.clusters:
+                    # cl_object.hosts = list()
+                    # for hs in hosts:
+                        # if hs.parent == cl_object.uuid:
+                            # cl_object.hosts.append(hs)
+                            # logger.debug(f'Collecting host: {hs.name}')
+                    # for hs_object in cl_object.hosts:
+                        # hs_object.vms = list()
+                        # for vm in vms:
+                            # if vm.parent == hs_object.uuid:
+                                # hs_object.vms.append(vm)
+                                # logger.debug(f'Collecting VM: {vm.name}')
+                # for dvs in distributed_virtual_switches:
+                    # if dvs.parent == dc_object.uuid:
+                        # dc_object.dvss.append(dvs)
+                        # logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
+        return vrops_skel
 
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
@@ -456,21 +492,20 @@ class InventoryBuilder:
 
     def provide_vcenters(self) -> dict:
         tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                tree[vcenter.target][vcenter.uuid] = {
-                    'uuid': vcenter.uuid,
-                    'name': vcenter.name,
-                    'kind_dc_name': dc.name,
-                    'kind_dc_uuid': dc.uuid,
-                    'target': vcenter.target,
-                    'token': vcenter.token,
-                }
-            self.amount_resources[target]['vcenters'] = len(tree[target])
+        for vrops in self.vrops_list:
+            for vcenter in vrops.vc:
+                vc = vrops.vc[vcenter]
+                tree[vc.vcenter.name] = dict()
+                tree[vc.vcenter.name][vc.vcenter.uuid] = {
+                            'uuid': vc.vcenter.uuid,
+                            'name': vc.vcenter.name,
+                            # TODO: compare if parent of datacenter is REALLY uuid of vcenter
+                            'kind_dc_name': vc.datacenter[0].name,
+                            'kind_dc_uuid': vc.datacenter[0].uuid,
+                            'target': vc.vcenter.target,
+                            'token': vc.vcenter.token
+                        }
+                # self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
 
