@@ -238,12 +238,11 @@ class InventoryBuilder:
 
             self.provide_vcenters()
             self.provide_datacenters()
-            pu.db
-            # self.provide_clusters()
-            # self.provide_hosts()
-            # self.provide_datastores()
-            # self.provide_vms()
-            # self.provide_distributed_vswitches()
+            self.provide_clusters()
+            self.provide_hosts()
+            self.provide_datastores()
+            self.provide_vms()
+            self.provide_distributed_vswitches()
             # self.provide_nsxt_adapter()
             # self.provide_nsxt_mgmt_cluster()
             # self.provide_nsxt_mgmt_nodes()
@@ -252,6 +251,7 @@ class InventoryBuilder:
             # self.provide_nsxt_logical_switches()
             # self.provide_vcops_objects()
             # self.provide_sddc_objects()
+            pu.db
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -345,41 +345,6 @@ class InventoryBuilder:
             vrops_skel.vc[vcenter.name].distributed_virtual_switches, self.response_codes[vrops_skel.name]["distributed_virtual_switch"] = \
                 Vrops.get_dis_virtual_switch(vrops_skel.handle, vrops_skel.name, token, [dc.uuid for dc in vrops_skel.vc[vcenter.name].datacenter], query_specs=query_specs)
 
-            # vcenter_adapter.datacenter = list()
-            # i call them sanity checks
-            # for dc in datacenter:
-                # vcenter_adapter.datacenter.append(dc)
-                # logger.debug(f'Collecting datacenter: {dc.name}')
-
-            # for dc_object in vcenter_adapter.datacenter:
-                # dc_object.datastores = list()
-                # dc_object.clusters = list()
-                # dc_object.dvss = list()
-
-                # for ds in datastores:
-                    # if ds.parent == dc_object.uuid:
-                        # dc_object.datastores.append(ds)
-                        # logger.debug(f'Collecting datastore: {ds.name}')
-                # for cl in cluster:
-                    # if cl.parent == dc_object.uuid:
-                        # dc_object.clusters.append(cl)
-                        # logger.debug(f'Collecting cluster: {cl.name}')
-                # for cl_object in dc_object.clusters:
-                    # cl_object.hosts = list()
-                    # for hs in hosts:
-                        # if hs.parent == cl_object.uuid:
-                            # cl_object.hosts.append(hs)
-                            # logger.debug(f'Collecting host: {hs.name}')
-                    # for hs_object in cl_object.hosts:
-                        # hs_object.vms = list()
-                        # for vm in vms:
-                            # if vm.parent == hs_object.uuid:
-                                # hs_object.vms.append(vm)
-                                # logger.debug(f'Collecting VM: {vm.name}')
-                # for dvs in distributed_virtual_switches:
-                    # if dvs.parent == dc_object.uuid:
-                        # dc_object.dvss.append(dvs)
-                        # logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
         return vrops_skel
 
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
@@ -496,14 +461,14 @@ class InventoryBuilder:
             for vcenter in vrops.vc:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
-                # figure out correct kind_dc_name and kind_dc_uuid
-                # HERE
+                kind_uuid = [dc.uuid for dc in vc.datacenter if vc.vcenter.uuid == dc.parent]
+                kind_name = [dc.name for dc in vc.datacenter if vc.vcenter.uuid == dc.parent]
                 tree[vc.vcenter.name][vc.vcenter.uuid] = {
                     'uuid': vc.vcenter.uuid,
                     'name': vc.vcenter.name,
                     # TODO: compare if parent of datacenter is REALLY uuid of vcenter
-                    'kind_dc_name': vc.datacenter[0].name,
-                    'kind_dc_uuid': vc.datacenter[0].uuid,
+                    'kind_dc_uuid': kind_uuid[0],
+                    'kind_dc_name': kind_name[0],
                     'target': vc.vcenter.target,
                     'token': vc.vcenter.token
                     }
@@ -522,8 +487,8 @@ class InventoryBuilder:
                         'uuid': dc.uuid,
                         'name': dc.name,
                         'internal_name': dc.internal_name,
-                        'parent_vcenter_uuid': dc.uuid,
-                        'parent_vcenter_name': dc.name,
+                        'parent_vcenter_uuid': vc.vcenter.uuid,
+                        'parent_vcenter_name': vc.vcenter.name,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
                         'token': vc.vcenter.token,
@@ -538,129 +503,119 @@ class InventoryBuilder:
             for vcenter in vrops.vc:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
-                tree[vc.vcenter.name][vc.vcenter.uuid] = {
-                    'uuid': datastore.uuid,
-                    'name': datastore.name,
-                    'internal_name': datastore.internal_name,
-                    'parent_dc_uuid': dc.uuid,
-                    'parent_dc_name': dc.name,
-                    'type': datastore.type,
-                    'vcenter': vcenter.name,
-                    'target': vcenter.target,
-                    'token': vcenter.token,
-                    }
+                for ds in vc.datastores:
+                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == ds.parent]
+                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == ds.parent]
+                    tree[vc.vcenter.name][ds.uuid] = {
+                        'uuid': ds.uuid,
+                        'name': ds.name,
+                        'internal_name': ds.internal_name,
+                        'parent_dc_uuid': parent_uuid[0],
+                        'parent_dc_name': parent_name[0],
+                        'type': ds.type,
+                        'vcenter': vc.vcenter.name,
+                        'target': vc.vcenter.target,
+                        'token': vc.vcenter.token,
+                        }
                 # self.amount_resources[target]['vcenters'] = len(tree[target])
-        self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
-        return tree
-        tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for datastore in dc.datastores:
-                    tree[vcenter.target][datastore.uuid] = {
-                    }
-            self.amount_resources[target]['datastores'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
 
     def provide_clusters(self) -> dict:
         tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    tree[vcenter.target][cluster.uuid] = {
-                        'uuid': cluster.uuid,
-                        'name': cluster.name,
-                        'internal_name': cluster.internal_name,
-                        'parent_dc_uuid': dc.uuid,
-                        'parent_dc_name': dc.name,
-                        'vcenter': vcenter.name,
-                        'target': vcenter.target,
-                        'token': vcenter.token,
-                    }
-            self.amount_resources[target]['clusters'] = len(tree[target])
+        for vrops in self.vrops_list:
+            for vcenter in vrops.vc:
+                vc = vrops.vc[vcenter]
+                tree[vc.vcenter.name] = dict()
+                for cl in vc.cluster:
+                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == cl.parent]
+                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == cl.parent]
+                    tree[vc.vcenter.name][cl.uuid] = {
+                        'uuid': cl.uuid,
+                        'name': cl.name,
+                        'internal_name': cl.internal_name,
+                        'parent_dc_uuid': parent_uuid[0],
+                        'parent_dc_name': parent_name[0],
+                        'vcenter': vc.vcenter.name,
+                        'target': vc.vcenter.target,
+                        'token': vc.vcenter.token,
+                        }
+                # self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
 
     def provide_hosts(self) -> dict:
         tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        tree[vcenter.target][host.uuid] = {
-                            'uuid': host.uuid,
-                            'name': host.name,
-                            'internal_name': host.internal_name,
-                            'parent_cluster_uuid': cluster.uuid,
-                            'parent_cluster_name': cluster.name,
-                            'datacenter': dc.name,
-                            'vcenter': vcenter.name,
-                            'target': vcenter.target,
-                            'token': vcenter.token,
+        for vrops in self.vrops_list:
+            for vcenter in vrops.vc:
+                vc = vrops.vc[vcenter]
+                tree[vc.vcenter.name] = dict()
+                for ho in vc.hosts:
+                    parent_uuid = [cl.uuid for cl in vc.cluster if cl.uuid == ho.parent]
+                    parent_name = [cl.name for cl in vc.cluster if cl.uuid == ho.parent]
+                    tree[vc.vcenter.name][ho.uuid] = {
+                        'uuid': ho.uuid,
+                        'name': ho.name,
+                        'internal_name': ho.internal_name,
+                        'parent_cluster_uuid': parent_uuid[0],
+                        'parent_cluster_name': parent_name[0],
+                        'vcenter': vc.vcenter.name,
+                        'target': vc.vcenter.target,
+                        'token': vc.vcenter.token,
                         }
-            self.amount_resources[target]['hosts'] = len(tree[target])
+                # self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
 
     def provide_vms(self) -> dict:
         tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        for vm in host.vms:
-                            tree[vcenter.target][vm.uuid] = {
-                                'uuid': vm.uuid,
-                                'name': vm.name,
-                                'internal_name': vm.internal_name,
-                                'instance_uuid': vm.instance_uuid,
-                                'parent_host_uuid': host.uuid,
-                                'parent_host_name': host.name,
-                                'cluster': cluster.name,
-                                'datacenter': dc.name,
-                                'vcenter': vcenter.name,
-                                'target': vcenter.target,
-                                'token': vcenter.token,
-                            }
-            self.amount_resources[target]['vms'] = len(tree[target])
+        for vrops in self.vrops_list:
+            for vcenter in vrops.vc:
+                vc = vrops.vc[vcenter]
+                tree[vc.vcenter.name] = dict()
+                for vm in vc.vms:
+                    parent_uuid = [ho.uuid for ho in vc.hosts if ho.uuid == vm.parent]
+                    parent_name = [ho.name for ho in vc.hosts if ho.uuid == vm.parent]
+                    # find cluster and datacenter
+                    parent_cl_name = [cl.name for cl in vc.cluster if cl.uuid == parent_uuid]
+                    # we only have parent_dc_name here, no uuid, hence, comparing names
+                    parent_dc_name = [dc.name for dc in vc.datacenter if dc.name == parent_cl_name]
+                    tree[vc.vcenter.name][vm.uuid] = {
+                        'uuid': vm.uuid,
+                        'name': vm.name,
+                        'internal_name': vm.internal_name,
+                        'instance_uuid': vm.instance_uuid,
+                        'parent_host_uuid': parent_uuid[0],
+                        'parent_host_name': parent_name[0],
+                        'cluster': parent_cl_name,
+                        'datacenter': parent_dc_name,
+                        'vcenter': vc.vcenter.name,
+                        'target': vc.vcenter.target,
+                        'token': vc.vcenter.token,
+                        }
+                # self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree
 
     def provide_distributed_vswitches(self) -> dict:
         tree = dict()
-        for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
-                continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for dvs in dc.dvss:
-                    tree[vcenter.target][dvs.uuid] = {
-                        'uuid': dvs.uuid,
-                        'name': dvs.name,
-                        'parent_dc_uuid': dc.uuid,
-                        'parent_dc_name': dc.name,
-                        'vcenter': vcenter.name,
-                        'target': vcenter.target,
-                        'token': vcenter.token,
-                    }
-            self.amount_resources[target]['distributed_virtual_switches'] = len(tree[target])
+        for vrops in self.vrops_list:
+            for vcenter in vrops.vc:
+                vc = vrops.vc[vcenter]
+                tree[vc.vcenter.name] = dict()
+                for dv in vc.distributed_virtual_switches:
+                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == dv.parent]
+                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == dv.parent]
+                    tree[vc.vcenter.name][dv.uuid] = {
+                        'uuid': dv.uuid,
+                        'name': dv.name,
+                        'parent_dc_uuid': parent_uuid[0],
+                        'parent_dc_name': parent_name[0],
+                        'vcenter': vc.vcenter.name,
+                        'target': vc.vcenter.target,
+                        'token': vc.vcenter.token,
+                        }
+                # self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['distributed_virtual_switches'] = tree
         return tree
 
