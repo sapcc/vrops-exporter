@@ -251,7 +251,7 @@ class InventoryBuilder:
             # self.provide_nsxt_logical_switches()
             # self.provide_vcops_objects()
             # self.provide_sddc_objects()
-            pu.db
+            # pu.db
             if len(self.iterated_inventory[str(self.iteration)]['vcenters']) > 0:
                 self.successful_iteration_list.append(self.iteration)
             else:
@@ -461,14 +461,13 @@ class InventoryBuilder:
             for vcenter in vrops.vc:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
-                kind_uuid = [dc.uuid for dc in vc.datacenter if vc.vcenter.uuid == dc.parent]
-                kind_name = [dc.name for dc in vc.datacenter if vc.vcenter.uuid == dc.parent]
+                dc = [dc for dc in vc.datacenter if vc.vcenter.uuid == dc.parent][0]
                 tree[vc.vcenter.name][vc.vcenter.uuid] = {
                     'uuid': vc.vcenter.uuid,
                     'name': vc.vcenter.name,
                     # TODO: compare if parent of datacenter is REALLY uuid of vcenter
-                    'kind_dc_uuid': kind_uuid[0],
-                    'kind_dc_name': kind_name[0],
+                    'kind_dc_uuid': dc.uuid,
+                    'kind_dc_name': dc.name,
                     'target': vc.vcenter.target,
                     'token': vc.vcenter.token
                     }
@@ -504,14 +503,13 @@ class InventoryBuilder:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
                 for ds in vc.datastores:
-                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == ds.parent]
-                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == ds.parent]
+                    dc = [dc for dc in vc.datacenter if dc.uuid == ds.parent][0]
                     tree[vc.vcenter.name][ds.uuid] = {
                         'uuid': ds.uuid,
                         'name': ds.name,
                         'internal_name': ds.internal_name,
-                        'parent_dc_uuid': parent_uuid[0],
-                        'parent_dc_name': parent_name[0],
+                        'parent_dc_uuid': dc.uuid,
+                        'parent_dc_name': dc.name,
                         'type': ds.type,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
@@ -528,14 +526,13 @@ class InventoryBuilder:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
                 for cl in vc.cluster:
-                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == cl.parent]
-                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == cl.parent]
+                    dc = [dc for dc in vc.datacenter if dc.uuid == cl.parent][0]
                     tree[vc.vcenter.name][cl.uuid] = {
                         'uuid': cl.uuid,
                         'name': cl.name,
                         'internal_name': cl.internal_name,
-                        'parent_dc_uuid': parent_uuid[0],
-                        'parent_dc_name': parent_name[0],
+                        'parent_dc_uuid': dc.uuid,
+                        'parent_dc_name': dc.name,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
                         'token': vc.vcenter.token,
@@ -551,14 +548,13 @@ class InventoryBuilder:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
                 for ho in vc.hosts:
-                    parent_uuid = [cl.uuid for cl in vc.cluster if cl.uuid == ho.parent]
-                    parent_name = [cl.name for cl in vc.cluster if cl.uuid == ho.parent]
+                    cl = [cl.uuid for cl in vc.cluster if cl.uuid == ho.parent][0]
                     tree[vc.vcenter.name][ho.uuid] = {
                         'uuid': ho.uuid,
                         'name': ho.name,
                         'internal_name': ho.internal_name,
-                        'parent_cluster_uuid': parent_uuid[0],
-                        'parent_cluster_name': parent_name[0],
+                        'parent_cluster_uuid': cl.uuid,
+                        'parent_cluster_name': cl.name,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
                         'token': vc.vcenter.token,
@@ -574,21 +570,20 @@ class InventoryBuilder:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
                 for vm in vc.vms:
-                    parent_uuid = [ho.uuid for ho in vc.hosts if ho.uuid == vm.parent]
-                    parent_name = [ho.name for ho in vc.hosts if ho.uuid == vm.parent]
+                    ho = [ho for ho in vc.hosts if ho.uuid == vm.parent][0]
                     # find cluster and datacenter
-                    parent_cl_name = [cl.name for cl in vc.cluster if cl.uuid == parent_uuid]
-                    # we only have parent_dc_name here, no uuid, hence, comparing names
-                    parent_dc_name = [dc.name for dc in vc.datacenter if dc.name == parent_cl_name]
+                    cl = [cl for cl in vc.cluster if cl.uuid == ho.uuid][0]
+                    # we only have parent dc.name here, no uuid, hence, comparing names
+                    dc = [dc for dc in vc.datacenter if dc.name == cl.name][0]
                     tree[vc.vcenter.name][vm.uuid] = {
                         'uuid': vm.uuid,
                         'name': vm.name,
                         'internal_name': vm.internal_name,
                         'instance_uuid': vm.instance_uuid,
-                        'parent_host_uuid': parent_uuid[0],
-                        'parent_host_name': parent_name[0],
-                        'cluster': parent_cl_name,
-                        'datacenter': parent_dc_name,
+                        'parent_host_uuid': ho.uuid,
+                        'parent_host_name': ho.name,
+                        'cluster': cl.name,
+                        'datacenter': dc.name,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
                         'token': vc.vcenter.token,
@@ -604,13 +599,12 @@ class InventoryBuilder:
                 vc = vrops.vc[vcenter]
                 tree[vc.vcenter.name] = dict()
                 for dv in vc.distributed_virtual_switches:
-                    parent_uuid = [dc.uuid for dc in vc.datacenter if dc.uuid == dv.parent]
-                    parent_name = [dc.name for dc in vc.datacenter if dc.uuid == dv.parent]
+                    dc = [dc.uuid for dc in vc.datacenter if dc.uuid == dv.parent][0]
                     tree[vc.vcenter.name][dv.uuid] = {
                         'uuid': dv.uuid,
                         'name': dv.name,
-                        'parent_dc_uuid': parent_uuid[0],
-                        'parent_dc_name': parent_name[0],
+                        'parent_dc_uuid': dc.uuid,
+                        'parent_dc_name': dc.name,
                         'vcenter': vc.vcenter.name,
                         'target': vc.vcenter.target,
                         'token': vc.vcenter.token,
