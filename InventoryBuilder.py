@@ -117,9 +117,9 @@ class InventoryBuilder:
         def sddc_health_objects(target, iteration):
             return self.iterated_inventory.get(str(iteration), {}).get('sddc_objects', {}).get(target, {})
 
-        @app.route('/alertdefinitions/', methods=['GET'])
-        def alert_alertdefinitions():
-            return self.alertdefinitions
+        @app.route('/alertdefinitions/<alert_id>', methods=['GET'])
+        def alert_alertdefinitions(alert_id):
+            return self.alertdefinitions[alert_id]
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
@@ -283,7 +283,8 @@ class InventoryBuilder:
         self.vcops_dict[target] = vcops_adapter
         self.sddc_dict[target] = sddc_adapter
 
-        if iteration == 1:
+        # retrieve alert definitions from the first vrops we see
+        if iteration == 1 and not self.alertdefinitions:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
         return True
 

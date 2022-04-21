@@ -1,4 +1,7 @@
 def chunk_list(lst, n):
+    # range() arg 3 does not accept zero
+    if n == 0:
+        n = 1
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 

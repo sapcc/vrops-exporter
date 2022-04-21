@@ -1,7 +1,6 @@
 from BaseCollector import BaseCollector
 from prometheus_client.core import InfoMetricFamily
 import logging
-import time
 
 logger = logging.getLogger('vrops-exporter')
 
@@ -10,13 +9,6 @@ class AlertCollector(BaseCollector):
 
     def __init__(self):
         super().__init__()
-        self.alertdefinitions = self.get_alertdefinitions()
-        while not self.alertdefinitions:
-            t = 60
-            logger.critical(f'{self.name} could not get the alertdefinitions from inventory.'
-                            f'Retrying in {t}s')
-            time.sleep(t)
-            self.alertdefinitions = self.get_alertdefinitions()
         self.resourcekind = list()
         self.adapterkind = list()
 
@@ -73,7 +65,7 @@ class AlertCollector(BaseCollector):
 
     def generate_alert_label_values(self, alert):
         alert_labels = dict()
-        alert_entry = self.alertdefinitions.get(alert.get('alertDefinitionId', {}), {})
+        alert_entry = self.get_alertdefinition(alert.get('alertDefinitionId', {}))
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
             alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
