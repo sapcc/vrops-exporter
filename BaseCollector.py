@@ -157,10 +157,10 @@ class BaseCollector(ABC):
         self.sddc_objects = request.json() if request else {}
         return self.sddc_objects
 
-    def get_alertdefinitions(self):
-        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions")
-        self.alertdefinitions = request.json() if request else {}
-        return self.alertdefinitions
+    def get_alertdefinition(self, alert_id):
+        request = requests.get(url="http://" + os.environ['INVENTORY'] + "/alertdefinitions/{}".format(alert_id))
+        self.alertdefinition = request.json() if request else {}
+        return self.alertdefinition
 
     def get_iteration(self):
         self.iteration = self.do_request(url="http://" + os.environ['INVENTORY'] + "/iteration")
