@@ -18,7 +18,9 @@ import importlib
 
 
 class TestCollectors(unittest.TestCase):
-    os.environ.setdefault('TARGET', 'testhost.test')
+
+    target = yaml_read(os.environ['INVENTORY_CONFIG'])['vrops_targets'][0]
+    os.environ.setdefault('TARGET', target)
 
     def test_environment(self):
         self.assertTrue(os.getenv('USER'), 'no dummy USER set')
