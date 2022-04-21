@@ -117,9 +117,9 @@ class InventoryBuilder:
         def sddc_health_objects(target, iteration):
             return self.iterated_inventory.get(str(iteration), {}).get('sddc_objects', {}).get(target, {})
 
-        @app.route('/alertdefinitions/', methods=['GET'])
-        def alert_alertdefinitions():
-            return self.alertdefinitions
+        @app.route('/alertdefinitions/<alert_id>', methods=['GET'])
+        def alert_alertdefinitions(alert_id):
+            return self.alertdefinitions[alert_id]
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
