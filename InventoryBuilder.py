@@ -288,62 +288,66 @@ class InventoryBuilder:
         return True
 
     def create_vcenter_objects(self, vrops, target: str, token: str, query_specs: dict):
-        vcenter_adapter, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
-        # just one vcenter adapter supported
-        vcenter_adapter = vcenter_adapter[0]
+        vcenter_adapter_list, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
 
-        if not vcenter_adapter:
+        if not vcenter_adapter_list:
             logger.critical(f'Could not get vcenter adapter!')
             return False
-        logger.debug(f'Collecting vcenter: {vcenter_adapter.name}')
+        
 
         datacenter, self.response_codes[target]["datacenters"] = \
-            Vrops.get_datacenter(vrops, target, token, [vcenter_adapter.uuid], query_specs=query_specs)
+            Vrops.get_datacenter(vrops, target, token, [vc.uuid for vc in vcenter_adapter_list], query_specs=query_specs)
         cluster, self.response_codes[target]["clusters"] = \
             Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         datastores, self.response_codes[target]["datastores"] = \
             Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         hosts, self.response_codes[target]["hosts"] = \
             Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster], query_specs=query_specs)
-        vms, self.response_codes[target]["vms"] = \
-            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
         distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"] = \
             Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
 
-        vcenter_adapter.datacenter = list()
-        for dc in datacenter:
-            vcenter_adapter.datacenter.append(dc)
-            logger.debug(f'Collecting datacenter: {dc.name}')
+        for vcenter_adapter in vcenter_adapter_list:
+            logger.debug(f'Collecting vCenter adapter: {vcenter_adapter.name}')
+            vcenter_adapter.datacenter = list()
 
-        for dc_object in vcenter_adapter.datacenter:
-            dc_object.datastores = list()
-            dc_object.clusters = list()
-            dc_object.dvss = list()
+            # we need the vcenter to estimate the amount of virtual machines for the request
+            vms, self.response_codes[target]["vms"] = \
+            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
+        
+            for dc in datacenter:
+                if dc.parent == vcenter_adapter.uuid:
+                    vcenter_adapter.datacenter.append(dc)
+                    logger.debug(f'Collecting datacenter: {dc.name}')
 
-            for ds in datastores:
-                if ds.parent == dc_object.uuid:
-                    dc_object.datastores.append(ds)
-                    logger.debug(f'Collecting datastore: {ds.name}')
-            for cl in cluster:
-                if cl.parent == dc_object.uuid:
-                    dc_object.clusters.append(cl)
-                    logger.debug(f'Collecting cluster: {cl.name}')
-            for cl_object in dc_object.clusters:
-                cl_object.hosts = list()
-                for hs in hosts:
-                    if hs.parent == cl_object.uuid:
-                        cl_object.hosts.append(hs)
-                        logger.debug(f'Collecting host: {hs.name}')
-                for hs_object in cl_object.hosts:
-                    hs_object.vms = list()
-                    for vm in vms:
-                        if vm.parent == hs_object.uuid:
-                            hs_object.vms.append(vm)
-                            logger.debug(f'Collecting VM: {vm.name}')
-            for dvs in distributed_virtual_switchs:
-                if dvs.parent == dc_object.uuid:
-                    dc_object.dvss.append(dvs)
-                    logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
+            for dc_object in vcenter_adapter.datacenter:
+                dc_object.datastores = list()
+                dc_object.clusters = list()
+                dc_object.dvss = list()
+
+                for ds in datastores:
+                    if ds.parent == dc_object.uuid:
+                        dc_object.datastores.append(ds)
+                        logger.debug(f'Collecting datastore: {ds.name}')
+                for cl in cluster:
+                    if cl.parent == dc_object.uuid:
+                        dc_object.clusters.append(cl)
+                        logger.debug(f'Collecting cluster: {cl.name}')
+                for cl_object in dc_object.clusters:
+                    cl_object.hosts = list()
+                    for hs in hosts:
+                        if hs.parent == cl_object.uuid:
+                            cl_object.hosts.append(hs)
+                            logger.debug(f'Collecting host: {hs.name}')
+                    for hs_object in cl_object.hosts:
+                        hs_object.vms = list()
+                        for vm in vms:
+                            if vm.parent == hs_object.uuid:
+                                hs_object.vms.append(vm)
+                                logger.debug(f'Collecting VM: {vm.name}')
+                for dvs in distributed_virtual_switchs:
+                    if dvs.parent == dc_object.uuid:
+                        dc_object.dvss.append(dvs)
+                        logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
         return vcenter_adapter
 
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
