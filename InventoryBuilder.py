@@ -273,12 +273,12 @@ class InventoryBuilder:
         inventory_config = self.read_inventory_config()
         query_specs = inventory_config.get('query_specs', {})
 
-        vcenter = self.create_vcenter_objects(vrops, target, token, query_specs)
+        vcenter_adapter = self.create_vcenter_objects(vrops, target, token, query_specs)
         nsxt_adapter = self.create_nsxt_objects(vrops, target, token, query_specs)
         vcops_adapter = self.create_vcops_objects(vrops, target, token, inventory_config)
         sddc_adapter = self.create_sddc_health_objects(vrops, target, token, inventory_config)
 
-        self.vcenter_dict[target] = vcenter
+        self.vcenter_dict[target] = vcenter_adapter
         self.nsxt_dict[target] = nsxt_adapter
         self.vcops_dict[target] = vcops_adapter
         self.sddc_dict[target] = sddc_adapter
@@ -348,7 +348,7 @@ class InventoryBuilder:
                     if dvs.parent == dc_object.uuid:
                         dc_object.dvss.append(dvs)
                         logger.debug(f'Collecting distributed virtual switch: {dvs.name}')
-        return vcenter_adapter
+        return vcenter_adapter_list
 
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
@@ -461,19 +461,20 @@ class InventoryBuilder:
     def provide_vcenters(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                tree[vcenter.target][vcenter.uuid] = {
-                    'uuid': vcenter.uuid,
-                    'name': vcenter.name,
-                    'kind_dc_name': dc.name,
-                    'kind_dc_uuid': dc.uuid,
-                    'target': vcenter.target,
-                    'token': vcenter.token,
-                }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    tree[vcenter.target][vcenter.uuid] = {
+                        'uuid': vcenter.uuid,
+                        'name': vcenter.name,
+                        'kind_dc_name': dc.name,
+                        'kind_dc_uuid': dc.uuid,
+                        'target': vcenter.target,
+                        'token': vcenter.token,
+                    }
             self.amount_resources[target]['vcenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vcenters'] = tree
         return tree
@@ -481,21 +482,22 @@ class InventoryBuilder:
     def provide_datacenters(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                tree[vcenter.target][dc.uuid] = {
-                    'uuid': dc.uuid,
-                    'name': dc.name,
-                    'internal_name': dc.internal_name,
-                    'parent_vcenter_uuid': vcenter.uuid,
-                    'parent_vcenter_name': vcenter.name,
-                    'vcenter': vcenter.name,
-                    'target': vcenter.target,
-                    'token': vcenter.token,
-                }
+            tree[target] = dict()    
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    tree[vcenter.target][dc.uuid] = {
+                        'uuid': dc.uuid,
+                        'name': dc.name,
+                        'internal_name': dc.internal_name,
+                        'parent_vcenter_uuid': vcenter.uuid,
+                        'parent_vcenter_name': vcenter.name,
+                        'vcenter': vcenter.name,
+                        'target': vcenter.target,
+                        'token': vcenter.token,
+                    }
             self.amount_resources[target]['datacenters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datacenters'] = tree
         return tree
@@ -503,23 +505,24 @@ class InventoryBuilder:
     def provide_datastores(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for datastore in dc.datastores:
-                    tree[vcenter.target][datastore.uuid] = {
-                        'uuid': datastore.uuid,
-                        'name': datastore.name,
-                        'internal_name': datastore.internal_name,
-                        'parent_dc_uuid': dc.uuid,
-                        'parent_dc_name': dc.name,
-                        'type': datastore.type,
-                        'vcenter': vcenter.name,
-                        'target': vcenter.target,
-                        'token': vcenter.token,
-                    }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for datastore in dc.datastores:
+                        tree[vcenter.target][datastore.uuid] = {
+                            'uuid': datastore.uuid,
+                            'name': datastore.name,
+                            'internal_name': datastore.internal_name,
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'type': datastore.type,
+                            'vcenter': vcenter.name,
+                            'target': vcenter.target,
+                            'token': vcenter.token,
+                        }
             self.amount_resources[target]['datastores'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree
@@ -527,22 +530,23 @@ class InventoryBuilder:
     def provide_clusters(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    tree[vcenter.target][cluster.uuid] = {
-                        'uuid': cluster.uuid,
-                        'name': cluster.name,
-                        'internal_name': cluster.internal_name,
-                        'parent_dc_uuid': dc.uuid,
-                        'parent_dc_name': dc.name,
-                        'vcenter': vcenter.name,
-                        'target': vcenter.target,
-                        'token': vcenter.token,
-                    }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for cluster in dc.clusters:
+                        tree[vcenter.target][cluster.uuid] = {
+                            'uuid': cluster.uuid,
+                            'name': cluster.name,
+                            'internal_name': cluster.internal_name,
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name,
+                            'target': vcenter.target,
+                            'token': vcenter.token,
+                        }
             self.amount_resources[target]['clusters'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['clusters'] = tree
         return tree
@@ -550,24 +554,25 @@ class InventoryBuilder:
     def provide_hosts(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        tree[vcenter.target][host.uuid] = {
-                            'uuid': host.uuid,
-                            'name': host.name,
-                            'internal_name': host.internal_name,
-                            'parent_cluster_uuid': cluster.uuid,
-                            'parent_cluster_name': cluster.name,
-                            'datacenter': dc.name,
-                            'vcenter': vcenter.name,
-                            'target': vcenter.target,
-                            'token': vcenter.token,
-                        }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for cluster in dc.clusters:
+                        for host in cluster.hosts:
+                            tree[vcenter.target][host.uuid] = {
+                                'uuid': host.uuid,
+                                'name': host.name,
+                                'internal_name': host.internal_name,
+                                'parent_cluster_uuid': cluster.uuid,
+                                'parent_cluster_name': cluster.name,
+                                'datacenter': dc.name,
+                                'vcenter': vcenter.name,
+                                'target': vcenter.target,
+                                'token': vcenter.token,
+                            }
             self.amount_resources[target]['hosts'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['hosts'] = tree
         return tree
@@ -575,27 +580,28 @@ class InventoryBuilder:
     def provide_vms(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for cluster in dc.clusters:
-                    for host in cluster.hosts:
-                        for vm in host.vms:
-                            tree[vcenter.target][vm.uuid] = {
-                                'uuid': vm.uuid,
-                                'name': vm.name,
-                                'internal_name': vm.internal_name,
-                                'instance_uuid': vm.instance_uuid,
-                                'parent_host_uuid': host.uuid,
-                                'parent_host_name': host.name,
-                                'cluster': cluster.name,
-                                'datacenter': dc.name,
-                                'vcenter': vcenter.name,
-                                'target': vcenter.target,
-                                'token': vcenter.token,
-                            }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for cluster in dc.clusters:
+                        for host in cluster.hosts:
+                            for vm in host.vms:
+                                tree[vcenter.target][vm.uuid] = {
+                                    'uuid': vm.uuid,
+                                    'name': vm.name,
+                                    'internal_name': vm.internal_name,
+                                    'instance_uuid': vm.instance_uuid,
+                                    'parent_host_uuid': host.uuid,
+                                    'parent_host_name': host.name,
+                                    'cluster': cluster.name,
+                                    'datacenter': dc.name,
+                                    'vcenter': vcenter.name,
+                                    'target': vcenter.target,
+                                    'token': vcenter.token,
+                                }
             self.amount_resources[target]['vms'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['vms'] = tree
         return tree
@@ -603,21 +609,22 @@ class InventoryBuilder:
     def provide_distributed_vswitches(self) -> dict:
         tree = dict()
         for target in self.vcenter_dict:
-            vcenter = self.vcenter_dict[target]
-            if not vcenter:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
                 continue
-            tree[vcenter.target] = dict()
-            for dc in vcenter.datacenter:
-                for dvs in dc.dvss:
-                    tree[vcenter.target][dvs.uuid] = {
-                        'uuid': dvs.uuid,
-                        'name': dvs.name,
-                        'parent_dc_uuid': dc.uuid,
-                        'parent_dc_name': dc.name,
-                        'vcenter': vcenter.name,
-                        'target': vcenter.target,
-                        'token': vcenter.token,
-                    }
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for dvs in dc.dvss:
+                        tree[vcenter.target][dvs.uuid] = {
+                            'uuid': dvs.uuid,
+                            'name': dvs.name,
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name,
+                            'target': vcenter.target,
+                            'token': vcenter.token,
+                        }
             self.amount_resources[target]['distributed_virtual_switches'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['distributed_virtual_switches'] = tree
         return tree
