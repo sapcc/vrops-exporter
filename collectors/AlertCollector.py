@@ -12,6 +12,7 @@ class AlertCollector(BaseCollector):
         super().__init__()
         self.resourcekind = list()
         self.adapterkind = list()
+        self.alert_entry_cache = dict()
 
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
@@ -70,9 +71,8 @@ class AlertCollector(BaseCollector):
     def generate_alert_label_values(self, alert):
         alert_id = alert.get('alertDefinitionId', {})
         alert_labels = dict()
-        alert_entry_cache = dict()
         alert_entry = self.get_alertdefinition(
-            alert_id) if alert_id not in alert_entry_cache else alert_entry_cache.get(alert_id)
+            alert_id) if alert_id not in self.alert_entry_cache else self.alert_entry_cache.get(alert_id)
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
             alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
