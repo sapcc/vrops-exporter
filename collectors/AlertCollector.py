@@ -35,12 +35,14 @@ class AlertCollector(BaseCollector):
         self.get_resource_uuids()
         alert_config = self.read_collector_config()['alerts']
 
-        alert_metric = self.generate_alert_metrics(label_names=self.label_names)
+        alert_metric = self.generate_alert_metrics(
+            label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         alerts, api_responding, api_response_time = \
             self.vrops.get_alerts(self.target, token,
                                   resourcekinds=self.resourcekind,
-                                  alert_criticality=[a for a in alert_config.get('alertCriticality')],
+                                  alert_criticality=[
+                                      a for a in alert_config.get('alertCriticality')],
                                   active_only=alert_config.get('activeOnly'),
                                   adapterkinds=self.adapterkind if self.adapterkind else [])
 
@@ -48,7 +50,8 @@ class AlertCollector(BaseCollector):
         yield self.create_api_response_time_metric(self.name, api_response_time)
 
         if not alerts:
-            logger.warning(f'No alerts in the response for {self.name}. API code: {api_responding}')
+            logger.warning(
+                f'No alerts in the response for {self.name}. API code: {api_responding}')
             return
 
         for alert in alerts:
@@ -65,12 +68,17 @@ class AlertCollector(BaseCollector):
         yield alert_metric
 
     def generate_alert_label_values(self, alert):
+        alert_id = alert.get('alertDefinitionId', {})
         alert_labels = dict()
-        alert_entry = self.get_alertdefinition(alert.get('alertDefinitionId', {}))
+        alert_entry_cache = dict()
+        alert_entry = self.get_alertdefinition(
+            alert_id) if alert_id not in alert_entry_cache else alert_entry_cache.get(alert_id)
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
             alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
-            alert_labels[f'symptom_{i+1}_data'] = str(symptom.get('state', 'n/a'))
+            alert_labels[f'symptom_{i+1}_data'] = str(
+                symptom.get('state', 'n/a'))
         for i, recommendation in enumerate(alert_entry.get('recommendations', [])):
-            alert_labels[f'recommendation_{i+1}'] = recommendation.get('description', 'n/a')
+            alert_labels[f'recommendation_{i+1}'] = recommendation.get(
+                'description', 'n/a')
         return alert_labels
