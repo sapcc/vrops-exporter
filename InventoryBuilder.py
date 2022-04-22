@@ -283,7 +283,7 @@ class InventoryBuilder:
         self.vcops_dict[target] = vcops_adapter
         self.sddc_dict[target] = sddc_adapter
 
-        if iteration == 1:
+        if iteration == 1 and not self.alertdefinitions:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
         return True
 
