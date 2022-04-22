@@ -143,8 +143,12 @@ resourcekinds:
   * `--timeout`: specifies timeout for fetching data from vROps, default: 600s
 
   There are two ways to configure your target vROps instances to be queried:
-  * in the [inventory-config](tests/inventory_config.yaml) as `vrops_targets`
-  * as an http endpoint providing an [Atlas](https://github.com/sapcc/atlas) compatible format.
+  * *config file*: in the [inventory-config](tests/inventory_config.yaml#L1-L2) as `vrops_targets`.
+    This is the default, add your vROps instance here.
+
+  * *web service*: as an http endpoint providing an [Atlas](https://github.com/sapcc/atlas) compatible format.
+    To use this, either specify `--atlas` as a cli param or use a `ATLAS` environement variable pointing to your web service url.
+
     The inventory queries the atlas service discovery endpoint to know all the DNS names of the vrops targets.
     It refers to our netbox extractor, which is in the end providing netbox data as a service endpoint in Kubernetes.
     The format provided via this endpoint looks like this, you can also provide your own tooling:
@@ -225,9 +229,9 @@ Start the container:
 
        docker run -it keppel.eu-de-1.cloud.sap/ccloud/vrops_exporter /bin/sh
 
-   This will start the container and directly enter the shell. Start the inventory:
+   This will start the inventory container and directly enter the shell. Note, you need to define your vROps target beforehand [tests/inventory_config.yaml](tests/inventory_config.yaml#L1-L2).
     
-       ./inventory.py --user foobaruser --password "foobarpw" --atlas /atlas/netbox.json --port 80 --vv
+       ./inventory.py --user foobaruser --password "foobarpw" --port 80 -m tests/inventory_config.yaml --vv
     
    Now you need to enter the container a second time:
     
@@ -258,7 +262,7 @@ Test module is called using ENV variables. Specifying these on the fly would loo
 
 Main test:
 ```shell
-LOOPBACK=0 DEBUG=0 INVENTORY=127.0.0.1:8000 USER=FOO PASSWORD=Bar CONFIG=tests/collector_config.yaml TARGET=testhost.test python3 tests/TestCollectors.py
+LOOPBACK=0 DEBUG=0 INVENTORY=127.0.0.1:8000 USER=FOO PASSWORD=Bar CONFIG=tests/collector_config.yaml TARGET=vrops-vcenter-test.company.com python3 tests/TestCollectors.py
 ```
 
 To run all tests you got to loop over it.
