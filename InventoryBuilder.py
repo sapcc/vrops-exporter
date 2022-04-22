@@ -293,7 +293,6 @@ class InventoryBuilder:
         if not vcenter_adapter_list:
             logger.critical(f'Could not get vcenter adapter!')
             return False
-        
 
         datacenter, self.response_codes[target]["datacenters"] = \
             Vrops.get_datacenter(vrops, target, token, [vc.uuid for vc in vcenter_adapter_list], query_specs=query_specs)
