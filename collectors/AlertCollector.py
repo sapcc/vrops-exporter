@@ -71,7 +71,8 @@ class AlertCollector(BaseCollector):
     def generate_alert_label_values(self, alert):
         alert_id = alert.get('alertDefinitionId', {})
         alert_labels = dict()
-        alert_entry = self.alert_entry_cache.setdefault(alert_id, self.get_alertdefinition(alert_id))
+        alert_entry = self.alert_entry_cache.get(alert_id) if alert_id in self.alert_entry_cache else self.get_alertdefinition(alert_id)
+        self.alert_entry_cache[alert_id] = alert_entry
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
             alert_labels[f'symptom_{i+1}_name'] = symptom.get('name', "n/a")
