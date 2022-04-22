@@ -311,7 +311,7 @@ class InventoryBuilder:
 
             # we need the vcenter to estimate the amount of virtual machines for the request
             vms, self.response_codes[target]["vms"] = \
-            Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
+                Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
         
             for dc in datacenter:
                 if dc.parent == vcenter_adapter.uuid:
