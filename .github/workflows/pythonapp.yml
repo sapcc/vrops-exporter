@@ -35,5 +35,5 @@ jobs:
       run: |
          for i in $(ls tests/Test*)
          do 
-           LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar COLLECTOR_CONFIG=tests/collector_config.yaml INVENTORY_CONFIG=tests/inventory_config.yaml TARGET=testhost.test python3 $i
+           LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar COLLECTOR_CONFIG=tests/collector_config.yaml INVENTORY_CONFIG=tests/inventory_config.yaml TARGET=vrops-vcenter-test.company.com python3 $i
          done

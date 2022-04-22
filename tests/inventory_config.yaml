@@ -1,5 +1,5 @@
 vrops_targets:
-  - "testhost.test"
+  - "vrops-vcenter-test.company.com"
 
 query_specs:
   # to create specific resource query specs for a resourcekind, stick to one of the following keys:
