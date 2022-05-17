@@ -186,8 +186,8 @@ class BaseCollector(ABC):
         return self.target_tokens
 
     def get_vrops_list(self):
-        self.vrops_list = self.do_request(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-        return self.vrops_list
+        vrops_list = self.do_request(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
+        return vrops_list
 
     def do_request(self, url):
         try:
