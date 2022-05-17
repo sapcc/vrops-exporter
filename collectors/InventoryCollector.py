@@ -17,21 +17,23 @@ class InventoryCollector(BaseCollector):
             yield GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory')
         yield CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
         yield GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory')
-        yield GaugeMetricFamily('vrops_api_response', 'vrops-exporter')
+        yield GaugeMetricFamily('vrops_api_response', 'vrops_inventory')
+        yield GaugeMetricFamily('vrops_inventory_target', 'vrops_inventory')
 
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
-        target_tokens = self.get_target_tokens()
-        if not target_tokens:
+        targets = self.get_vrops_list()
+        if not targets:
             return
 
-        for target, token in self.target_tokens.items():
+        for target in targets:
             for gauge_metric in self.amount_inventory_resources(target):
                 yield gauge_metric
             yield self.iteration_metric(target)
             yield self.api_response_metric(target)
             yield self.collection_time_metric(target)
+            yield self.inventory_targets_info(target)
 
     def amount_inventory_resources(self, target):
         gauges = list()
@@ -51,7 +53,7 @@ class InventoryCollector(BaseCollector):
         return iteration_gauge
 
     def api_response_metric(self, target):
-        api_response_gauge = GaugeMetricFamily('vrops_api_response', 'vrops-exporter',
+        api_response_gauge = GaugeMetricFamily('vrops_api_response', 'vrops_inventory',
                                                labels=['target', 'class', 'get_request'])
         status_code_dict = self.get_inventory_api_responses()[target]
         if not status_code_dict:
@@ -69,3 +71,9 @@ class InventoryCollector(BaseCollector):
             return collection_time_gauge
         collection_time_gauge.add_metric(labels=[target], value=collection_time)
         return collection_time_gauge
+
+    def inventory_targets_info(self, target):
+        inventory_target_info = GaugeMetricFamily('vrops_inventory_target', 'vrops_inventory',
+                                                  labels=["target"])
+        inventory_target_info.add_metric(labels=[target], value=1)
+        return inventory_target_info
