@@ -7,7 +7,9 @@ from tools.helper import yaml_read
 from collections import defaultdict
 import time
 import json
+import simplejson
 import os
+import sys
 import logging
 import requests
 
@@ -172,13 +174,29 @@ class InventoryBuilder:
         elif self.atlas_path:
             try:
                 response = requests.get(url=self.atlas_path)
-                netbox_json = response.json()
-                self.vrops_list = [target['labels']['server_name'] for target in netbox_json if
-                                   target['labels']['job'] == "vrops"]
+                self.response_codes['atlas'][self.atlas_path] = response.status_code
             except (urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError,
-                    urllib3.exceptions.NewConnectionError):
-                logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s')
+                    urllib3.exceptions.NewConnectionError) as err:
+                logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s', err)
+                if not self.vrops_list:
+                    logger.critical(f'No targets found to start inventory collection, exit 0')
+                    sys.exit(0)
                 logger.info(f'continue with the old vrops_list')
+                return
+
+            try:
+                response.json()
+            except simplejson.errors.JSONDecodeError:
+                logger.error(f'Invalid json data in atlas netbox http response, Content-Type: "{response.headers.get("Content-Type")}"')
+                if not self.vrops_list:
+                    logger.critical(f'No targets found to start inventory collection, exit 0')
+                    sys.exit(0)
+                logger.info(f'continue with the old vrops_list')
+                return
+
+            netbox_json = response.json()
+            self.vrops_list = [target['labels']['server_name'] for target in netbox_json if target['labels']['job'] == "vrops"]
+
         else:
             return
 

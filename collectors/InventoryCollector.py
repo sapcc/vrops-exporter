@@ -34,6 +34,7 @@ class InventoryCollector(BaseCollector):
             yield self.api_response_metric(target)
             yield self.collection_time_metric(target)
             yield self.inventory_targets_info(target)
+            yield self.atlas_http_sd_endpoint_probe()
 
     def amount_inventory_resources(self, target):
         gauges = list()
@@ -62,6 +63,13 @@ class InventoryCollector(BaseCollector):
             api_response_gauge.add_metric(labels=[target, self.name.lower(), get_request],
                                           value=status_code)
         return api_response_gauge
+
+    def atlas_http_sd_endpoint_probe(self):
+        atlas_response_gauge = GaugeMetricFamily('atlas_sd_response', 'vrops_inventory',
+                                               labels=['atlas_path'])
+        for atlas_patch, response_code in self.get_inventory_api_responses()['atlas'].items():
+            atlas_response_gauge.add_metric(labels=[atlas_patch], value=response_code)
+        return atlas_response_gauge
 
     def collection_time_metric(self, target):
         collection_time_gauge = GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory',
