@@ -70,21 +70,21 @@ def parse_params(logger):
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify PORT with ENV or -o')
-        sys.exit(0)
+        sys.exit(1)
     if "USER" not in os.environ and not options.user:
         logger.error('Cannot start, please specify USER with ENV or -u')
-        sys.exit(0)
+        sys.exit(1)
     if "PASSWORD" not in os.environ and not options.password:
         logger.error('Cannot start, please specify PASSWORD with ENV or -p')
-        sys.exit(0)
+        sys.exit(1)
     if "INVENTORY_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify inventory config with ENV or -m')
-        sys.exit(0)
+        sys.exit(1)
     if "ATLAS" not in os.environ and not options.atlas:
         vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets')
         if not vrops_list:
             logger.error('Cannot start, please declare vrops_targets in inventory config or ATLAS path with ENV or -a')
-            sys.exit(0)
+            sys.exit(1)
 
     return options
 
