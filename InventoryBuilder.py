@@ -179,7 +179,7 @@ class InventoryBuilder:
                     urllib3.exceptions.NewConnectionError) as err:
                 logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s', err)
                 if not self.vrops_list:
-                    logger.critical(f'No targets found to start InventoryBuilder, exit 1')
+                    logger.critical(f'No targets found to start InventoryBuilder, bailing out')
                     sys.exit(1)
                 logger.info(f'Continue with the old vrops_list')
                 return
