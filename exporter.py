@@ -68,16 +68,16 @@ def parse_params(logger):
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify port with ENV or -o')
-        sys.exit(0)
+        sys.exit(1)
     if "INVENTORY" not in os.environ and not options.inventory:
         logger.error('Cannot start, please specify inventory with ENV or -i')
-        sys.exit(0)
+        sys.exit(1)
     if "COLLECTOR_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify collector config with ENV or -m')
-        sys.exit(0)
+        sys.exit(1)
     if not options.collectors:
         logger.error('Cannot start, no default collectors activated in config')
-        sys.exit(0)
+        sys.exit(1)
 
     return options
 
