@@ -108,7 +108,7 @@ class TestLaunchExporter(TestCase):
         sys.argv = ['prog']
         with self.assertRaises(SystemExit) as se:
             parse_params(logger)
-        self.assertEqual(se.exception.code, 0, 'PORT, USER, ATLAS or PASSWORD are not set in ENV or command line!')
+        self.assertEqual(se.exception.code, 1, 'PORT, USER, ATLAS or PASSWORD are not set in ENV or command line!')
 
 
 if __name__ == '__main__':
