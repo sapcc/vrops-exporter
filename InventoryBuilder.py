@@ -189,7 +189,7 @@ class InventoryBuilder:
             except simplejson.errors.JSONDecodeError:
                 logger.error(f'Invalid json data in atlas netbox http response, Content-Type: "{response.headers.get("Content-Type")}"')
                 if not self.vrops_list:
-                    logger.critical(f'No targets found to start InventoryBuilder, exit 1')
+                    logger.critical(f'No targets found to start InventoryBuilder, bailing out')
                     sys.exit(1)
                 logger.info(f'Continue with the old vrops_list')
                 return
