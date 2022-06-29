@@ -309,7 +309,7 @@ class InventoryBuilder:
         vcenter_adapter_list, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
 
         if not vcenter_adapter_list:
-            logger.critical(f'Could not get vcenter adapter!')
+            logger.info(f'Could not get vcenter adapter!')
             return False
 
         datacenter, self.response_codes[target]["datacenters"] = \
@@ -369,7 +369,7 @@ class InventoryBuilder:
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
         nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter_list:
-            logger.warning(f'Could not get any nsxt adapter from {target}!')
+            logger.info(f'Could not get any nsxt adapter from {target}!')
             return False
 
         nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
@@ -435,7 +435,7 @@ class InventoryBuilder:
             Vrops.get_vcenter_operations_adapter_intance(vrops, target, token)
         vcops_adapter_instance = vcops_adapter_instance[0]
         if not vcops_adapter_instance:
-            logger.critical(f'Could not get vcops adapter!')
+            logger.info(f'Could not get vcops adapter!')
             return False
 
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('vcops_resourcekinds', [])]
@@ -455,6 +455,7 @@ class InventoryBuilder:
             Vrops.get_sddc_health_adapter_intance(vrops, target, token)
 
         if not sddc_adapter_instances:
+            logger.info(f'Could not get sddc adapter!')
             return False
 
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('sddc_resourcekinds', [])]

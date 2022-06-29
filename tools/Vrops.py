@@ -30,7 +30,7 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=10)
+                                     timeout=30)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
             return False, 504
@@ -109,7 +109,7 @@ class Vrops:
                       ) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
-            return [], 200
+            return [], 400
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
 
@@ -228,11 +228,15 @@ class Vrops:
                                   uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
     def get_vms(self, target, token, parent_uuids, vcenter_uuid, query_specs):
+        if not parent_uuids:
+            logger.debug(f'No parent resources for virtual machines from {target}')
+            return [], 400
         resourcekind = 'VirtualMachine'
         q_specs = self._set_query_specs(query_specs, resourcekind)
         amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
+
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
             api_responding == 200 and amount_vms else 0
 
