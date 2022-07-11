@@ -81,6 +81,7 @@ resourcekinds:
       - "VCENTER"
       - "NSXVPostgresService"
       - "SSHService"
+      - "StoragePod"
       - "NSXReplicatorService"
       - "NSXRabbitmqService"
       - "NSXManagerService"

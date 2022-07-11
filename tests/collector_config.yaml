@@ -9,6 +9,7 @@ default_collectors:
     - 'ClusterPropertiesCollector'
     - 'DistributedvSwitchPropertiesCollector'
     - 'DatastoreStatsCollector'
+    - 'SDRSStatsCollector'
     - 'DatastorePropertiesCollector'
     - 'HostSystemStatsCollector'
     - 'HostSystemPropertiesCollector'
@@ -96,6 +97,10 @@ DatastoreStatsCollector:
     key: "diskspace|capacity"
   - metric_suffix: "summary_total_number_vms"
     key: "summary|total_number_vms"
+
+SDRSStatsCollector:
+  - metric_suffix: "capacity_remaining_percentage"
+    key: "OnlineCapacityAnalytics|capacityRemainingPercentage"
 
 DatastorePropertiesCollector:
   - metric_suffix: "summary_datastore_accessible"

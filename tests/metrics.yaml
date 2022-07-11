@@ -287,6 +287,16 @@ DatastoreStatsCollector:
   - 'vrops_datastore_summary_total_number_vms{datacenter="datacenter_1",datastore="Datastore_1",type="other",vcenter="vcenter_2"}'
   - 'vrops_datastore_diskspace_capacity_gigabytes{datacenter="datacenter_1",datastore="Datastore_1",type="other",vcenter="vcenter_2"}'
 
+SDRSStatsCollector:
+  - 'vrops_api_response{class="sdrsstatscollector",target="vrops-vcenter-test.company.com"}'  
+  - 'vrops_storagepod_capacity_remaining_percentage{datacenter="datacenter_1",storagepod="Storagepod_2",vcenter="vcenter_2"}'
+  - 'vrops_storagepod_capacity_remaining_percentage{datacenter="datacenter_1",storagepod="Storagepod_3",vcenter="vcenter_2"}'
+  - 'vrops_collector_resources_number{class="sdrsstatscollector",target="vrops-vcenter-test.company.com"}'
+  - 'vrops_collector_metric_samples_generated_number{class="sdrsstatscollector",metric_name="vrops_storagepod_capacity_remaining_percentage",target="vrops-vcenter-test.company.com"}'
+  - 'vrops_storagepod_capacity_remaining_percentage{datacenter="datacenter_1",storagepod="Storagepod_1",vcenter="vcenter_2"}'
+  - 'vrops_collector_metrics_number{class="sdrsstatscollector",target="vrops-vcenter-test.company.com"}'
+  - 'vrops_api_response_time_seconds{class="sdrsstatscollector",target="vrops-vcenter-test.company.com"}'
+
 DatastorePropertiesCollector:
   - 'vrops_api_response_time_seconds{class="datastorepropertiescollector",target="vrops-vcenter-test.company.com"}'
   - 'vrops_api_response{class="datastorepropertiescollector",target="vrops-vcenter-test.company.com"}'

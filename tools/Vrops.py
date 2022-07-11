@@ -198,6 +198,11 @@ class Vrops:
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
                                   uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
 
+    def get_SDRS_cluster(self, target, token, parent_uuids, query_specs):
+        resourcekind = 'StoragePod'
+        return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=["StoragePod"],
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
+
     def get_datastores(self, target, token, parent_uuids, query_specs):
         resourcekind = 'Datastore'
         datastores, api_responding = self.get_resources(target, token, adapterkind="VMWARE",

@@ -77,6 +77,10 @@ class InventoryBuilder:
         def datastores(target, iteration):
             return self.iterated_inventory.get(str(iteration), {}).get('datastores', {}).get(target, {})
 
+        @app.route('/<target>/storagepod/<int:iteration>', methods=['GET'])
+        def storagepod(target, iteration):
+            return self.iterated_inventory.get(str(iteration), {}).get('storagepod', {}).get(target, {})
+
         @app.route('/<target>/vms/<int:iteration>', methods=['GET'])
         def vms(target, iteration):
             return self.iterated_inventory.get(str(iteration), {}).get('vms', {}).get(target, {})
@@ -256,6 +260,7 @@ class InventoryBuilder:
             self.provide_clusters()
             self.provide_hosts()
             self.provide_datastores()
+            self.provide_SDRS_clusters()
             self.provide_vms()
             self.provide_distributed_vswitches()
             self.provide_nsxt_adapter()
@@ -322,6 +327,8 @@ class InventoryBuilder:
             Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster], query_specs=query_specs)
         distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"] = \
             Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
+        storagepod, self.response_codes[target]["storagepod"] = \
+            Vrops.get_SDRS_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
 
         for vcenter_adapter in vcenter_adapter_list:
             logger.debug(f'Collecting vCenter adapter: {vcenter_adapter.name}')
@@ -339,11 +346,16 @@ class InventoryBuilder:
                 dc_object.datastores = list()
                 dc_object.clusters = list()
                 dc_object.dvss = list()
+                dc_object.storagepod = list()
 
                 for ds in datastores:
                     if ds.parent == dc_object.uuid:
                         dc_object.datastores.append(ds)
                         logger.debug(f'Collecting datastore: {ds.name}')
+                for sc in storagepod:
+                    if sc.parent == dc_object.uuid:
+                        dc_object.storagepod.append(sc)
+                        logger.debug(f'Collecting SDRS clusters: {sc.name}')
                 for cl in cluster:
                     if cl.parent == dc_object.uuid:
                         dc_object.clusters.append(cl)
@@ -542,6 +554,30 @@ class InventoryBuilder:
                         }
             self.amount_resources[target]['datastores'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
+        return tree
+
+    def provide_SDRS_clusters(self) -> dict:
+        tree = dict()
+        for target in self.vcenter_dict:
+            vcenter_adapter_list = self.vcenter_dict[target]
+            if not vcenter_adapter_list:
+                continue
+            tree[target] = dict()
+            for vcenter in vcenter_adapter_list:
+                for dc in vcenter.datacenter:
+                    for sc in dc.storagepod:
+                        tree[vcenter.target][sc.uuid] = {
+                            'uuid': sc.uuid,
+                            'name': sc.name,
+                            'internal_name': sc.internal_name,
+                            'parent_dc_uuid': dc.uuid,
+                            'parent_dc_name': dc.name,
+                            'vcenter': vcenter.name,
+                            'target': vcenter.target,
+                            'token': vcenter.token,
+                        }
+            self.amount_resources[target]['storagepod'] = len(tree[target])
+        self.iterated_inventory[str(self.iteration)]['storagepod'] = tree
         return tree
 
     def provide_clusters(self) -> dict:
