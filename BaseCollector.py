@@ -67,6 +67,14 @@ class BaseCollector(ABC):
         self.hosts = request.json() if request else {}
         return self.hosts
 
+    def get_SDRS_cluster(self, target):
+        self.wait_for_inventory_data()
+        current_iteration = self.get_iteration()
+        url = "http://" + os.environ['INVENTORY'] + "/" + target + "/storagepod/{}".format(current_iteration)
+        request = requests.get(url)
+        self.sdrs_clusters = request.json() if request else {}
+        return self.sdrs_clusters
+
     def get_datastores(self, target):
         self.wait_for_inventory_data()
         current_iteration = self.get_iteration()
@@ -212,6 +220,11 @@ class BaseCollector(ABC):
         host_dict = self.get_hosts(self.target)
         self.target_hosts = [host_dict[uuid]['uuid'] for uuid in host_dict]
         return self.target_hosts
+
+    def get_SDRS_clusters_by_target(self):
+        SDRS_clusters_dict = self.get_SDRS_cluster(self.target)
+        self.target_SDRS_clusters = [SDRS_clusters_dict[uuid]['uuid'] for uuid in SDRS_clusters_dict]
+        return self.target_SDRS_clusters
 
     def get_datastores_by_target(self):
         datastore_dict = self.get_datastores(self.target)

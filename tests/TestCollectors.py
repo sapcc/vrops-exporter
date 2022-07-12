@@ -87,6 +87,7 @@ class TestCollectors(unittest.TestCase):
         Vrops.get_nsxt_logical_switch = MagicMock(return_value=(create_resource_objects("LogicalSwitch"), 200))
         Vrops.get_datacenter = MagicMock(return_value=(create_resource_objects("Datacenter"), 200))
         Vrops.get_cluster = MagicMock(return_value=(create_resource_objects("ClusterComputeResource"), 200))
+        Vrops.get_SDRS_cluster = MagicMock(return_value=(create_resource_objects("StoragePod"), 200))
         datastores = create_resource_objects("Datastore")
         for ds in datastores:
             ds.type = 'other'
