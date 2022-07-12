@@ -329,6 +329,8 @@ class InventoryBuilder:
             Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         storagepod, self.response_codes[target]["storagepod"] = \
             Vrops.get_SDRS_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
+        clustered_datastores, self.response_codes[target]["clustered_datastores"] = \
+            Vrops.get_datastores(vrops, target, token, [sc.uuid for sc in storagepod], query_specs=query_specs)
 
         for vcenter_adapter in vcenter_adapter_list:
             logger.debug(f'Collecting vCenter adapter: {vcenter_adapter.name}')
@@ -356,6 +358,12 @@ class InventoryBuilder:
                     if sc.parent == dc_object.uuid:
                         dc_object.storagepod.append(sc)
                         logger.debug(f'Collecting SDRS clusters: {sc.name}')
+                    for sc_object in dc_object.storagepod:
+                        sc_object.datastores = list()
+                        for ds in clustered_datastores:
+                            if ds.parent == sc_object.uuid:
+                                sc_object.datastores.append(ds)
+                                logger.debug(f'Collecting clustered datastore: {ds.name}')
                 for cl in cluster:
                     if cl.parent == dc_object.uuid:
                         dc_object.clusters.append(cl)
@@ -552,6 +560,21 @@ class InventoryBuilder:
                             'target': vcenter.target,
                             'token': vcenter.token,
                         }
+                    for sc in dc.storagepod:
+                        for datastore in sc.datastores:
+                            tree[vcenter.target][datastore.uuid] = {
+                                'uuid': datastore.uuid,
+                                'name': datastore.name,
+                                'internal_name': datastore.internal_name,
+                                'parent_dc_uuid': dc.uuid,
+                                'parent_dc_name': dc.name,
+                                'storage_cluster_name': sc.name,
+                                'storage_cluster_uuid': sc.uuid,
+                                'type': datastore.type,
+                                'vcenter': vcenter.name,
+                                'target': vcenter.target,
+                                'token': vcenter.token,
+                            }
             self.amount_resources[target]['datastores'] = len(tree[target])
         self.iterated_inventory[str(self.iteration)]['datastores'] = tree
         return tree

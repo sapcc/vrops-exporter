@@ -131,7 +131,7 @@ class Vrops:
                 "resourceHealth": r_health_list,
                 "resourceState": r_states_list
             },
-            "hierarchyDepth": 5
+            "hierarchyDepth": 1
         }
         headers = {
             'Content-Type': "application/json",
