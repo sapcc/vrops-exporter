@@ -278,7 +278,7 @@ class Vrops:
     def get_nsxt_mgmt_nodes(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementNode'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
 
     def get_nsxt_mgmt_service(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementService'
@@ -288,7 +288,7 @@ class Vrops:
     def get_nsxt_transport_zone(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportZone'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind))
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
 
     def get_nsxt_transport_node(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportNode'
