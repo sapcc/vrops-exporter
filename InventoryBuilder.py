@@ -329,8 +329,10 @@ class InventoryBuilder:
             Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
         storagepod, self.response_codes[target]["storagepod"] = \
             Vrops.get_SDRS_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        clustered_datastores, self.response_codes[target]["clustered_datastores"] = \
-            Vrops.get_datastores(vrops, target, token, [sc.uuid for sc in storagepod], query_specs=query_specs)
+
+        if storagepod:
+            clustered_datastores, self.response_codes[target]["clustered_datastores"] = \
+                Vrops.get_datastores(vrops, target, token, [sc.uuid for sc in storagepod], query_specs=query_specs)
 
         for vcenter_adapter in vcenter_adapter_list:
             logger.debug(f'Collecting vCenter adapter: {vcenter_adapter.name}')
