@@ -106,7 +106,7 @@ class Vrops:
                       resourcekinds: list,  # Array of resource kind keys
                       uuids: list,  # Array of parent uuids
                       query_specs: dict,  # Dict of resource query specifications
-                      h_dept: 1 ) -> (list, int):
+                      h_dept: int =1 ) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
             return [], 400
