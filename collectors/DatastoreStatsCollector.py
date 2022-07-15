@@ -6,7 +6,7 @@ class DatastoreStatsCollector(StatsCollector):
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'datastore'
-        self.label_names = [self.vrops_entity_name, 'vcenter', 'type', 'datacenter', 'storage_cluster']
+        self.label_names = [self.vrops_entity_name, 'vcenter', 'type', 'datacenter', 'storagepod']
 
     def get_resource_uuids(self):
         return self.get_datastores_by_target()

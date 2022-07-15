@@ -7,7 +7,7 @@ class DatastorePropertiesCollector(PropertiesCollector):
         super().__init__()
         self.vrops_entity_name = 'datastore'
         self.label_names = [self.vrops_entity_name,
-                            'vcenter', 'type', 'datacenter', 'storage_cluster']
+                            'vcenter', 'type', 'datacenter', 'storagepod']
 
     def get_resource_uuids(self):
         return self.get_datastores_by_target()

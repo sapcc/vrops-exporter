@@ -6,7 +6,7 @@ class DatastoreAlertCollector(AlertCollector):
     def __init__(self):
         super().__init__()
         self.vrops_entity_name = 'datastore'
-        self.label_names = [self.vrops_entity_name, 'vcenter', 'type', 'datacenter', 'storage_cluster']
+        self.label_names = [self.vrops_entity_name, 'vcenter', 'type', 'datacenter', 'storagepod']
         self.resourcekind = ["Datastore"]
 
     def get_resource_uuids(self):
