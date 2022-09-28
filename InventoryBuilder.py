@@ -455,10 +455,11 @@ class InventoryBuilder:
     def create_vcops_objects(self, vrops, target: str, token: str, inventory_config: dict):
         vcops_adapter_instance, self.response_codes[target]["vcops_adapter"] = \
             Vrops.get_vcenter_operations_adapter_intance(vrops, target, token)
-        vcops_adapter_instance = vcops_adapter_instance[0]
+
         if not vcops_adapter_instance:
             logger.info(f'Could not get vcops adapter!')
             return False
+        vcops_adapter_instance = vcops_adapter_instance[0]
 
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('vcops_resourcekinds', [])]
         query_specs = inventory_config.get('query_specs', {})
