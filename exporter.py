@@ -5,6 +5,7 @@ import os
 import importlib
 import requests
 import logging
+import random
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
 from optparse import OptionParser
@@ -62,7 +63,7 @@ def parse_params(logger):
     if options.target:
         os.environ['TARGET'] = options.target
     if not options.target:
-        target = get_targets(options.inventory)[0]
+        target = random.choice(get_targets(options.inventory))
         logger.warning(f'No target specified. Running exporter with {target} from inventory')
         os.environ['TARGET'] = target
 

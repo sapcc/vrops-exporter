@@ -40,7 +40,9 @@ class InventoryCollector(BaseCollector):
 
     def amount_inventory_resources(self, target):
         gauges = list()
-        for resourcekind, amount in self.get_amount_resources()[target].items():
+        for resourcekind, amount in self.get_amount_resources().get(target, {"empty": 0}).items():
+            if resourcekind == "empty":
+                logger.warning(f'InventoryBuilder could not capture resources for {target}')
             gauge = GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory',
                                       labels=["target"])
             gauge.add_metric(labels=[target], value=amount)

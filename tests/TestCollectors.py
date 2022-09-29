@@ -18,7 +18,6 @@ import importlib
 
 
 class TestCollectors(unittest.TestCase):
-
     target = yaml_read(os.environ['INVENTORY_CONFIG'])['vrops_targets'][0]
     os.environ.setdefault('TARGET', target)
 
@@ -28,6 +27,7 @@ class TestCollectors(unittest.TestCase):
         self.assertTrue(os.getenv('COLLECTOR_CONFIG'), 'no COLLECTOR CONFIG set')
         self.assertTrue(os.getenv('INVENTORY_CONFIG'), 'no INVENTORY CONFIG set')
         self.assertTrue(os.getenv('TARGET'), 'no target set')
+        self.assertEqual(os.getenv('TARGET'), "vrops-vcenter-test.company.com", "The test must be run with the target: vrops-vcenter-test.company.com")
 
     def test_collector_metrics(self):
         self.metrics_yaml = yaml_read('tests/metrics.yaml')
