@@ -106,7 +106,7 @@ class Vrops:
                       resourcekinds: list,  # Array of resource kind keys
                       uuids: list,  # Array of parent uuids
                       query_specs: dict,  # Dict of resource query specifications
-                      h_depth: int =1 ) -> (list, int):
+                      h_depth: int = 1) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
             return [], 400
@@ -157,6 +157,10 @@ class Vrops:
         if response.status_code == 200:
             try:
                 relations = response.json()["resourcesRelations"]
+                if not relations:
+                    resourcekinds_beautyfied = ', '.join(resourcekinds)
+                    logger.warning(f'No child relation returned for {resourcekinds_beautyfied} from adapter {adapterkind} for {target}.')
+                    return resources, 901
                 for resource in relations:
                     resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resourcekind = re.sub("[^a-zA-Z]+", "", resourcekind)
