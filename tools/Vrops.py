@@ -106,7 +106,7 @@ class Vrops:
                       resourcekinds: list,  # Array of resource kind keys
                       uuids: list,  # Array of parent uuids
                       query_specs: dict,  # Dict of resource query specifications
-                      h_dept: int = 1) -> (list, int):
+                      h_depth: int = 1) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
             return [], 400
@@ -131,7 +131,7 @@ class Vrops:
                 "resourceHealth": r_health_list,
                 "resourceState": r_states_list
             },
-            "hierarchyDepth": h_dept
+            "hierarchyDepth": h_depth
         }
         headers = {
             'Content-Type': "application/json",
@@ -282,17 +282,17 @@ class Vrops:
     def get_nsxt_mgmt_nodes(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementNode'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_depth=5)
 
     def get_nsxt_mgmt_service(self, target, token, parent_uuids, query_specs):
         resourcekind = 'ManagementService'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_depth=5)
 
     def get_nsxt_transport_zone(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportZone'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_depth=5)
 
     def get_nsxt_transport_node(self, target, token, parent_uuids, query_specs):
         resourcekind = 'TransportNode'
@@ -302,17 +302,17 @@ class Vrops:
     def get_nsxt_logical_switch(self, target, token, parent_uuids, query_specs):
         resourcekind = 'LogicalSwitch'
         return self.get_resources(target, token, adapterkind="NSXTAdapter", resourcekinds=[resourcekind],
-                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_dept=5)
+                                  uuids=parent_uuids, query_specs=self._set_query_specs(query_specs, resourcekind), h_depth=5)
 
     def get_vcops_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
         return self.get_resources(target, token, adapterkind="vCenter Operations Adapter",
                                   resourcekinds=resourcekinds, uuids=parent_uuids,
-                                  query_specs=query_specs.get('default', {}))
+                                  query_specs=query_specs.get('default', {}), h_depth=5)
 
     def get_sddc_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
         return self.get_resources(target, token, adapterkind="SDDCHealthAdapter",
                                   resourcekinds=resourcekinds, uuids=parent_uuids,
-                                  query_specs=query_specs.get('default', {}))
+                                  query_specs=query_specs.get('default', {}), h_depth=5)
 
     def _set_query_specs(self, query_specs, resourcekind):
         return query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
