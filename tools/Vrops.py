@@ -303,12 +303,12 @@ class Vrops:
     def get_vcops_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
         return self.get_resources(target, token, adapterkind="vCenter Operations Adapter",
                                   resourcekinds=resourcekinds, uuids=parent_uuids,
-                                  query_specs=query_specs.get('default', {}))
+                                  query_specs=query_specs.get('default', {}), h_dept=5)
 
     def get_sddc_instances(self, target, token, parent_uuids, resourcekinds, query_specs):
         return self.get_resources(target, token, adapterkind="SDDCHealthAdapter",
                                   resourcekinds=resourcekinds, uuids=parent_uuids,
-                                  query_specs=query_specs.get('default', {}))
+                                  query_specs=query_specs.get('default', {}), h_dept=5)
 
     def _set_query_specs(self, query_specs, resourcekind):
         return query_specs.get(resourcekind) if resourcekind in query_specs else query_specs.get('default', {})
