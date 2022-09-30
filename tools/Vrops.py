@@ -160,7 +160,7 @@ class Vrops:
                 if not relations:
                     resourcekinds_beautyfied = ', '.join(resourcekinds)
                     logger.warning(f'No child relation returned for {resourcekinds_beautyfied} from adapter {adapterkind} for {target}.')
-                    return resources, 901
+                    return resources, 204
                 for resource in relations:
                     resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resourcekind = re.sub("[^a-zA-Z]+", "", resourcekind)
