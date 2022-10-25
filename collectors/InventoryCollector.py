@@ -23,20 +23,15 @@ class InventoryCollector(BaseCollector):
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
-        targets = self.get_vrops_list()
-        if not targets:
-            return
+        for gauge_metric in self.amount_inventory_resources(self.target):
+            yield gauge_metric
+        yield self.iteration_metric(self.target)
+        yield self.api_response_metric(self.target)
+        yield self.collection_time_metric(self.target)
+        yield self.inventory_targets_info(self.target)
 
-        for target in targets:
-            for gauge_metric in self.amount_inventory_resources(target):
-                yield gauge_metric
-            yield self.iteration_metric(target)
-            yield self.api_response_metric(target)
-            yield self.collection_time_metric(target)
-            yield self.inventory_targets_info(target)
-
-            # If Atlas is used for target discovery
-            yield self.atlas_http_sd_endpoint_probe()
+        # If Atlas is used for target discovery
+        yield self.atlas_http_sd_endpoint_probe()
 
     def amount_inventory_resources(self, target):
         gauges = list()
