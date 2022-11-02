@@ -7,7 +7,7 @@ class VMStatsCollector(StatsCollector):
         super().__init__()
         self.vrops_entity_name = 'virtualmachine'
         self.label_names = [self.vrops_entity_name, 'vcenter', 'datacenter', 'vccluster', 'hostsystem',
-                            'resource_uuid', 'internal_name', 'instance_uuid', 'project']
+                            'internal_name', 'instance_uuid', 'project']
         self.project_ids = True
 
     def get_resource_uuids(self):
@@ -23,7 +23,6 @@ class VMStatsCollector(StatsCollector):
                 self.vms[resource_id]['datacenter'].lower(),
                 self.vms[resource_id]['cluster'],
                 self.vms[resource_id]['parent_host_name'],
-                self.vms[resource_id]['uuid'],
                 self.vms[resource_id]['internal_name'],
                 self.vms[resource_id]['instance_uuid'],
                 project_id] if resource_id in self.vms else []
