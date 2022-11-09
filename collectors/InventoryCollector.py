@@ -13,7 +13,7 @@ class InventoryCollector(BaseCollector):
         self.name = self.__class__.__name__
 
     def describe(self):
-        for resourcekind in self.get_amount_resources()[self.target]:
+        for resourcekind in self.get_amount_resources().get(self.target, "empty"):
             yield GaugeMetricFamily(f'vrops_inventory_{resourcekind}', f'Amount of {resourcekind} in inventory')
         yield CounterMetricFamily('vrops_inventory_iteration', 'vrops_inventory')
         yield GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory')
