@@ -23,7 +23,8 @@ class InventoryCollector(BaseCollector):
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
-        yield self.amount_inventory_resources(self.target)
+        for gauge_metric in self.amount_inventory_resources(self.target):
+            yield gauge_metric
         yield self.iteration_metric(self.target)
         yield self.api_response_metric(self.target)
         yield self.collection_time_metric(self.target)
