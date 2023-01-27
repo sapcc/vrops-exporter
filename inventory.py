@@ -75,7 +75,7 @@ def parse_params(logger):
         logger.error('Cannot start, please specify inventory config with ENV or -m')
         sys.exit(1)
     if "TARGET" not in os.environ and not options.target:
-        logger.error('Cannot start, please specify TARGET with ENV or -a')
+        logger.error('Cannot start, please specify TARGET with ENV or -t')
         sys.exit(1)
 
     return options

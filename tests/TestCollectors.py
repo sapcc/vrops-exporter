@@ -18,6 +18,7 @@ import importlib
 
 
 class TestCollectors(unittest.TestCase):
+    print(f"Running TestCollectors")
     os.environ.setdefault('TARGET', "vrops-vcenter-test.company.com")
 
     def test_environment(self):
@@ -106,8 +107,7 @@ class TestCollectors(unittest.TestCase):
                                                              'recommendation': [{'id': 'test-re',
                                                                                  'description': 'test-description'}]})
 
-        # testing the non atlas sd case here, as we don't have a service to reply in the test case anyway. First param is None as it would be passed in from inventory.py
-        thread = Thread(target=InventoryBuilder, args=(None, 8000, 180))
+        thread = Thread(target=InventoryBuilder, args=(self.target, 8000, 180))
         thread.daemon = True
         thread.start()
 
