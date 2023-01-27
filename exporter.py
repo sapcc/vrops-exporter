@@ -62,10 +62,6 @@ def parse_params(logger):
         options.collectors = default_collectors()
     if options.target:
         os.environ['TARGET'] = options.target
-    if not options.target:
-        target = random.choice(get_targets(options.inventory))
-        logger.warning(f'No target specified. Running exporter with {target} from inventory')
-        os.environ['TARGET'] = target
 
     if "PORT" not in os.environ and not options.port:
         logger.error('Cannot start, please specify port with ENV or -o')
@@ -75,6 +71,9 @@ def parse_params(logger):
         sys.exit(1)
     if "COLLECTOR_CONFIG" not in os.environ and not options.config:
         logger.error('Cannot start, please specify collector config with ENV or -m')
+        sys.exit(1)
+    if "TARGET" not in os.environ and not options.target:
+        logger.error('Cannot start, please specify TARGET with ENV or -a')
         sys.exit(1)
     if not options.collectors:
         logger.error('Cannot start, no default collectors activated in config')
@@ -105,26 +104,6 @@ def initialize_collector_by_name(class_name, logger):
         print('Unable to initialize "ClassNotDefinedCollector". Ignoring...')
         logger.error(f'Unable to initialize {class_name}. {e}')
         return None
-
-
-def get_targets(inventory):
-    # error handling in case inventory is not reachable
-    attempt = 1
-    while attempt <= 5:
-        try:
-            request = requests.get(url="http://" + os.environ['INVENTORY'] + "/vrops_list", timeout=30)
-            targets = request.json()
-            logger.debug(f'Found targets: {targets}')
-            return targets
-        except (requests.exceptions.ConnectionError, requests.exceptions.ReadTimeout) as e:
-            logger.critical(f'Connection error to {inventory} - Error: {e}')
-            logger.critical(f'Trying again in 2sec.')
-            time.sleep(2)
-            attempt += 1
-    logger.critical(f'{inventory} not reachable')
-    logger.critical(f'Exit')
-    sys.exit(0)
-
 
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')

@@ -15,11 +15,8 @@ class BaseCollector(ABC):
 
     def __init__(self):
         self.vrops_entity_name = 'base'
-        while os.environ['TARGET'] not in self.get_vrops_list():
-            logger.critical('Cannot start exporter without valid target!')
-            logger.critical(f'{os.environ["TARGET"]} is not in vrops_list from inventory')
-            logger.critical(
-                f'The following vrops are known from inventory: {[t for t in self.get_vrops_list()]}, retrying in 60s')
+        while os.environ['TARGET'] not in self.get_vrops_target():
+            logger.critical(f'Cannot start exporter. Missing inventory pod for {os.environ["TARGET"]}, retry in 60s')
             time.sleep(60)
         self.target = os.environ.get('TARGET')
         self.vrops = Vrops()
@@ -193,9 +190,9 @@ class BaseCollector(ABC):
         self.target_tokens = self.do_request(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
         return self.target_tokens
 
-    def get_vrops_list(self):
-        vrops_list = self.do_request(url="http://" + os.environ['INVENTORY'] + "/vrops_list")
-        return vrops_list
+    def get_vrops_target(self):
+        vrops_target = self.do_request(url="http://" + os.environ['INVENTORY'] + "/target")
+        return vrops_target
 
     def do_request(self, url):
         try:
