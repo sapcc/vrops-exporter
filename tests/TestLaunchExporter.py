@@ -20,6 +20,7 @@ logger = logging.getLogger('test-logger')
 
 
 class TestLaunchExporter(TestCase):
+    print(f"Running TestLaunchExporter")
 
     # test with debug option on
     def test_with_cli_params_1(self):

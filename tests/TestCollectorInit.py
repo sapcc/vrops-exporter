@@ -14,9 +14,10 @@ logger = logging.getLogger('test-logger')
 
 
 class TestCollectorInitialization(TestCase):
-    os.environ.setdefault('TARGET', 'vrops-vcenter-test.company.com')
-    collectors.HostSystemStatsCollector.StatsCollector.get_vrops_list = MagicMock(
-        return_value=['vrops-vcenter-test.company.com'])
+    print(f"Running TestCollectorInitialization")
+    os.environ.setdefault('TARGET', "vrops-vcenter-test.company.com")
+    collectors.HostSystemStatsCollector.StatsCollector.get_vrops_target = MagicMock(
+        return_value='vrops-vcenter-test.company.com')
     collectors.HostSystemStatsCollector.StatsCollector.read_collector_config = MagicMock(return_value={})
 
     @patch('BaseCollector.BaseCollector.wait_for_inventory_data')

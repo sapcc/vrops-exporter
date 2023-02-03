@@ -17,12 +17,10 @@ logger = logging.getLogger('vrops-exporter')
 
 
 class InventoryBuilder:
-    def __init__(self, atlas_path, port, sleep, timeout):
-        self.atlas_path = atlas_path
-        self.vrops_list = None
+    def __init__(self, target, port, sleep):
+        self.target = os.environ.get("TARGET")
         self.port = int(port)
         self.sleep = sleep
-        self.timeout = int(timeout)
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
         self.vcenter_dict = dict()
@@ -49,11 +47,11 @@ class InventoryBuilder:
     def run_rest_server(self):
 
         app = Flask(__name__)
-        logger.info(f'serving /vrops_list on {self.port}')
+        logger.info(f'serving /target on {self.port}')
 
-        @app.route('/vrops_list', methods=['GET'])
-        def vrops_list():
-            return json.dumps(self.vrops_list)
+        @app.route('/target', methods=['GET'])
+        def target():
+            return json.dumps(self.target)
 
         logger.info(f'serving /inventory on  {self.port}')
 
@@ -172,46 +170,11 @@ class InventoryBuilder:
     def read_inventory_config(self):
         return yaml_read(os.environ['INVENTORY_CONFIG'])
 
-    def get_vrops(self):
-        if not self.atlas_path and not self.vrops_list:
-            self.vrops_list = yaml_read(os.environ['INVENTORY_CONFIG']).get('vrops_targets', [])
-        elif self.atlas_path:
-            try:
-                response = requests.get(url=self.atlas_path)
-                self.response_codes['atlas'][self.atlas_path] = response.status_code
-            except (urllib3.exceptions.MaxRetryError, requests.exceptions.ConnectionError,
-                    urllib3.exceptions.NewConnectionError) as err:
-                logger.error(f'Failed to establish a connection to: {self.atlas_path}, retrying in {self.sleep}s', err)
-                if not self.vrops_list:
-                    logger.critical(f'No targets found to start InventoryBuilder, bailing out')
-                    sys.exit(1)
-                logger.info(f'Continue with the old vrops_list')
-                return
-
-            try:
-                response.json()
-            except simplejson.errors.JSONDecodeError:
-                logger.error(f'Invalid json data in atlas netbox http response, Content-Type: "{response.headers.get("Content-Type")}"')
-                if not self.vrops_list:
-                    logger.critical(f'No targets found to start InventoryBuilder, bailing out')
-                    sys.exit(1)
-                logger.info(f'Continue with the old vrops_list')
-                return
-
-            netbox_json = response.json()
-            self.vrops_list = [target['labels']['server_name'] for target in netbox_json if target['labels']['job'] == "vrops"]
-
-        else:
-            return
-
     def query_inventory_permanent(self):
         # first iteration to fill is 1. while this is not ready,
         # curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
-            self.read_inventory_config()
-            # get vrops targets every run in case we have new targets appearing
-            self.get_vrops()
             if len(self.successful_iteration_list) > 2:
                 iteration_to_be_deleted = self.successful_iteration_list.pop(0)
                 # initial case, since 0 is never filled in iterated_inventory
@@ -223,37 +186,9 @@ class InventoryBuilder:
             # initialize empty inventory per iteration
             self.iterated_inventory[str(self.iteration)] = dict()
             logger.info(f'real run {self.iteration}')
-            threads = list()
-            for vrops in self.vrops_list:
-                vrops_short_name = vrops.split('.')[0]
-                thread = Thread(target=self.query_vrops, args=(vrops, vrops_short_name, self.iteration))
-                thread.start()
-                threads.append((thread, vrops))
-
-            timeout = self.timeout
-            timeout_reached = False
             start_time = time.time()
-            current_time = start_time
-            joined_threads = dict()
-            while current_time <= (start_time + timeout):
-                for t in threads:
-                    if not t[0].is_alive():
-                        t[0].join()
-                        if t[0] not in joined_threads:
-                            joined_threads.setdefault(t[1], round(time.time() - start_time))
-                if len(joined_threads.keys()) >= len(threads):
-                    break
-                time.sleep(1)
-                current_time = time.time()
-            else:
-                still_running = [t for t in threads if t[0].is_alive()]
-                for running_thread in still_running:
-                    logger.info(f"Timeout {timeout}s reached for fetching {running_thread[1]}")
-                    running_thread[0].join(0)
-                    timeout_reached = True
-            for vrops in joined_threads:
-                self.vrops_collection_times[vrops] = joined_threads[vrops]
-                logger.info(f"Fetched {vrops} in {joined_threads[vrops]}s")
+            vrops_short_name = self.target.split('.')[0]
+            self.query_vrops(self.target, vrops_short_name, self.iteration)
 
             self.provide_vcenters()
             self.provide_datacenters()
@@ -278,9 +213,12 @@ class InventoryBuilder:
                 logger.debug(f'Withdrawing current iteration: {self.iteration}')
                 self.iterated_inventory.pop(str(self.iteration))
             self.iteration += 1
-            if not timeout_reached:
-                logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
-                time.sleep(int(self.sleep))
+
+            logger.info(f"Fetched {self.target} in {round(time.time() - start_time)}s")
+            self.vrops_collection_times[self.target] = round(time.time() - start_time)
+
+            logger.info(f'Inventory relaxing before going to work again in {self.sleep}s')
+            time.sleep(int(self.sleep))
 
     def query_vrops(self, target, vrops_short_name, iteration):
         vrops = Vrops()

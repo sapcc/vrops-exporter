@@ -1,6 +1,3 @@
-vrops_targets:
-  - "vrops-vcenter-test.company.com"
-
 query_specs:
   # to create specific resource query specs for a resourcekind, stick to one of the following keys:
   # vCenter Adapter: [Datacenter, ClusterComputeResource, Datastore, HostSystem, VmwareDistributedVirtualSwitch]
