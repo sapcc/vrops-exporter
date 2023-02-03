@@ -25,23 +25,20 @@ The inventory is providing the resource-uuids (unique unit identifier) from vROp
 
 #### inventory
 
-The inventory collects all supported resourcekinds in their hierarchical relation, and makes them available at an internal API. 
+The inventory collects all supported resourcekinds in their parent-child relation, and makes them available at an internal API. 
 The resourcekinds are updated by a continuous cycle that can be configured with `--sleep`. The inventory preserves data through iterations. 
 The last two iterations for these cycles are always provided via the endpoints and in order to know which iteration to fetch, 
 latest iteration needs to be queried first.
 
 To have more control over the resources to be collected, they can be filtered by _resourcestatus_, _resourcehealth_ and _resourcestate_ in [inventory-config](tests/inventory_config.yaml).
 
-Additionally, multiple vROps can be processed concurrently. This is implemented with threads.
-*NOTE*: currently only once vCenter per vROps is supported.
-
 ###### inventory endpoints
 ```shell
 GET
 
-/vrops_list                                       # list of one or multiple vrops
+/target                                           # vrops FQDN
 /<target>/<resourcekind>/<int:iteration>          # path for each resourcekind
-/alertdefinitions/                                # vrops pre-defined alertdefinitions
+/alertdefinitions/                                # vrops integrated alertdefinitions
 /iteration                                        # current inventory iteration
 /amount_resources                                 # amount of resources for each resourcekind
 /collection_times                                 # measured time for a inventory run per vrops
@@ -131,49 +128,22 @@ resourcekinds:
 
 #### **inventory**
 
+The inventory must be started with a specific `target`
+
   * `--user`: specifiy user to log in
   * `--password`: specify password to log in
   * `--port`: specify inventory port
-  * `--atlas`: path to atlas config file [OPTIONAL]
+  * `--target`: define target vrops
   * `--config`: path to inventory config to set query filters (and resourcekinds - SDDC & VCOPS only)
   * `--v`: logging all level except debug
   * `--vv`: logging all level including debug
   * `--loopback`: use 127.0.0.1 address instead of listen to 0.0.0.0 (for test purpose)
   * `--sleep`: how often the resources are updated, default: 1800s
-  * `--timeout`: specifies timeout for fetching data from vROps, default: 600s
 
-  There are two ways to configure your target vROps instances to be queried:
-  * *config file*: in the [inventory-config](tests/inventory_config.yaml#L1-L2) as `vrops_targets`.
-    This is the default, add your vROps instance here.
-
-  * *web service*: as an http endpoint providing an [Atlas](https://github.com/sapcc/atlas) compatible format.
-    To use this, either specify `--atlas` as a cli param or use a `ATLAS` environement variable pointing to your web service url.
-
-    The inventory queries the atlas service discovery endpoint to know all the DNS names of the vrops targets.
-    It refers to our netbox extractor, which is in the end providing netbox data as a service endpoint in Kubernetes.
-    The format provided via this endpoint looks like this, you can also provide your own tooling:
-    ```json
-    [
-      {
-          "labels": {
-              "job": "vrops",
-              "server_name": "VROPS_DNS_ADDRESS"
-          }
-      },
-      {
-          "labels": {
-              "job": "another_vrops",
-              "server_name": "ANOTHER_VROPS_DNS_ADDRESS"
-          }
-      }
-    ]
-    ```
-
-Remark for local testing: In case the WSGI server can't be connected you might want to try `--loopback` to hook up the loopback interface (127.0.0.1). This is sometimes needed for local debugging.
 
 #### **exporter**
 
-The exporter can be started with a specific `target` and/or a specific `collector` and/or specific `rubric` (rubrics defined in the collector config). This is important to provide smaller and also faster exporters in the landscape.
+The exporter must be started with a specific `target`. Optionally a specific `collector`, otherwise the `default_collectors` in [collector-config](tests/collector_config.yaml) were used.
     
   * `--port`: specify exporter port
   * `--inventory`: inventory service address
@@ -184,18 +154,18 @@ The exporter can be started with a specific `target` and/or a specific `collecto
   * `--v`: logging all level except debug
   * `--vv`: logging all level including debug
   
-  An example [collector-config](tests/collector_config.yaml). Add the desired `statkeys` and `properties` that your collectors should collect in a dedicated category. This is where pairs of a `statkey` and a `metric_suffix` are described. The `statkey` follows VMware notation and the `metric_suffix` follows best practices as it should appear in prometheus.
+  An example [collector-config](tests/collector_config.yaml). Add the desired `statkeys` and `properties` that your collectors should collect in a dedicated category. This is where `statkey` mapped to a `metric_suffix`. The `statkey` follows VMware notation (to make the API call) and the `metric_suffix` follows best practices as it should appear as a metric in prometheus.
   
   Metrics:
- [VMWARE Documentation | Metrics for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations/8.6/com.vmware.vcom.metrics.doc/GUID-9DB18E49-5E00-4534-B5FF-6276948D5A09.html)
+ [VMWARE Documentation | Metrics for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations/8.10/com.vmware.vcom.metrics.doc/GUID-9DB18E49-5E00-4534-B5FF-6276948D5A09.html)
  
   Properties:
- [VMWARE Documentation | Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations/8.6/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
+ [VMWARE Documentation | Properties for vCenter Server Components](https://docs.vmware.com/en/vRealize-Operations/8.10/com.vmware.vcom.metrics.doc/GUID-0199A14B-019B-4EAD-B0AF-59097527ED59.html)
  
   Prometheus:
  [Prometheus | Metric and label naming](https://prometheus.io/docs/practices/naming/)
  
-In addition, vrops-exporter is able to fetch active alerts from supported resource types and wrap them in an info metric containing all symptoms and recommendations as labels. 
+In addition, vrops-exporter is able to fetch alerts from supported resource types and wrap them in an info metric containing all symptoms and recommendations. 
 
 ```javascript
 vrops_hostsystem_alert_info{
