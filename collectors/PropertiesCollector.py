@@ -13,6 +13,9 @@ class PropertiesCollector(BaseCollector):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
+        if self.collect_running and self.am_i_killed:
+            return
+        self.collect_running = True
         logger.info(f'{self.name} starts with collecting the metrics')
 
         token = self.get_target_tokens()
@@ -97,3 +100,4 @@ class PropertiesCollector(BaseCollector):
                                                           len(created_metrics[metric].samples))
             logger.info(f'Created metrics enriched by API in {self.name}: {created_metrics[metric].name}')
             yield created_metrics[metric]
+        self.collect_running = False
