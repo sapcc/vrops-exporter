@@ -6,6 +6,7 @@ import importlib
 import requests
 import logging
 import random
+import signal
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
 from optparse import OptionParser
@@ -86,8 +87,20 @@ def run_prometheus_server(port, collectors, *args):
     start_http_server(int(port))
     for c in collectors:
         REGISTRY.register(c)
+    signal.signal(signal.SIGTERM, exit_gracefully)
     while True:
         time.sleep(1)
+
+
+def exit_gracefully(no, frm):
+    logger.warning('SIGTERM received, shutting down gently.')
+    for c in collectors:
+        while c.collect_running:
+            logger.debug(f'Waiting for {c.name} to finish current collect run.')
+            time.sleep(1)
+        logger.debug(f'Unregistering {c.name}')
+        REGISTRY.unregister(c)
+    sys.exit(0)
 
 
 def initialize_collector_by_name(class_name, logger):
@@ -105,8 +118,10 @@ def initialize_collector_by_name(class_name, logger):
         logger.error(f'Unable to initialize {class_name}. {e}')
         return None
 
+
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')
     options = parse_params(logger)
+    global collectors
     collectors = list(map(lambda c: initialize_collector_by_name(c, logger), options.collectors))
     run_prometheus_server(int(os.environ['PORT']), collectors)

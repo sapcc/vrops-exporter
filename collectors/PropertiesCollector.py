@@ -13,8 +13,6 @@ class PropertiesCollector(BaseCollector):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
-        if self.am_i_killed:
-            return
         self.collect_running = True
         logger.info(f'{self.name} starts with collecting the metrics')
 

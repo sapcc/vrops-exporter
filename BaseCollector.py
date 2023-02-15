@@ -4,8 +4,6 @@ import time
 import os
 import re
 import logging
-import signal
-import sys
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
 from prometheus_client.core import GaugeMetricFamily, InfoMetricFamily
@@ -25,9 +23,7 @@ class BaseCollector(ABC):
         self.name = self.__class__.__name__
         self.label_names = []
         self.project_ids = []
-        self.am_i_killed = False
         self.collect_running = False
-        signal.signal(signal.SIGTERM, self.exit_gracefully)
 
     @abstractmethod
     def collect(self):
@@ -376,13 +372,3 @@ class BaseCollector(ABC):
         for metric in collector_config[self.name]:
             metric_suffix = metric['metric_suffix']
             yield GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{metric_suffix.lower()}', 'vrops-exporter')
-
-    def exit_gracefully(self, signum, frame):
-        self.am_i_killed = True
-        if self.collect_running:
-            logger.warning('SIGTERM received, finishing current collect run.')
-            while self.collect_running:
-                time.sleep(1)
-        else:
-            logger.warning('SIGTERM received, bailing out.')
-        sys.exit(0)
