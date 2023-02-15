@@ -12,8 +12,6 @@ from prometheus_client.core import REGISTRY
 from optparse import OptionParser
 from tools.helper import yaml_read
 
-collector_globals = list()
-
 
 def default_collectors():
     collector_config = yaml_read(os.environ['COLLECTOR_CONFIG']).get('default_collectors')
@@ -96,12 +94,12 @@ def run_prometheus_server(port, collectors, *args):
 
 def exit_gracefully(no, frm):
     logger.warning('SIGTERM received, shutting down gently.')
-    for c in collector_globals:
-        logger.debug(f'Unregistering {c.name}')
-        REGISTRY.unregister(c)
+    for c in collectors:
         while c.collect_running:
             logger.debug(f'Waiting for {c.name} to finish current collect run.')
             time.sleep(1)
+        logger.debug(f'Unregistering {c.name}')
+        REGISTRY.unregister(c)
     sys.exit(0)
 
 
@@ -120,9 +118,10 @@ def initialize_collector_by_name(class_name, logger):
         logger.error(f'Unable to initialize {class_name}. {e}')
         return None
 
+
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')
     options = parse_params(logger)
+    global collectors
     collectors = list(map(lambda c: initialize_collector_by_name(c, logger), options.collectors))
-    collector_globals = collectors
     run_prometheus_server(int(os.environ['PORT']), collectors)
