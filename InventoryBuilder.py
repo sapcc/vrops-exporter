@@ -35,6 +35,7 @@ class InventoryBuilder:
         self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
+        self.am_i_killed = False
         if 'LOOPBACK' in os.environ:
             if os.environ['LOOPBACK'] == '1':
                 self.wsgi_address = '127.0.0.1'
@@ -151,6 +152,12 @@ class InventoryBuilder:
             return_iteration = self.successful_iteration_list
             return json.dumps(return_iteration)
 
+        @app.route('/stop')
+        def stop():
+            self.am_i_killed = True
+            self.WSGIServer.stop()
+            return "Bye"
+
         # FIXME: this could basically be the always active token list. no active token? refresh!
         @app.route('/target_tokens', methods=['GET'])
         def token():
@@ -159,9 +166,10 @@ class InventoryBuilder:
         try:
             if logger.level == 10:
                 # WSGi is logging on DEBUG Level
-                WSGIServer((self.wsgi_address, self.port), app).serve_forever()
+                self.WSGIServer = WSGIServer((self.wsgi_address, self.port), app)
             else:
-                WSGIServer((self.wsgi_address, self.port), app, log=None).serve_forever()
+                self.WSGIServer = WSGIServer((self.wsgi_address, self.port), app, log=None)
+            self.WSGIServer.serve_forever()
         except TypeError as e:
             logger.error('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
             logger.error(f'Current used options: {self.wsgi_address} on port {self.port}')
@@ -175,6 +183,8 @@ class InventoryBuilder:
         # curl to /iteration would still report 0 to wait for actual data
         self.iteration = 1
         while True:
+            if self.am_i_killed:
+                return
             if len(self.successful_iteration_list) > 2:
                 iteration_to_be_deleted = self.successful_iteration_list.pop(0)
                 # initial case, since 0 is never filled in iterated_inventory
