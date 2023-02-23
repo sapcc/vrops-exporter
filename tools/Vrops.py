@@ -15,6 +15,7 @@ logger = logging.getLogger('vrops-exporter')
 class Vrops:
     def get_token(target):
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        timeout = 40
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
@@ -30,10 +31,10 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=30)
+                                     timeout=timeout)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
-            return False, 504, 0
+            return False, 504, timeout
         except Exception as e:
             logger.error(f'Problem connecting to {target}. Error: {e}')
             return False, 503, 0
@@ -46,6 +47,7 @@ class Vrops:
 
     def get_adapter(self, target: str, token: str, adapterkind: str) -> (list, int):
         url = f'https://{target}/suite-api/api/adapters'
+        timeout = 40
         querystring = {
             "adapterKindKey": adapterkind
         }
@@ -61,10 +63,10 @@ class Vrops:
                                     params=querystring,
                                     verify=False,
                                     headers=headers,
-                                    timeout=30)
+                                    timeout=timeout)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
-            return adapter, 504, 0
+            return adapter, 504, timeout
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
             return adapter, 503, 0
