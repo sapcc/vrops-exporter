@@ -25,13 +25,11 @@ class InventoryCollector(BaseCollector):
 
         for gauge_metric in self.amount_inventory_resources(self.target):
             yield gauge_metric
+        for response_metric in self.api_response_metric(self.target):
+            yield response_metric
         yield self.iteration_metric(self.target)
-        yield self.api_response_metric(self.target)
         yield self.collection_time_metric(self.target)
         yield self.inventory_targets_info(self.target)
-
-        # If Atlas is used for target discovery
-        yield self.atlas_http_sd_endpoint_probe()
 
     def amount_inventory_resources(self, target):
         gauges = list()
@@ -55,21 +53,21 @@ class InventoryCollector(BaseCollector):
     def api_response_metric(self, target):
         api_response_gauge = GaugeMetricFamily('vrops_api_response', 'vrops_inventory',
                                                labels=['target', 'class', 'get_request'])
-        status_code_dict = self.get_inventory_api_responses()[target]
-        if not status_code_dict:
+        api_response_time_gauge = GaugeMetricFamily('vrops_api_response_time_seconds', 'vrops_inventory',
+                                               labels=['target', 'class', 'get_request'])
+
+        status_code_dict, time_dict = self.get_inventory_api_responses()
+        if not status_code_dict[target]:
             return api_response_gauge
-        for get_request, status_code in status_code_dict.items():
+        if not time_dict[target]:
+            return api_response_time_gauge
+        for get_request, status_code in status_code_dict[target].items():
             api_response_gauge.add_metric(labels=[target, self.name.lower(), get_request],
                                           value=status_code)
-        return api_response_gauge
-
-    def atlas_http_sd_endpoint_probe(self):
-        atlas_response_gauge = GaugeMetricFamily('atlas_sd_response', 'vrops_inventory',
-                                                 labels=['atlas_path'])
-        if atlas_endpoint_response := self.get_inventory_api_responses().get('atlas'):
-            for atlas_path, response_code in atlas_endpoint_response.items():
-                atlas_response_gauge.add_metric(labels=[atlas_path], value=response_code)
-        return atlas_response_gauge
+        for get_request, response_time in time_dict[target].items():
+            api_response_time_gauge.add_metric(labels=[target, self.name.lower(), get_request],
+                                          value=response_time)
+        return [api_response_gauge, api_response_time_gauge]
 
     def collection_time_metric(self, target):
         collection_time_gauge = GaugeMetricFamily('vrops_inventory_collection_time_seconds', 'vrops_inventory',

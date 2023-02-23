@@ -15,6 +15,7 @@ logger = logging.getLogger('vrops-exporter')
 class Vrops:
     def get_token(target):
         url = "https://" + target + "/suite-api/api/auth/token/acquire"
+        timeout = 40
         headers = {
             'Content-Type': "application/json",
             'Accept': "application/json"
@@ -30,22 +31,23 @@ class Vrops:
                                      data=json.dumps(payload),
                                      verify=False,
                                      headers=headers,
-                                     timeout=30)
+                                     timeout=timeout)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
-            return False, 504
+            return False, 504, timeout
         except Exception as e:
             logger.error(f'Problem connecting to {target}. Error: {e}')
-            return False, 503
+            return False, 503, 0
 
         if response.status_code == 200:
-            return response.json()["token"], response.status_code
+            return response.json()["token"], response.status_code, response.elapsed.total_seconds()
         else:
             logger.error(f'Problem getting token from {target} : {response.text}')
-            return False, response.status_code
+            return False, response.status_code, response.elapsed.total_seconds()
 
     def get_adapter(self, target: str, token: str, adapterkind: str) -> (list, int):
         url = f'https://{target}/suite-api/api/adapters'
+        timeout = 40
         querystring = {
             "adapterKindKey": adapterkind
         }
@@ -61,13 +63,13 @@ class Vrops:
                                     params=querystring,
                                     verify=False,
                                     headers=headers,
-                                    timeout=30)
+                                    timeout=timeout)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
-            return adapter, 504
+            return adapter, 504, timeout
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return adapter, 503
+            return adapter, 503, 0
 
         if response.status_code == 200:
             for resource in response.json()["adapterInstancesInfoDto"]:
@@ -83,10 +85,10 @@ class Vrops:
                     "token": token
                 })
                 adapter.append(adapter_object)
-            return adapter, response.status_code
+            return adapter, response.status_code, response.elapsed.total_seconds()
         else:
             logger.error(f'Problem getting adapter {target} : {response.text}')
-            return adapter, response.status_code
+            return adapter, response.status_code, response.elapsed.total_seconds()
 
     def get_vcenter_adapter(self, target, token):
         return self.get_adapter(target, token, adapterkind="VMWARE")
@@ -109,9 +111,10 @@ class Vrops:
                       h_depth: int = 1) -> (list, int):
         if not uuids:
             logger.debug(f'No parent resources for {resourcekinds} from {target}')
-            return [], 400
+            return [], 400, 0
         logger.debug(f'Getting {resourcekinds} from {target}')
         url = "https://" + target + "/suite-api/api/resources/bulk/relationships"
+        timeout = 40
 
         logger.debug(f'Using resource query specs: {query_specs}')
         r_status_list = [rs for rs in query_specs.get('resourceStatus', [])]
@@ -146,13 +149,13 @@ class Vrops:
                                      params=querystring,
                                      verify=False,
                                      headers=headers,
-                                     timeout=30)
+                                     timeout=timeout)
         except requests.exceptions.ReadTimeout as e:
             logger.error(f'Request to {url} timed out. Error: {e}')
-            return resources, 504
+            return resources, 504, timeout
         except Exception as e:
             logger.error(f'Problem connecting to {target} - Error: {e}')
-            return resources, 503
+            return resources, 503, 0
 
         if response.status_code == 200:
             try:
@@ -160,7 +163,7 @@ class Vrops:
                 if not relations:
                     resourcekinds_beautyfied = ', '.join(resourcekinds)
                     logger.warning(f'No child relation returned for {resourcekinds_beautyfied} from adapter {adapterkind} for {target}.')
-                    return resources, 204
+                    return resources, 204, response.elapsed.total_seconds()
                 for resource in relations:
                     resourcekind = resource["resource"]["resourceKey"]["resourceKindKey"]
                     resourcekind = re.sub("[^a-zA-Z]+", "", resourcekind)
@@ -178,19 +181,21 @@ class Vrops:
                         "name": resource["resource"]["resourceKey"]["name"],
                         "uuid": resource["resource"]["identifier"],
                         "resourcekind": resourcekind,
-                        "parent": resource.get("relatedResources", )[0],
+                        "parent": resource.get("relatedResources", [])[0],
                         "internal_name": internal_name,
                         "instance_uuid": instance_uuid
                     })
+                    if not resource.get("relatedResources"):
+                        logger.warning(f'No parent relation returned for {resource["resource"]["resourceKey"]["name"]}; resourcekind: {resourcekind}; target: {target}.')
                     resources.append(resource_object)
-                return resources, response.status_code
+                return resources, response.status_code, response.elapsed.total_seconds()
             except json.decoder.JSONDecodeError as e:
                 logger.error(f'Catching JSONDecodeError for target {target}'
                              f'- Error: {e}')
-                return resources, response.status_code
+                return resources, response.status_code, response.elapsed.total_seconds()
         else:
             logger.error(f'Problem getting resources from {target} : {response.text}')
-            return resources, response.status_code
+            return resources, response.status_code, response.elapsed.total_seconds()
 
     def get_datacenter(self, target, token, parent_uuids, query_specs):
         resourcekind = 'Datacenter'
@@ -209,7 +214,7 @@ class Vrops:
 
     def get_datastores(self, target, token, parent_uuids, query_specs):
         resourcekind = 'Datastore'
-        datastores, api_responding = self.get_resources(target, token, adapterkind="VMWARE",
+        datastores, http_code, response_time = self.get_resources(target, token, adapterkind="VMWARE",
                                                         resourcekinds=["Datastore"], uuids=parent_uuids,
                                                         query_specs=self._set_query_specs(query_specs, resourcekind))
         for datastore in datastores:
@@ -229,7 +234,7 @@ class Vrops:
                 datastore.type = "NVMe"
             else:
                 datastore.type = "other"
-        return datastores, api_responding
+        return datastores, http_code, response_time
 
     def get_hosts(self, target, token, parent_uuids, query_specs):
         resourcekind = 'HostSystem'
@@ -242,12 +247,12 @@ class Vrops:
             return [], 400
         resourcekind = 'VirtualMachine'
         q_specs = self._set_query_specs(query_specs, resourcekind)
-        amount_vms, api_responding, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
+        amount_vms, http_code, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
                                                                        ['summary|total_number_vms'],
                                                                        'Inventory')
 
         number_of_vms = amount_vms[0].get('stat-list', {}).get('stat', [])[0].get('data', [0])[0] if \
-            api_responding == 200 and amount_vms else 0
+            http_code == 200 and amount_vms else 0
 
         # vrops cannot handle more than 10000 uuids in a single request
         split_factor = int(number_of_vms / 10000)
@@ -255,17 +260,19 @@ class Vrops:
             uuids_chunked = list(chunk_list(parent_uuids, int(len(parent_uuids) / (split_factor + 1))))
             logger.debug(f'Chunking VM requests into {len(uuids_chunked)} chunks')
             vms = list()
-            api_responding = list()
+            http_codes = list()
+            response_times = list()
 
             for uuid_list in uuids_chunked:
 
-                vm_chunks, api_chunk_responding = self.get_resources(target, token, adapterkind="VMWARE",
+                vm_chunks, http_code, response_time = self.get_resources(target, token, adapterkind="VMWARE",
                                                                      resourcekinds=[resourcekind],
                                                                      uuids=uuid_list, query_specs=q_specs)
                 vms.extend(vm_chunks)
-                api_responding.append(api_chunk_responding)
+                http_codes.append(http_code)
+                response_times.append(response_time)
             logger.debug(f'Number of VMs collected: {len(vms)}')
-            return vms, max(api_responding)
+            return vms, max(http_codes), sum(response_times)
         return self.get_resources(target, token, adapterkind="VMWARE", resourcekinds=[resourcekind],
                                   uuids=parent_uuids, query_specs=q_specs)
 
