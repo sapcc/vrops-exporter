@@ -185,7 +185,8 @@ class BaseCollector(ABC):
     def get_inventory_api_responses(self):
         self.wait_for_inventory_data()
         self.api_responses = self.do_request(url="http://" + os.environ['INVENTORY'] + "/api_response_codes")
-        return self.api_responses
+        self.api_reponse_times = self.do_request(url="http://" + os.environ['INVENTORY'] + "/api_response_times")
+        return self.api_responses, self.api_reponse_times
 
     def get_target_tokens(self):
         self.target_tokens = self.do_request(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
