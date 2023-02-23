@@ -32,6 +32,7 @@ class InventoryBuilder:
         self.amount_resources = defaultdict(dict)
         self.vrops_collection_times = dict()
         self.response_codes = defaultdict(dict)
+        self.response_times = defaultdict(dict)
         self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
         self.wsgi_address = '0.0.0.0'
@@ -145,6 +146,11 @@ class InventoryBuilder:
             response_codes = self.response_codes
             return json.dumps(response_codes)
 
+        @app.route('/api_response_times', methods=['GET'])
+        def api_response_times():
+            response_times = self.response_times
+            return json.dumps(response_times)
+
         # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
         def iteration_store():
@@ -223,7 +229,7 @@ class InventoryBuilder:
     def query_vrops(self, target, vrops_short_name, iteration):
         vrops = Vrops()
         logger.info(f'Querying {target}')
-        token, self.response_codes[target]["token"] = Vrops.get_token(target=target)
+        token, self.response_codes[target]["token"], self.response_times[target]["token"] = Vrops.get_token(target=target)
         if not token:
             logger.warning(f'retrying connection to {target} in next iteration {self.iteration + 1}')
             return False
@@ -249,27 +255,27 @@ class InventoryBuilder:
         return True
 
     def create_vcenter_objects(self, vrops, target: str, token: str, query_specs: dict):
-        vcenter_adapter_list, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
+        vcenter_adapter_list, self.response_codes[target]["vcenter"], self.response_times[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
 
         if not vcenter_adapter_list:
             logger.info(f'Could not get vcenter adapter!')
             return False
 
-        datacenter, self.response_codes[target]["datacenters"] = \
+        datacenter, self.response_codes[target]["datacenters"], self.response_times[target]["datacenters"] = \
             Vrops.get_datacenter(vrops, target, token, [vc.uuid for vc in vcenter_adapter_list], query_specs=query_specs)
-        cluster, self.response_codes[target]["clusters"] = \
+        cluster, self.response_codes[target]["clusters"], self.response_times[target]["clusters"] = \
             Vrops.get_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        datastores, self.response_codes[target]["datastores"] = \
+        datastores, self.response_codes[target]["datastores"], self.response_times[target]["datastores"] = \
             Vrops.get_datastores(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        hosts, self.response_codes[target]["hosts"] = \
+        hosts, self.response_codes[target]["hosts"], self.response_times[target]["hosts"] = \
             Vrops.get_hosts(vrops, target, token, [cl.uuid for cl in cluster], query_specs=query_specs)
-        distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"] = \
+        distributed_virtual_switchs, self.response_codes[target]["distributed_virtual_switch"], self.response_times[target]["distributed_virtual_switch"]= \
             Vrops.get_dis_virtual_switch(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
-        storagepod, self.response_codes[target]["storagepod"] = \
+        storagepod, self.response_codes[target]["storagepod"], self.response_times[target]["storagepod"]  = \
             Vrops.get_SDRS_cluster(vrops, target, token, [dc.uuid for dc in datacenter], query_specs=query_specs)
 
         if storagepod:
-            clustered_datastores, self.response_codes[target]["clustered_datastores"] = \
+            clustered_datastores, self.response_codes[target]["clustered_datastores"], self.response_times[target]["clustered_datastores"] = \
                 Vrops.get_datastores(vrops, target, token, [sc.uuid for sc in storagepod], query_specs=query_specs)
 
         for vcenter_adapter in vcenter_adapter_list:
@@ -277,7 +283,7 @@ class InventoryBuilder:
             vcenter_adapter.datacenter = list()
 
             # we need the vcenter to estimate the amount of virtual machines for the request
-            vms, self.response_codes[target]["vms"] = \
+            vms, self.response_codes[target]["vms"], self.response_times[target]["vms"] = \
                 Vrops.get_vms(vrops, target, token, [hs.uuid for hs in hosts], vcenter_adapter.uuid, query_specs=query_specs)
             for dc in datacenter:
                 if dc.parent == vcenter_adapter.uuid:
@@ -327,27 +333,28 @@ class InventoryBuilder:
         return vcenter_adapter_list
 
     def create_nsxt_objects(self, vrops, target: str, token: str, query_specs: dict):
-        nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"] = Vrops.get_nsxt_adapter(vrops, target, token)
+        nsxt_adapter_list, self.response_codes[target]["nsxt_adapter"], self.response_times[target]["nsxt_adapter"]  \
+            = Vrops.get_nsxt_adapter(vrops, target, token)
         if not nsxt_adapter_list:
             logger.info(f'Could not get any nsxt adapter from {target}!')
             return False
 
-        nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"] = \
+        nsxt_mgmt_cluster, self.response_codes[target]["nsxt_mgmt_cluster"], self.response_times[target]["nsxt_mgmt_cluster"] = \
             Vrops.get_nsxt_mgmt_cluster(vrops, target, token, [a.uuid for a in nsxt_adapter_list],
                                         query_specs=query_specs)
-        nsxt_mgmt_nodes, self.response_codes[target]["nsxt_mgmt_nodes"] = \
+        nsxt_mgmt_nodes, self.response_codes[target]["nsxt_mgmt_nodes"], self.response_times[target]["nsxt_mgmt_nodes"]  = \
             Vrops.get_nsxt_mgmt_nodes(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
                                       query_specs=query_specs)
-        nsxt_mgmt_service, self.response_codes[target]["nsxt_mgmt_services"] = \
+        nsxt_mgmt_service, self.response_codes[target]["nsxt_mgmt_services"], self.response_times[target]["nsxt_mgmt_services"] = \
             Vrops.get_nsxt_mgmt_service(vrops, target, token, [n.uuid for n in nsxt_mgmt_nodes],
                                         query_specs=query_specs)
-        nsxt_transport_zones, self.response_codes[target]["nsxt_transport_zones"] = \
+        nsxt_transport_zones, self.response_codes[target]["nsxt_transport_zones"], self.response_times[target]["nsxt_transport_zones"] = \
             Vrops.get_nsxt_transport_zone(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
                                           query_specs=query_specs)
-        nsxt_transport_nodes, self.response_codes[target]["nsxt_transport_nodes"] = \
+        nsxt_transport_nodes, self.response_codes[target]["nsxt_transport_nodes"], self.response_times[target]["nsxt_transport_nodes"] = \
             Vrops.get_nsxt_transport_node(vrops, target, token, [z.uuid for z in nsxt_transport_zones],
                                           query_specs=query_specs)
-        nsxt_logical_switches, self.response_codes[target]["nsxt_logical_switches"] = \
+        nsxt_logical_switches, self.response_codes[target]["nsxt_logical_switches"], self.response_times[target]["nsxt_logical_switches"] = \
             Vrops.get_nsxt_logical_switch(vrops, target, token, [c.uuid for c in nsxt_mgmt_cluster],
                                           query_specs=query_specs)
 
@@ -391,7 +398,7 @@ class InventoryBuilder:
         return nsxt_adapter_list
 
     def create_vcops_objects(self, vrops, target: str, token: str, inventory_config: dict):
-        vcops_adapter_instance, self.response_codes[target]["vcops_adapter"] = \
+        vcops_adapter_instance, self.response_codes[target]["vcops_adapter"], self.response_times[target]["vcops_adapter"] = \
             Vrops.get_vcenter_operations_adapter_intance(vrops, target, token)
 
         if not vcops_adapter_instance:
@@ -402,7 +409,7 @@ class InventoryBuilder:
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('vcops_resourcekinds', [])]
         query_specs = inventory_config.get('query_specs', {})
 
-        vcops_objects, self.response_codes[target]["vcops_self_monitoring_objects"] = \
+        vcops_objects, self.response_codes[target]["vcops_self_monitoring_objects"], self.response_times[target]["vcops_self_monitoring_objects"] = \
             Vrops.get_vcops_instances(vrops, target, token, parent_uuids=[vcops_adapter_instance.uuid],
                                       resourcekinds=resourcekinds, query_specs=query_specs)
         vcops_adapter_instance.vcops_objects = list()
@@ -412,7 +419,7 @@ class InventoryBuilder:
         return vcops_adapter_instance
 
     def create_sddc_health_objects(self, vrops, target: str, token: str, inventory_config: dict):
-        sddc_adapter_instances, self.response_codes[target]["sddc_health_adapter"] = \
+        sddc_adapter_instances, self.response_codes[target]["sddc_health_adapter"], self.response_times[target]["sddc_health_adapter"] = \
             Vrops.get_sddc_health_adapter_intance(vrops, target, token)
 
         if not sddc_adapter_instances:
@@ -422,7 +429,7 @@ class InventoryBuilder:
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('sddc_resourcekinds', [])]
         query_specs = inventory_config.get('query_specs', {})
 
-        sddc_objects, self.response_codes[target]["sddc_health_objects"] = \
+        sddc_objects, self.response_codes[target]["sddc_health_objects"], self.response_times[target]["sddc_health_objects"] = \
             Vrops.get_sddc_instances(vrops, target, token, parent_uuids=[s.uuid for s in sddc_adapter_instances],
                                      resourcekinds=resourcekinds, query_specs=query_specs)
 
