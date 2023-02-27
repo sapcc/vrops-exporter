@@ -60,8 +60,13 @@ class InventoryApi:
 
         @app.route('/<target>/dvs/<int:iteration>', methods=['GET'])
         def distributed_virtual_switches(target, iteration):
+<<<<<<< HEAD
             return self.builder.iterated_inventory.get(str(iteration), {}).get('distributed_virtual_switches', {}).get(target, {
                 })
+=======
+            return self.builder.iterated_inventory.get(str(iteration), {}).get('distributed_virtual_switches', {}).get(target,
+                                                                                                                 {})
+>>>>>>> 375077d (seperating api from builder)
 
         @app.route('/<target>/nsxt_adapter/<int:iteration>', methods=['GET'])
         def nsxt_adapter(target, iteration):
@@ -147,5 +152,3 @@ class InventoryApi:
             logger.error('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
             logger.error(f'Current used options: {self.wsgi_address} on port {self.port}')
             logger.error(f'TypeError: {e}')
-            import traceback
-            traceback.print_exc()
