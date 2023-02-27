@@ -6,6 +6,7 @@ import sys
 import os
 import logging
 import random
+import signal
 
 
 def parse_params(logger):
@@ -80,7 +81,16 @@ def parse_params(logger):
 
     return options
 
+
+def exit_gracefully(no, frm):
+    logger.warning('SIGTERM received, bye.')
+    import requests
+    requests.get("http://127.0.0.1/stop")
+    sys.exit(0)
+
+
 if __name__ == '__main__':
     logger = logging.getLogger('vrops-exporter')
     options = parse_params(logger)
+    signal.signal(signal.SIGTERM, exit_gracefully)
     InventoryBuilder(os.environ.get('TARGET'), os.environ['PORT'], os.environ['SLEEP'])
