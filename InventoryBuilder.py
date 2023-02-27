@@ -1,17 +1,10 @@
-import urllib3.exceptions
-from flask import Flask
-from gevent.pywsgi import WSGIServer
-from threading import Thread
 from tools.Vrops import Vrops
 from tools.helper import yaml_read
 from collections import defaultdict
+from tools.InventoryApi import InventoryApi
 import time
-import json
-import simplejson
 import os
-import sys
 import logging
-import requests
 
 logger = logging.getLogger('vrops-exporter')
 
@@ -19,7 +12,6 @@ logger = logging.getLogger('vrops-exporter')
 class InventoryBuilder:
     def __init__(self, target, port, sleep):
         self.target = os.environ.get("TARGET")
-        self.port = int(port)
         self.sleep = sleep
         self._user = os.environ["USER"]
         self._password = os.environ["PASSWORD"]
@@ -34,146 +26,10 @@ class InventoryBuilder:
         self.response_codes = defaultdict(dict)
         self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
-        self.wsgi_address = '0.0.0.0'
         self.am_i_killed = False
-        if 'LOOPBACK' in os.environ:
-            if os.environ['LOOPBACK'] == '1':
-                self.wsgi_address = '127.0.0.1'
 
-        thread = Thread(target=self.run_rest_server)
-        thread.start()
-
+        self.api = InventoryApi(self, port)
         self.query_inventory_permanent()
-
-    def run_rest_server(self):
-
-        app = Flask(__name__)
-        logger.info(f'serving /target on {self.port}')
-
-        @app.route('/target', methods=['GET'])
-        def target():
-            return json.dumps(self.target)
-
-        logger.info(f'serving /inventory on  {self.port}')
-
-        @app.route('/<target>/vcenters/<int:iteration>', methods=['GET'])
-        def vcenters(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('vcenters', {}).get(target, {})
-
-        @app.route('/<target>/datacenters/<int:iteration>', methods=['GET'])
-        def datacenters(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('datacenters', {}).get(target, {})
-
-        @app.route('/<target>/clusters/<int:iteration>', methods=['GET'])
-        def clusters(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('clusters', {}).get(target, {})
-
-        @app.route('/<target>/hosts/<int:iteration>', methods=['GET'])
-        def hosts(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('hosts', {}).get(target, {})
-
-        @app.route('/<target>/datastores/<int:iteration>', methods=['GET'])
-        def datastores(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('datastores', {}).get(target, {})
-
-        @app.route('/<target>/storagepod/<int:iteration>', methods=['GET'])
-        def storagepod(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('storagepod', {}).get(target, {})
-
-        @app.route('/<target>/vms/<int:iteration>', methods=['GET'])
-        def vms(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('vms', {}).get(target, {})
-
-        @app.route('/<target>/dvs/<int:iteration>', methods=['GET'])
-        def distributed_virtual_switches(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('distributed_virtual_switches', {}).get(target,
-                                                                                                                 {})
-
-        @app.route('/<target>/nsxt_adapter/<int:iteration>', methods=['GET'])
-        def nsxt_adapter(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_adapter', {}).get(target, {})
-
-        @app.route('/<target>/nsxt_mgmt_cluster/<int:iteration>', methods=['GET'])
-        def nsxt_mgmt_cluster(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_mgmt_cluster', {}).get(target, {})
-
-        @app.route('/<target>/nsxt_mgmt_nodes/<int:iteration>', methods=['GET'])
-        def nsxt_mgmt_nodes(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_mgmt_nodes', {}).get(target, {})
-
-        @app.route('/<target>/nsxt_mgmt_service/<int:iteration>', methods=['GET'])
-        def nsxt_mgmt_service(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_mgmt_service', {}).get(target, {})
-
-        @app.route('/<target>/nsxt_transport_nodes/<int:iteration>', methods=['GET'])
-        def nsxt_transport_nodes(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_transport_nodes', {}).get(target, {})
-
-        @app.route('/<target>/nsxt_logical_switches/<int:iteration>', methods=['GET'])
-        def nsxt_logical_switches(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('nsxt_logical_switches', {}).get(target, {})
-
-        @app.route('/<target>/vcops_objects/<int:iteration>', methods=['GET'])
-        def vcops_self_monitoring_objects(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('vcops_objects', {}).get(target,
-                                                                                                                {})
-
-        @app.route('/<target>/sddc_objects/<int:iteration>', methods=['GET'])
-        def sddc_health_objects(target, iteration):
-            return self.iterated_inventory.get(str(iteration), {}).get('sddc_objects', {}).get(target, {})
-
-        @app.route('/alertdefinitions/<alert_id>', methods=['GET'])
-        def alert_alertdefinitions(alert_id):
-            return self.alertdefinitions[alert_id]
-
-        @app.route('/iteration', methods=['GET'])
-        def iteration():
-            return_iteration = self.successful_iteration_list[-1]
-            return str(return_iteration)
-
-        @app.route('/amount_resources', methods=['GET'])
-        def amount_resources():
-            amount_resources = self.amount_resources
-            return json.dumps(amount_resources)
-
-        @app.route('/collection_times', methods=['GET'])
-        def collection_times():
-            vrops_collection_times = self.vrops_collection_times
-            return json.dumps(vrops_collection_times)
-
-        @app.route('/api_response_codes', methods=['GET'])
-        def api_response_codes():
-            response_codes = self.response_codes
-            return json.dumps(response_codes)
-
-        # debugging purpose
-        @app.route('/iteration_store', methods=['GET'])
-        def iteration_store():
-            return_iteration = self.successful_iteration_list
-            return json.dumps(return_iteration)
-
-        @app.route('/stop')
-        def stop():
-            self.am_i_killed = True
-            self.WSGIServer.stop()
-            return "Bye"
-
-        # FIXME: this could basically be the always active token list. no active token? refresh!
-        @app.route('/target_tokens', methods=['GET'])
-        def token():
-            return json.dumps(self.target_tokens)
-
-        try:
-            if logger.level == 10:
-                # WSGi is logging on DEBUG Level
-                self.WSGIServer = WSGIServer((self.wsgi_address, self.port), app)
-            else:
-                self.WSGIServer = WSGIServer((self.wsgi_address, self.port), app, log=None)
-            self.WSGIServer.serve_forever()
-        except TypeError as e:
-            logger.error('Problem starting server, you might want to try LOOPBACK=0 or LOOPBACK=1')
-            logger.error(f'Current used options: {self.wsgi_address} on port {self.port}')
-            logger.error(f'TypeError: {e}')
 
     def read_inventory_config(self):
         return yaml_read(os.environ['INVENTORY_CONFIG'])
@@ -262,7 +118,7 @@ class InventoryBuilder:
         vcenter_adapter_list, self.response_codes[target]["vcenter"] = Vrops.get_vcenter_adapter(vrops, target, token)
 
         if not vcenter_adapter_list:
-            logger.info(f'Could not get vcenter adapter!')
+            logger.info('Could not get vcenter adapter!')
             return False
 
         datacenter, self.response_codes[target]["datacenters"] = \
@@ -405,7 +261,7 @@ class InventoryBuilder:
             Vrops.get_vcenter_operations_adapter_intance(vrops, target, token)
 
         if not vcops_adapter_instance:
-            logger.info(f'Could not get vcops adapter!')
+            logger.info('Could not get vcops adapter!')
             return False
         vcops_adapter_instance = vcops_adapter_instance[0]
 
@@ -426,7 +282,7 @@ class InventoryBuilder:
             Vrops.get_sddc_health_adapter_intance(vrops, target, token)
 
         if not sddc_adapter_instances:
-            logger.info(f'Could not get sddc adapter!')
+            logger.info('Could not get sddc adapter!')
             return False
 
         resourcekinds = [rk for rk in inventory_config.get('resourcekinds', {}).get('sddc_resourcekinds', [])]
@@ -473,7 +329,7 @@ class InventoryBuilder:
             vcenter_adapter_list = self.vcenter_dict[target]
             if not vcenter_adapter_list:
                 continue
-            tree[target] = dict()    
+            tree[target] = dict()
             for vcenter in vcenter_adapter_list:
                 for dc in vcenter.datacenter:
                     tree[vcenter.target][dc.uuid] = {
