@@ -1,5 +1,11 @@
 FROM keppel.eu-de-1.cloud.sap/ccloud-dockerhub-mirror/library/alpine:latest
-LABEL source_repository="https://github.com/sapcc/vrops-exporter"
+
+ARG BININFO_BUILD_DATE BININFO_COMMIT_HASH BININFO_VERSION
+LABEL source_repository="https://github.com/sapcc/vrops-exporter" \
+  org.opencontainers.image.url="https://github.com/sapcc/vrops-exporter" \
+  org.opencontainers.image.created=${BININFO_BUILD_DATE} \
+  org.opencontainers.image.revision=${BININFO_COMMIT_HASH} \
+  org.opencontainers.image.version=${BININFO_VERSION}
 
 RUN apk --update add python3 openssl ca-certificates bash python3-dev  git py3-pip && \
     apk --update add --virtual build-dependencies libffi-dev openssl-dev libxml2 libxml2-dev libxslt libxslt-dev build-base
