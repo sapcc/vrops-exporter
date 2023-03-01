@@ -121,6 +121,11 @@ class InventoryApi:
             response_codes = self.builder.response_codes
             return json.dumps(response_codes)
 
+        @app.route('/api_response_times', methods=['GET'])
+        def api_response_times():
+            response_times = self.builder.response_times
+            return json.dumps(response_times)
+
         # debugging purpose
         @app.route('/iteration_store', methods=['GET'])
         def iteration_store():
