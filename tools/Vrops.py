@@ -181,7 +181,7 @@ class Vrops:
                         "name": resource["resource"]["resourceKey"]["name"],
                         "uuid": resource["resource"]["identifier"],
                         "resourcekind": resourcekind,
-                        "parent": resource.get("relatedResources", [])[0],
+                        "parent": resource.get("relatedResources", ["None"])[0],
                         "internal_name": internal_name,
                         "instance_uuid": instance_uuid
                     })
