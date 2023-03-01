@@ -60,18 +60,22 @@ class AlertCollector(BaseCollector):
             labels = self.get_labels(resource_id, project_ids)
             if not labels:
                 continue
-            labels.extend([alert['alertDefinitionName'],
-                           alert['alertLevel'],
-                           alert['status'],
-                           alert["alertImpact"]])
             alert_labels = self.generate_alert_label_values(alert)
-            alert_metric.add_metric(labels=labels, value=alert_labels)
+            if alert_labels:
+                labels.extend([alert['alertDefinitionName'],
+                               alert['alertLevel'],
+                               alert['status'],
+                               alert["alertImpact"]])
+                alert_metric.add_metric(labels=labels, value=alert_labels)
         yield alert_metric
 
     def generate_alert_label_values(self, alert):
         alert_id = alert.get('alertDefinitionId', {})
         alert_labels = dict()
-        alert_entry = self.alert_entry_cache.get(alert_id) if alert_id in self.alert_entry_cache else self.get_alertdefinition(alert_id)
+        alert_entry = self.alert_entry_cache.get(
+            alert_id) if alert_id in self.alert_entry_cache else self.get_alertdefinition(alert_id)
+        if not alert_entry:
+            return None
         self.alert_entry_cache[alert_id] = alert_entry
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):

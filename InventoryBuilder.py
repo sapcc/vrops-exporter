@@ -124,7 +124,7 @@ class InventoryBuilder:
 
         @app.route('/alertdefinitions/<alert_id>', methods=['GET'])
         def alert_alertdefinitions(alert_id):
-            return self.alertdefinitions[alert_id]
+            return self.alertdefinitions.get(alert_id, {})
 
         @app.route('/iteration', methods=['GET'])
         def iteration():
