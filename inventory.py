@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from InventoryBuilder import InventoryBuilder
+from inventory.Builder import InventoryBuilder
 from optparse import OptionParser
 from tools.helper import yaml_read
 import sys

@@ -6,7 +6,7 @@ from threading import Thread
 from exporter import run_prometheus_server
 from tools.helper import yaml_read
 from tools.Vrops import Vrops
-from InventoryBuilder import InventoryBuilder
+from inventory.Builder import InventoryBuilder
 from BaseCollector import BaseCollector
 from prometheus_client.core import REGISTRY
 import unittest

@@ -1,7 +1,7 @@
 from tools.Vrops import Vrops
 from tools.helper import yaml_read
 from collections import defaultdict
-from tools.InventoryApi import InventoryApi
+from inventory.Api import InventoryApi
 import time
 import os
 import logging
