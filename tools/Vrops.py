@@ -244,7 +244,7 @@ class Vrops:
     def get_vms(self, target, token, parent_uuids, vcenter_uuid, query_specs):
         if not parent_uuids:
             logger.debug(f'No parent resources for virtual machines from {target}')
-            return [], 400
+            return [], 400, 0
         resourcekind = 'VirtualMachine'
         q_specs = self._set_query_specs(query_specs, resourcekind)
         amount_vms, http_code, _ = self.get_latest_stats_multiple(target, token, [vcenter_uuid],
