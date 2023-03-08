@@ -75,7 +75,7 @@ class AlertCollector(BaseCollector):
         alert_entry = self.alert_entry_cache.get(
             alert_id) if alert_id in self.alert_entry_cache else self.get_alertdefinition(alert_id)
         if not alert_entry:
-            return None
+            return {}
         self.alert_entry_cache[alert_id] = alert_entry
         alert_labels['description'] = alert_entry.get('description', "n/a")
         for i, symptom in enumerate(alert_entry.get('symptoms', [])):
