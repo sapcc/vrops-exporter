@@ -9,6 +9,6 @@ gevent
 cffi
 beautifulsoup4==4.9.3
 lxml
-itsdangerous==1.1.0
+itsdangerous==2.1.2
 jinja2==3.0.3
 simplejson
