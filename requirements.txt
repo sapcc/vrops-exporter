@@ -3,7 +3,7 @@ prometheus-client
 requests
 six
 PyYAML
-Flask==1.1.2
+Flask==1.1.4
 Werkzeug==2.0.3
 gevent
 cffi
