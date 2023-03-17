@@ -643,3 +643,30 @@ class Vrops:
                         alert_entry['recommendations'].append(recommendation_entry)
             alerts[alert.get('id')] = alert_entry
         return alerts
+
+    def get_service_states(self, target: str, token: str):
+        url = f'https://{target}/suite-api/api/deployment/node/services/info'
+        timeout = 40
+        headers = {
+            'Content-Type': "application/json",
+            'Accept': "application/json",
+            'Authorization': f"vRealizeOpsToken {token}"
+        }
+        disable_warnings(exceptions.InsecureRequestWarning)
+        try:
+            response = requests.get(url,
+                                    verify=False,
+                                    headers=headers,
+                                    timeout=timeout)
+        except requests.exceptions.ReadTimeout as e:
+            logger.error(f'Request to {url} timed out. Error: {e}')
+            return {}, 504, timeout
+        except Exception as e:
+            logger.error(f'Problem connecting to {target} - Error: {e}')
+            return {}, 503, 0
+
+        if response.status_code == 200:
+            return response.json(), response.status_code, response.elapsed.total_seconds()
+        else:
+            logger.error(f'Problem getting service stats from {target} : {response.text}')
+            return response.json(), response.status_code, response.elapsed.total_seconds()
