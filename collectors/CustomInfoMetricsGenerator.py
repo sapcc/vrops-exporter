@@ -13,7 +13,8 @@ class CustomInfoMetricsGenerator(BaseCollector):
         self.name = self.__class__.__name__
 
     def describe(self):
-        for entry in self.custom_metrics:
+        custom_metrics = self.read_collector_config().get('CustomInfoMetricsGenerator')
+        for entry in custom_metrics:
             yield InfoMetricFamily(entry['metric'], 'vrops-exporter')
 
     def collect(self):
