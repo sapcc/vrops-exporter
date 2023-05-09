@@ -23,11 +23,9 @@ class InventoryCollector(BaseCollector):
     def collect(self):
         logger.info(f'{self.name} starts with collecting the metrics')
 
-        for metric in self.amount_inventory_resources(self.target):
-            yield metric
-        for metric in self.api_response_metric(self.target):
-            yield metric
-        for metric in self.vrops_node_service_states(self.target):
+        for metric in (self.amount_inventory_resources(self.target) +
+                       self.api_response_metric(self.target) +
+                       self.vrops_node_service_states(self.target)):
             yield metric
         yield self.iteration_metric(self.target)
         yield self.collection_time_metric(self.target)
