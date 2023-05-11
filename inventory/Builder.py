@@ -25,6 +25,7 @@ class InventoryBuilder:
         self.vrops_collection_times = dict()
         self.response_codes = defaultdict(dict)
         self.response_times = defaultdict(dict)
+        self.service_states = dict()
         self.alertdefinitions = dict()
         self.successful_iteration_list = [0]
         self.am_i_killed = False
@@ -113,6 +114,9 @@ class InventoryBuilder:
 
         if iteration == 1 and not self.alertdefinitions:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
+
+        self.service_states, self.response_codes[target]["node_services"], self.response_times[target]["node_services"] = \
+            Vrops.get_service_states(vrops, target, token)
         return True
 
     def create_vcenter_objects(self, vrops, target: str, token: str, query_specs: dict):

@@ -188,6 +188,11 @@ class BaseCollector(ABC):
         self.api_reponse_times = self.do_request(url="http://" + os.environ['INVENTORY'] + "/api_response_times")
         return self.api_responses, self.api_reponse_times
 
+    def get_service_states(self):
+        self.wait_for_inventory_data()
+        self.service_states = self.do_request(url="http://" + os.environ['INVENTORY'] + "/service_states")
+        return self.service_states
+
     def get_target_tokens(self):
         self.target_tokens = self.do_request(url="http://" + os.environ['INVENTORY'] + "/target_tokens")
         return self.target_tokens
