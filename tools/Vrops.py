@@ -552,7 +552,7 @@ class Vrops:
                     alert_dict["resourceId"] = alert["resourceId"]
                     alert_dict["alertLevel"] = alert["alertLevel"]
                     alert_dict["status"] = alert['status']
-                    alert_dict["alertDefinitionName"] = alert["alertDefinitionName"]
+                    alert_dict["alertDefinitionName"] = alert.get("alertDefinitionName", alert["alertDefinitionId")
                     alert_dict["alertImpact"] = alert["alertImpact"]
                     alert_dict["alertDefinitionId"] = alert["alertDefinitionId"]
                     alerts.append(alert_dict)
