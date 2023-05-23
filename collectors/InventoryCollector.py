@@ -117,7 +117,7 @@ class InventoryCollector(BaseCollector):
                                                          service.get("name", "N/A").lower(),
                                                          service.get("health", "N/A").lower(),
                                                          service.get("details", "N/A").lower()],
-                                                 value=1)
+                                                 value=1 if service.get("health").lower() == "ok" else 0)
             vrops_node_service_uptime.add_metric(labels=[target,
                                                          service.get("name", "N/A").lower()],
                                                  value=service.get("uptime", 0))
