@@ -58,10 +58,7 @@ class PropertiesCollector(BaseCollector):
                 values_received.add(statkey)
 
                 metric_data = value_entry.get('data', [False])[0]
-                metric_value = value_entry.get('values', [False])[0]
-
-                if metric_data == "summary|customTag:cinder_state|customTagValue" and not metric_value:
-                    metric_value = 'none'
+                metric_value = value_entry.get('values', ['none'])[0]
 
                 if statkey in metrics:
                     # enum metrics
