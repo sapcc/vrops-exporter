@@ -112,7 +112,7 @@ class InventoryBuilder:
         self.vcops_dict[target] = vcops_adapter
         self.sddc_dict[target] = sddc_adapter
 
-        if iteration == 1 and not self.alertdefinitions:
+        if iteration % 10 == 0 and not self.alertdefinitions:
             self.alertdefinitions = Vrops.get_alertdefinitions(vrops, target, token)
 
         self.service_states, self.response_codes[target]["node_services"], self.response_times[target]["node_services"] = \
