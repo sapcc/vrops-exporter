@@ -98,7 +98,7 @@ class InventoryApi:
             return self.builder.iterated_inventory.get(str(iteration), {}).get('sddc_objects', {}).get(target, {})
 
         @app.route('/alertdefinitions/<alert_id>', methods=['GET'])
-        def alert_alertdefinitions(alert_id):
+        def alert_alertdefinition(alert_id):
             return self.builder.alertdefinitions.get(alert_id, {})
 
         @app.route('/alertdefinitions', methods=['GET'])
