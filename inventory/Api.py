@@ -101,6 +101,10 @@ class InventoryApi:
         def alert_alertdefinitions(alert_id):
             return self.builder.alertdefinitions.get(alert_id, {})
 
+        @app.route('/alertdefinitions', methods=['GET'])
+        def alert_alertdefinitions():
+            return self.builder.alertdefinitions, {})
+
         @app.route('/iteration', methods=['GET'])
         def iteration():
             return_iteration = self.builder.successful_iteration_list[-1]
