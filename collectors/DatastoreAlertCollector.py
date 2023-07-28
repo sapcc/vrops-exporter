@@ -20,5 +20,7 @@ class DatastoreAlertCollector(AlertCollector):
 
         if sc_name := self.datastores[resource_id].get('storage_cluster_name'):
             label_values.append(sc_name)
+        else:
+            label_values.append("none")
 
         return label_values
