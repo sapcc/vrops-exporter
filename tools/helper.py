@@ -15,8 +15,11 @@ def yaml_read(path):
 
 
 def remove_html_tags(text):
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
+    import warnings
     import re
+    warnings.filterwarnings('ignore', category=MarkupResemblesLocatorWarning)
+    
     soup = BeautifulSoup(text, features="lxml")
     text = soup.text
     text = re.sub(r"\s+", " ", text)
