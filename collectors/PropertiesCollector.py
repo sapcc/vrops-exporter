@@ -9,12 +9,17 @@ class PropertiesCollector(BaseCollector):
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
+    def unlock_nested_values(self):
+        raise NotImplementedError("Please Implement this method")
+
     def get_labels(self, resource_id: str, project_ids: list):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
         self.collect_running = True
         logger.info(f'{self.name} starts with collecting the metrics')
+        if self.nested_value_metric_keys:
+            logger.info(f'Found nested metric values for: {self.name}, keys: {self.nested_value_metric_keys}')
 
         token = self.get_target_tokens()
         token = token.setdefault(self.target, '')
@@ -59,6 +64,17 @@ class PropertiesCollector(BaseCollector):
 
                 metric_data = value_entry.get('data', [False])[0]
                 metric_value = value_entry.get('values', [False])[0]
+
+                if statkey in self.nested_value_metric_keys:
+                    n_labels, n_label_values, n_value = self.unlock_nested_values(statkey, metric_value)
+                    labels.extend(n_label_values)
+
+                    if labels[0] not in metrics[statkey]['gauge']._labelnames:
+                        for label in n_labels:
+                            metrics[statkey]['gauge']._labelnames += (label,)
+
+                    metrics[statkey]['gauge'].add_metric(labels=labels, value=n_value)
+                    continue
 
                 if statkey in metrics:
                     # enum metrics

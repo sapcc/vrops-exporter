@@ -24,6 +24,7 @@ class BaseCollector(ABC):
         self.label_names = []
         self.project_ids = []
         self.collect_running = False
+        self.nested_value_metric_keys = []
 
     @abstractmethod
     def collect(self):
