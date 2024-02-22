@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('.')
 from unittest import TestCase
-from inventory import parse_params
+from inventory_launch import parse_params
 import os
 import unittest
 import logging
@@ -18,6 +18,7 @@ logger = logging.getLogger('test-logger')
 
 
 class TestLaunchInventory(TestCase):
+
     print(f"Running TestLaunchInventory")
     os.environ.setdefault('TARGET', "vrops-vcenter-test.company.com")
 
