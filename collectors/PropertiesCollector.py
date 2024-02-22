@@ -9,7 +9,7 @@ class PropertiesCollector(BaseCollector):
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
-    def unlock_nested_values(self):
+    def unlock_nested_values(self, s, m):
         raise NotImplementedError("Please Implement this method")
 
     def get_labels(self, resource_id: str, project_ids: list):
@@ -66,14 +66,15 @@ class PropertiesCollector(BaseCollector):
                 metric_value = value_entry.get('values', [False])[0]
 
                 if statkey in self.nested_value_metric_keys:
-                    n_labels, n_label_values, n_value = self.unlock_nested_values(statkey, metric_value)
-                    labels.extend(n_label_values)
+                    add_labels, add_label_value_list, add_value = self.unlock_nested_values(statkey, metric_value)
+                    if add_labels[0] not in metrics[statkey]['gauge']._labelnames:
+                        for add_label in add_labels:
+                            metrics[statkey]['gauge']._labelnames += (add_label,)
 
-                    if labels[0] not in metrics[statkey]['gauge']._labelnames:
-                        for label in n_labels:
-                            metrics[statkey]['gauge']._labelnames += (label,)
-
-                    metrics[statkey]['gauge'].add_metric(labels=labels, value=n_value)
+                    for add_label_value in add_label_value_list:
+                        _ = [labels.append(l) for l in add_label_value]
+                        metrics[statkey]['gauge'].add_metric(labels=labels, value=add_value)
+                        _ = [labels.remove(l) for l in add_label_value]
                     continue
 
                 if statkey in metrics:
