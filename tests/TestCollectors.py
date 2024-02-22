@@ -40,7 +40,7 @@ class TestCollectors(unittest.TestCase):
 
         BaseCollector.get_target_tokens = MagicMock(
             return_value={self.target: self.token})
-        Vrops.get_token = MagicMock(return_value=("2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234", 200))
+        Vrops.get_token = MagicMock(return_value=("2ed214d523-235f-h283-4566-6sf356124fd62::f234234-234", 200, 0.282561))
 
         def create_adapter_objects(adapterkind) -> list:
             uuids = ["3628-93a1-56e84634050814", "3628-93a1-56e84634050814"]
@@ -56,12 +56,12 @@ class TestCollectors(unittest.TestCase):
             return object_list
 
         Vrops.get_adapter = MagicMock(return_value=None)
-        Vrops.get_vcenter_adapter = MagicMock(return_value=(create_adapter_objects("Vcenter"), 200))
-        Vrops.get_nsxt_adapter = MagicMock(return_value=(create_adapter_objects("NSXTAdapterInstance"), 200))
+        Vrops.get_vcenter_adapter = MagicMock(return_value=(create_adapter_objects("Vcenter"), 200, 0.282561))
+        Vrops.get_nsxt_adapter = MagicMock(return_value=(create_adapter_objects("NSXTAdapterInstance"), 200, 0.282561))
         Vrops.get_vcenter_operations_adapter_intance = MagicMock(
-            return_value=(create_adapter_objects("VcopsAdapterInstance"), 200))
+            return_value=(create_adapter_objects("VcopsAdapterInstance"), 200, 0.282561))
         Vrops.get_sddc_health_adapter_intance = MagicMock(
-            return_value=(create_adapter_objects("SDDCAdapterInstance"), 200))
+            return_value=(create_adapter_objects("SDDCAdapterInstance"), 200, 0.282561))
 
         # test tool get_resources to create resource objects
         def create_resource_objects(resourcekind) -> list:
@@ -79,24 +79,24 @@ class TestCollectors(unittest.TestCase):
                 object_list.append(resource_object)
             return object_list
 
-        Vrops.get_nsxt_mgmt_cluster = MagicMock(return_value=(create_resource_objects("ManagementCluster"), 200))
-        Vrops.get_nsxt_mgmt_nodes = MagicMock(return_value=(create_resource_objects("ManagementNode"), 200))
-        Vrops.get_nsxt_mgmt_service = MagicMock(return_value=(create_resource_objects("ManagementService"), 200))
-        Vrops.get_nsxt_transport_zone = MagicMock(return_value=(create_resource_objects("TransportZone"), 200))
-        Vrops.get_nsxt_transport_node = MagicMock(return_value=(create_resource_objects("TransportNode"), 200))
-        Vrops.get_nsxt_logical_switch = MagicMock(return_value=(create_resource_objects("LogicalSwitch"), 200))
-        Vrops.get_datacenter = MagicMock(return_value=(create_resource_objects("Datacenter"), 200))
-        Vrops.get_cluster = MagicMock(return_value=(create_resource_objects("ClusterComputeResource"), 200))
-        Vrops.get_SDRS_cluster = MagicMock(return_value=(create_resource_objects("StoragePod"), 200))
+        Vrops.get_nsxt_mgmt_cluster = MagicMock(return_value=(create_resource_objects("ManagementCluster"), 200, 0.282561))
+        Vrops.get_nsxt_mgmt_nodes = MagicMock(return_value=(create_resource_objects("ManagementNode"), 200, 0.282561))
+        Vrops.get_nsxt_mgmt_service = MagicMock(return_value=(create_resource_objects("ManagementService"), 200, 0.282561))
+        Vrops.get_nsxt_transport_zone = MagicMock(return_value=(create_resource_objects("TransportZone"), 200, 0.282561))
+        Vrops.get_nsxt_transport_node = MagicMock(return_value=(create_resource_objects("TransportNode"), 200, 0.282561))
+        Vrops.get_nsxt_logical_switch = MagicMock(return_value=(create_resource_objects("LogicalSwitch"), 200, 0.282561))
+        Vrops.get_datacenter = MagicMock(return_value=(create_resource_objects("Datacenter"), 200, 0.282561))
+        Vrops.get_cluster = MagicMock(return_value=(create_resource_objects("ClusterComputeResource"), 200, 0.282561))
+        Vrops.get_SDRS_cluster = MagicMock(return_value=(create_resource_objects("StoragePod"), 200, 0.282561))
         datastores = create_resource_objects("Datastore")
         for ds in datastores:
             ds.type = 'other'
-        Vrops.get_datastores = MagicMock(return_value=(datastores, 200))
-        Vrops.get_hosts = MagicMock(return_value=(create_resource_objects("HostSystem"), 200))
-        Vrops.get_vms = MagicMock(return_value=(create_resource_objects("VirtualMachine"), 200))
-        Vrops.get_dis_virtual_switch = MagicMock(return_value=(create_resource_objects("VmwareDistributedSwitch"), 200))
-        Vrops.get_vcops_instances = MagicMock(return_value=(create_resource_objects("vcops_object"), 200))
-        Vrops.get_sddc_instances = MagicMock(return_value=(create_resource_objects("sddc_object"), 200))
+        Vrops.get_datastores = MagicMock(return_value=(datastores, 200, 0.282561))
+        Vrops.get_hosts = MagicMock(return_value=(create_resource_objects("HostSystem"), 200, 0.282561))
+        Vrops.get_vms = MagicMock(return_value=(create_resource_objects("VirtualMachine"), 200, 0.282561))
+        Vrops.get_dis_virtual_switch = MagicMock(return_value=(create_resource_objects("VmwareDistributedSwitch"), 200, 0.282561))
+        Vrops.get_vcops_instances = MagicMock(return_value=(create_resource_objects("vcops_object"), 200, 0.282561))
+        Vrops.get_sddc_instances = MagicMock(return_value=(create_resource_objects("sddc_object"), 200, 0.282561))
 
         Vrops.get_project_ids = MagicMock(return_value=[{"3628-93a1-56e84634050814": "0815"},
                                                         {"7422-91h7-52s842060815": "0815"},
