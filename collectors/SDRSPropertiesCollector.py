@@ -38,7 +38,7 @@ class SDRSPropertiesCollector(PropertiesCollector):
         value = 0
 
         for i, rule in enumerate(rules):
-            mapped_vms = self.vm_mapping_helper(rule.get('virtualMachines'))
+            mapped_vms = self.vm_mapping_helper(rule.get('virtualMachines'), [])
             for vm in mapped_vms:
                 rule_label_values.append([
                     f'{i+1}/{amount_rules}',
