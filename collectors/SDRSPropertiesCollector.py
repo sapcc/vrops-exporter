@@ -47,7 +47,7 @@ class SDRSPropertiesCollector(PropertiesCollector):
                     str(rule.get('valid')).lower(),
                     vm
                     ])
-        return rule_labels, rule_label_values, value
+        return rule_labels, rule_label_values, len(mapped_vms)
 
     def vm_mapping_helper(self, vm_list):
         mapped_vms = []
