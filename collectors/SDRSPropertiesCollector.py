@@ -30,7 +30,7 @@ class SDRSPropertiesCollector(PropertiesCollector):
         metric_value = json.loads(metric_value)
         rules = metric_value.get("rules") if metric_value.get("rules") else []
 
-        amount_rules = len(rules) if rules else 0
+        amount_rules = len(rules)
 
         rule_labels = ['rule', 'rule_name', 'rule_type', 'valid', 'virtualmachine']
         rule_label_values = []
