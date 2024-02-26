@@ -102,10 +102,47 @@ class TestCollectors(unittest.TestCase):
                                                         {"7422-91h7-52s842060815": "0815"},
                                                         {"5628-9ba1-55e847050815": "internal"}])
         Vrops.get_alertdefinitions = MagicMock(return_value={'id': 'test-id', 'name': 'test-alert',
+
                                                              'symptoms': [{'name': 'test_symptom',
                                                                            'state': 'test-state'}],
                                                              'recommendation': [{'id': 'test-re',
                                                                                  'description': 'test-description'}]})
+        Vrops.get_service_states = MagicMock(return_value=[
+            {'service': [{'details': 'Success, Service LOCATOR is running and responding',
+                          'health': 'OK',
+                          'name': 'LOCATOR',
+                          'startedOn': 1702541189387,
+                          'uptime': 6412774450},
+                         {'details': 'Success, Service ANALYTICS is running and responding',
+                          'health': 'OK',
+                          'name': 'ANALYTICS',
+                          'startedOn': 1702541205556,
+                          'uptime': 6412762377},
+                         {'details': 'Success, Service COLLECTOR is running and responding',
+                          'health': 'OK',
+                          'name': 'COLLECTOR',
+                          'startedOn': 1702541203086,
+                          'uptime': 6412760790},
+                         {'details': 'Success, Service API is running and responding',
+                          'health': 'OK',
+                          'name': 'API',
+                          'startedOn': 1702541204544,
+                          'uptime': 6412759317},
+                         {'details': 'Success, Service CASA is running and responding',
+                          'health': 'OK',
+                          'name': 'CASA',
+                          'startedOn': 1702541071734,
+                          'uptime': 6412892126},
+                         {'details': 'Success, Service ADMINUI is running and responding',
+                          'health': 'OK',
+                          'name': 'ADMINUI',
+                          'startedOn': 1702541195420,
+                          'uptime': 6412768497},
+                         {'details': 'Success, Service UI is running and responding',
+                          'health': 'OK',
+                          'name': 'UI',
+                          'startedOn': 1702541195420,
+                          'uptime': 6412768503}]}, 200, 0.282561])
 
         thread = Thread(target=InventoryBuilder, args=(self.target, 8000, 180))
         thread.daemon = True
