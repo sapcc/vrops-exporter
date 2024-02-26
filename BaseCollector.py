@@ -374,6 +374,12 @@ class BaseCollector(ABC):
                                         labels=label_names)
         return alert_metric
 
+    def add_metric_labels(self, metric_object: GaugeMetricFamily, labels):
+        if labels[0] not in metric_object._labelnames:
+            for label in labels:
+                metric_object._labelnames += (label,)
+        return
+
     def describe(self):
         collector_config = self.read_collector_config()
         for metric in collector_config[self.name]:

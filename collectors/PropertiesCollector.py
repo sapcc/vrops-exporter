@@ -67,21 +67,17 @@ class PropertiesCollector(BaseCollector):
 
                 if statkey in self.nested_value_metric_keys:
                     add_labels, add_label_value_list, add_value = self.unlock_nested_values(statkey, metric_value)
-                    if add_labels[0] not in metrics[statkey]['gauge']._labelnames:
-                        for add_label in add_labels:
-                            metrics[statkey]['gauge']._labelnames += (add_label,)
+
+                    self.add_metric_labels(metrics[statkey]['gauge'], add_labels)
 
                     for add_label_value in add_label_value_list:
-                        _ = [labels.append(l) for l in add_label_value]
-                        metrics[statkey]['gauge'].add_metric(labels=labels, value=add_value)
-                        _ = [labels.remove(l) for l in add_label_value]
+                        metrics[statkey]['gauge'].add_metric(labels=labels+add_label_value, value=add_value)
                     continue
 
                 if statkey in metrics:
                     # enum metrics
                     if metrics[statkey]['expected']:
-                        if 'state' not in metrics[statkey]['gauge']._labelnames:
-                            metrics[statkey]['gauge']._labelnames += ('state',)
+                        self.add_metric_labels(metrics[statkey]['gauge'], ['state'])
 
                         state = metric_value if metric_value else 'n/a'
                         labels.append(state)
@@ -91,8 +87,7 @@ class PropertiesCollector(BaseCollector):
                     # string values
                     elif metric_value:
                         metric_suffix = metrics[statkey]['metric_suffix']
-                        if metric_suffix not in metrics[statkey]['gauge']._labelnames:
-                            metrics[statkey]['gauge']._labelnames += (metric_suffix,)
+                        self.add_metric_labels(metrics[statkey]['gauge'], [metric_suffix])
 
                         labels.append(metric_value)
                         metrics[statkey]['gauge'].add_metric(labels=labels, value=1)
