@@ -28,7 +28,7 @@ class SDRSPropertiesCollector(PropertiesCollector):
     def config_sdrsconfig_vmStorageAntiAffinityRules(self, metric_value):
 
         metric_value = json.loads(metric_value)
-        rules = metric_value.get("rules") if metric_value.get("rules") else []
+        rules = metric_value.get("rules") or []
 
         amount_rules = len(rules)
 
