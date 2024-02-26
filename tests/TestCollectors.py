@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append('.')
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from threading import Thread
 from exporter import run_prometheus_server
 from tools.helper import yaml_read
@@ -29,7 +29,8 @@ class TestCollectors(unittest.TestCase):
         self.assertTrue(os.getenv('TARGET'), 'no target set')
         self.assertEqual(os.getenv('TARGET'), "vrops-vcenter-test.company.com", "The test must be run with the target: vrops-vcenter-test.company.com")
 
-    def test_collector_metrics(self):
+    @patch('exporter.signal.signal')
+    def test_collector_metrics(self, mock_signal):
         self.metrics_yaml = yaml_read('tests/metrics.yaml')
         self.collector_config = yaml_read(os.environ['COLLECTOR_CONFIG'])
         self.target = os.getenv('TARGET')
@@ -191,7 +192,7 @@ class TestCollectors(unittest.TestCase):
 
             # start prometheus server to provide metrics later on
 
-            thread1 = Thread(target=run_prometheus_server, args=(self.random_prometheus_port, [collector_instance]))
+            thread1 = Thread(target=run_prometheus_server, args=(self.random_prometheus_port, [collector_instance], mock_signal))
             thread1.daemon = True
             thread1.start()
             thread_list.append(thread1)
