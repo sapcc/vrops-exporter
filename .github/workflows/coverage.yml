@@ -34,7 +34,7 @@ jobs:
             LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar COLLECTOR_CONFIG=tests/collector_config.yaml INVENTORY_CONFIG=tests/inventory_config.yaml TARGET=vrops-vcenter-test.company.com coverage run -a --omit "*.md","*.txt",LICENSE,Makefile,Dockerfile $i
            done
       - name: Coveralls Parallel
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           flag-name: run-vrops-test
