@@ -24,6 +24,7 @@ class BaseCollector(ABC):
         self.label_names = []
         self.project_ids = []
         self.collect_running = False
+        self.nested_value_metric_keys = []
 
     @abstractmethod
     def collect(self):
@@ -372,6 +373,12 @@ class BaseCollector(ABC):
         alert_metric = InfoMetricFamily(f'vrops_{self.vrops_entity_name}_alert', 'vrops-exporter',
                                         labels=label_names)
         return alert_metric
+
+    def add_metric_labels(self, metric_object: GaugeMetricFamily, labels):
+        if labels[0] not in metric_object._labelnames:
+            for label in labels:
+                metric_object._labelnames += (label,)
+        return
 
     def describe(self):
         collector_config = self.read_collector_config()

@@ -10,6 +10,7 @@ default_collectors:
     - 'DistributedvSwitchPropertiesCollector'
     - 'DatastoreStatsCollector'
     - 'SDRSStatsCollector'
+    - 'SDRSPropertiesCollector'
     - 'DatastorePropertiesCollector'
     - 'HostSystemStatsCollector'
     - 'HostSystemPropertiesCollector'
@@ -101,6 +102,10 @@ DatastoreStatsCollector:
 SDRSStatsCollector:
   - metric_suffix: "capacity_remaining_percentage"
     key: "OnlineCapacityAnalytics|capacityRemainingPercentage"
+
+SDRSPropertiesCollector:
+  - metric_suffix: "config_sdrsconfig_vmStorageAntiAffinityRules"
+    key: "config|sdrsconfig|vmStorageAntiAffinityRules"
 
 DatastorePropertiesCollector:
   - metric_suffix: "summary_datastore_accessible"

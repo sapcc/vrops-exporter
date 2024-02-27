@@ -9,12 +9,17 @@ class PropertiesCollector(BaseCollector):
     def get_resource_uuids(self):
         raise NotImplementedError("Please Implement this method")
 
+    def unlock_nested_values(self, s, m):
+        raise NotImplementedError("Please Implement this method")
+
     def get_labels(self, resource_id: str, project_ids: list):
         raise NotImplementedError("Please Implement this method")
 
     def collect(self):
         self.collect_running = True
         logger.info(f'{self.name} starts with collecting the metrics')
+        if self.nested_value_metric_keys:
+            logger.info(f'Found nested metric values for: {self.name}, keys: {self.nested_value_metric_keys}')
 
         token = self.get_target_tokens()
         token = token.setdefault(self.target, '')
@@ -60,11 +65,26 @@ class PropertiesCollector(BaseCollector):
                 metric_data = value_entry.get('data', [False])[0]
                 metric_value = value_entry.get('values', [False])[0]
 
+                if statkey in self.nested_value_metric_keys:
+
+                    add_labels, add_label_value_list, add_value = self.unlock_nested_values(statkey, metric_value)
+
+                    if not add_labels:
+                        metric_suffix = metrics[statkey]['metric_suffix']
+                        self.add_metric_labels(metrics[statkey]['gauge'], [metric_suffix])
+                        metrics[statkey]['gauge'].add_metric(labels=labels+[metric_suffix], value=0)
+                        continue
+
+                    self.add_metric_labels(metrics[statkey]['gauge'], add_labels)
+
+                    for add_label_value in add_label_value_list:
+                        metrics[statkey]['gauge'].add_metric(labels=labels+add_label_value, value=add_value)
+                    continue
+
                 if statkey in metrics:
                     # enum metrics
                     if metrics[statkey]['expected']:
-                        if 'state' not in metrics[statkey]['gauge']._labelnames:
-                            metrics[statkey]['gauge']._labelnames += ('state',)
+                        self.add_metric_labels(metrics[statkey]['gauge'], ['state'])
 
                         state = metric_value if metric_value else 'n/a'
                         labels.append(state)
@@ -74,8 +94,7 @@ class PropertiesCollector(BaseCollector):
                     # string values
                     elif metric_value:
                         metric_suffix = metrics[statkey]['metric_suffix']
-                        if metric_suffix not in metrics[statkey]['gauge']._labelnames:
-                            metrics[statkey]['gauge']._labelnames += (metric_suffix,)
+                        self.add_metric_labels(metrics[statkey]['gauge'], [metric_suffix])
 
                         labels.append(metric_value)
                         metrics[statkey]['gauge'].add_metric(labels=labels, value=1)
