@@ -1,46 +1,47 @@
+---
 name: code test coverage
 
-on:   
+on:
   push:
     branches:
       - master
   pull_request:
     branches:
       - master
-    
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python 3.11.8
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11.8
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: vrops-test
-      env:
-         COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-         for i in $(ls tests/Test*)
-         do 
-           LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar COLLECTOR_CONFIG=tests/collector_config.yaml INVENTORY_CONFIG=tests/inventory_config.yaml TARGET=vrops-vcenter-test.company.com coverage run -a --omit "*.md","*.txt",LICENSE,Makefile,Dockerfile $i
-         done
-    - name: Coveralls Parallel
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        flag-name: run-vrops-test
-        parallel: true
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11.8
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: vrops-test
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for i in $(ls tests/Test*)
+          do
+            LOOPBACK=1 INVENTORY="127.0.0.1:8000" DEBUG=0 USER=FOO PASSWORD=Bar COLLECTOR_CONFIG=tests/collector_config.yaml INVENTORY_CONFIG=tests/inventory_config.yaml TARGET=vrops-vcenter-test.company.com coverage run -a --omit "*.md","*.txt",LICENSE,Makefile,Dockerfile $i
+           done
+      - name: Coveralls Parallel
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          flag-name: run-vrops-test
+          parallel: true
   finish:
     needs: test
     runs-on: ubuntu-latest
-    - name: Coveralls finished
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.github_token }}
-        parallel-finished: true
+    steps:
+      - name: Coveralls finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true

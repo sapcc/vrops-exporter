@@ -1,4 +1,4 @@
-![Python application](https://github.com/sapcc/vrops-exporter/workflows/Python%20application/badge.svg)
+![Python application](https://github.com/sapcc/vrops-exporter/actions/workflows/pythonapp.yml/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/sapcc/vrops-exporter/badge.svg?branch=master)](https://coveralls.io/github/sapcc/vrops-exporter?branch=master)
 
 # vrops-exporter
