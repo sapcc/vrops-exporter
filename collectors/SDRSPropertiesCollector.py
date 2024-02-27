@@ -1,5 +1,8 @@
 from collectors.PropertiesCollector import PropertiesCollector
 import json
+import logging
+
+logger = logging.getLogger('vrops-exporter')
 
 class SDRSPropertiesCollector(PropertiesCollector):
 
@@ -27,9 +30,14 @@ class SDRSPropertiesCollector(PropertiesCollector):
 
     def config_sdrsconfig_vmStorageAntiAffinityRules(self, metric_value):
 
-        metric_value = json.loads(metric_value)
-        rules = metric_value.get("rules") or []
+        try:
+            metric_value = json.loads(metric_value)
 
+        except (TypeError, json.decoder.JSONDecodeError) as e:
+            logger.warning(f'metric_value is not a valid json: {e.args}, {metric_value}')
+            return [], [], 0
+
+        rules = metric_value.get("rules") or []
         amount_rules = len(rules)
 
         rule_labels = ['rule', 'rule_name', 'rule_type', 'valid', 'virtualmachine']

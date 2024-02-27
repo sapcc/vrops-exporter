@@ -66,7 +66,14 @@ class PropertiesCollector(BaseCollector):
                 metric_value = value_entry.get('values', [False])[0]
 
                 if statkey in self.nested_value_metric_keys:
+
                     add_labels, add_label_value_list, add_value = self.unlock_nested_values(statkey, metric_value)
+
+                    if not add_labels:
+                        metric_suffix = metrics[statkey]['metric_suffix']
+                        self.add_metric_labels(metrics[statkey]['gauge'], [metric_suffix])
+                        metrics[statkey]['gauge'].add_metric(labels=labels+[metric_suffix], value=0)
+                        continue
 
                     self.add_metric_labels(metrics[statkey]['gauge'], add_labels)
 
