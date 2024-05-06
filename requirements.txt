@@ -4,7 +4,7 @@ requests
 six
 PyYAML
 Flask==3.0.2
-Werkzeug==3.0.1
+Werkzeug==3.0.3
 gevent
 cffi
 beautifulsoup4==4.12.3
