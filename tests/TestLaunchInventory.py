@@ -57,6 +57,7 @@ class TestLaunchInventory(TestCase):
                     '-s', '180']
         os.environ['USER'] = 'env_testuser'
         os.environ['PASSWORD'] = 'testps31!_2'
+        os.environ['AUTHSOURCE'] = 'Local'
         os.environ['PORT'] = '1123'
         os.environ['TARGET'] = '/wrong/path/to/atlas.yaml'
         os.environ['INVENTORY_CONFIG'] = 'wrong/path/to/config.yaml'
@@ -78,6 +79,7 @@ class TestLaunchInventory(TestCase):
         os.environ.clear()
         os.environ['USER'] = 'testuser'
         os.environ['PASSWORD'] = 'testpw31!'
+        os.environ['AUTHSOURCE'] = 'Local'
         os.environ['PORT'] = '1234'
         os.environ['TARGET'] = 'vrops-vcenter-test.company.com'
         os.environ['INVENTORY_CONFIG'] = 'tests/inventory_config.yaml'
