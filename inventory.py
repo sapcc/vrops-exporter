@@ -17,6 +17,7 @@ def parse_params(logger):
     parser = OptionParser()
     parser.add_option("-u", "--user", help="specify user to log in", action="store", dest="user")
     parser.add_option("-p", "--password", help="specify password to log in", action="store", dest="password")
+    parser.add_option("-e", "--authsource", help="specify auth source to authenticate against", action="store", dest="authsource")
     parser.add_option("-o", "--port", help="specify inventory port", action="store", dest="port")
     parser.add_option("-a", "--atlas", help="path to atlas service endpoint", action="store", dest="atlas")
     parser.add_option("-m", "--config", help="Path to the configuration to set properties of the resources kept in "
@@ -37,6 +38,10 @@ def parse_params(logger):
         os.environ['USER'] = options.user
     if options.password:
         os.environ['PASSWORD'] = options.password
+    if options.authsource:
+        os.environ['AUTHSOURCE'] = options.authsource
+    elif "AUTHSOURCE" not in os.environ:
+        os.environ['AUTHSOURCE'] = 'Local'
     if options.info:
         logger.setLevel(logging.INFO)
         ConsoleHandler.setLevel(logging.INFO)

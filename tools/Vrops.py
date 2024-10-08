@@ -21,7 +21,7 @@ class Vrops:
         }
         payload = {
             "username": os.environ['USER'],
-            "authSource": "Local",
+            "authSource": os.environ['AUTHSOURCE'],
             "password": os.environ['PASSWORD']
         }
         disable_warnings(exceptions.InsecureRequestWarning)
