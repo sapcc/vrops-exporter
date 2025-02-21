@@ -315,7 +315,7 @@ class BaseCollector(ABC):
 
         if api_responding > 200:
             logger.critical(f'API response {api_responding} [{collector}, {self.target}], no return')
-            return gauge
+
         return gauge
 
     def create_api_response_time_metric(self, collector: str, response_time: float) -> GaugeMetricFamily:
