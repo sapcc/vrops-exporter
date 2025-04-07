@@ -226,8 +226,6 @@ class Vrops:
                 datastore.type = "ephemeral"
             elif "Management" in datastore.name:
                 datastore.type = "Management"
-            elif "vVOL" in datastore.name:
-                datastore.type = "vVOL"
             elif "local" in datastore.name:
                 datastore.type = "local"
             elif datastore.name.startswith('nfs'):
