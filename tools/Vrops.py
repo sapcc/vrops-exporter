@@ -232,6 +232,8 @@ class Vrops:
                 datastore.type = "local"
             elif datastore.name.startswith('nfs'):
                 datastore.type = "nfs"
+            elif datastore.name.startswith('nsxt'):
+                datastore.type = "nsxt"
             elif "swap" in datastore.name:
                 datastore.type = "NVMe"
             else:
