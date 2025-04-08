@@ -222,7 +222,7 @@ class Vrops:
                 datastore.type = "vmfs_p_ssd"
             elif "s_hdd" in datastore.name:
                 datastore.type = "vmfs_s_hdd"
-            elif "eph" in datastore.name:
+            elif datastore.name.startswith("eph") or datastore.name.startswith("donotdeploy_eph"):
                 datastore.type = "ephemeral"
             elif "Management" in datastore.name:
                 datastore.type = "Management"
