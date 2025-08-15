@@ -1,5 +1,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+migrations/
+media/
+settings.py
 *.py[codz]
 *$py.class
 
@@ -8,6 +11,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -54,6 +58,9 @@ cover/
 # Translations
 *.mo
 *.pot
+
+# configs
+netbox.json
 
 # Django stuff:
 *.log
@@ -201,3 +208,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# vim
+*.swo
+*.swp
