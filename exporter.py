@@ -3,9 +3,7 @@ import sys
 import time
 import os
 import importlib
-import requests
 import logging
-import random
 import signal
 from prometheus_client import start_http_server
 from prometheus_client.core import REGISTRY
