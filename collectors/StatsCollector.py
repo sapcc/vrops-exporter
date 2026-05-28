@@ -46,6 +46,8 @@ class StatsCollector(BaseCollector):
 
         values_received = set()
         no_match_in_config = list()
+        # Track which metric+label combinations have been added to prevent duplicates
+        added_metrics = set()
 
         for resource in values:
             resource_id = resource.get('resourceId')
@@ -60,10 +62,19 @@ class StatsCollector(BaseCollector):
                 values_received.add(norm_statkey)
 
                 metric_data = value_entry.get('data', [0])[0]
+                # Create a unique key for this metric+labels combination to detect duplicates
+                metric_key = (norm_statkey, tuple(labels))
+                
                 if norm_statkey in metrics:
-                    metrics[norm_statkey]['gauge'].add_metric(labels=labels, value=metric_data)
+                    # Only add if we haven't seen this exact metric+labels combination before
+                    if metric_key not in added_metrics:
+                        metrics[norm_statkey]['gauge'].add_metric(labels=labels, value=metric_data)
+                        added_metrics.add(metric_key)
                 else:
-                    no_match_in_config.append([statkey, metric_data, labels])
+                    # Only add to no_match_in_config if we haven't seen this combination before
+                    if metric_key not in added_metrics:
+                        no_match_in_config.append([statkey, metric_data, labels])
+                        added_metrics.add(metric_key)
 
         # no match in config, bring into the right format
         created_metrics = self.generate_metrics_enriched_by_api(no_match_in_config, label_names=self.label_names)
