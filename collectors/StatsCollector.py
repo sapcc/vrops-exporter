@@ -62,16 +62,21 @@ class StatsCollector(BaseCollector):
                 values_received.add(norm_statkey)
 
                 metric_data = value_entry.get('data', [0])[0]
-                # Create a unique key for this metric+labels combination to detect duplicates
-                metric_key = (norm_statkey, tuple(labels))
-                
+
                 if norm_statkey in metrics:
-                    # Only add if we haven't seen this exact metric+labels combination before
+                    if metrics[norm_statkey].get('disk_instance'):
+                        # Extract disk index from original statkey (e.g. diskspace:0|perDsUsed -> '0')
+                        disk_match = re.search(r':(\d+)\|', statkey)
+                        disk_index = disk_match.group(1) if disk_match else ''
+                        sample_labels = labels + [disk_index]
+                    else:
+                        sample_labels = labels
+                    metric_key = (norm_statkey, tuple(sample_labels))
                     if metric_key not in added_metrics:
-                        metrics[norm_statkey]['gauge'].add_metric(labels=labels, value=metric_data)
+                        metrics[norm_statkey]['gauge'].add_metric(labels=sample_labels, value=metric_data)
                         added_metrics.add(metric_key)
                 else:
-                    # Only add to no_match_in_config if we haven't seen this combination before
+                    metric_key = (norm_statkey, tuple(labels))
                     if metric_key not in added_metrics:
                         no_match_in_config.append([statkey, metric_data, labels])
                         added_metrics.add(metric_key)

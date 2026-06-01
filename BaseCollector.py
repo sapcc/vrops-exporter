@@ -345,12 +345,18 @@ class BaseCollector(ABC):
 
     def generate_metrics(self, label_names: list) -> dict:
         collector_config = self.read_collector_config()
-        metrics = {m['key']: {'metric_suffix': m['metric_suffix'],
-                              'key': m['key'],
-                              'expected': m.setdefault('expected', None),
-                              'gauge': GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{m["metric_suffix"].lower()}',
-                                                         'vrops-exporter', labels=label_names)
-                              } for m in collector_config.get(self.name, {})}
+        metrics = {}
+        for m in collector_config.get(self.name, {}):
+            has_disk_instance = m.get('disk_instance', False)
+            metric_label_names = label_names + ['disk'] if has_disk_instance else label_names
+            metrics[m['key']] = {
+                'metric_suffix': m['metric_suffix'],
+                'key': m['key'],
+                'expected': m.setdefault('expected', None),
+                'disk_instance': has_disk_instance,
+                'gauge': GaugeMetricFamily(f'vrops_{self.vrops_entity_name}_{m["metric_suffix"].lower()}',
+                                           'vrops-exporter', labels=metric_label_names)
+            }
         if not metrics:
             logger.error(f'Cannot find {self.name} in collector_config')
         return metrics
