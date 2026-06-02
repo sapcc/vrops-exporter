@@ -63,9 +63,22 @@ class StatsCollector(BaseCollector):
 
                 if norm_statkey in metrics:
                     if metrics[norm_statkey].get('disk_instance'):
-                        # Extract disk index from original statkey (e.g. diskspace:0|perDsUsed -> '0')
-                        disk_match = re.search(r':(\d+)\|', statkey)
-                        disk_index = disk_match.group(1) if disk_match else ''
+                        # Extract disk index from original statkey (e.g. diskspace:0|perDsUsed -> '0').
+                        # Falls back to 'total' for non-instanced statkeys: vROps reports the VM-wide
+                        # rollup as e.g. diskspace|perDsUsed without an instance suffix.
+                        disk_index = 'total'
+
+                        colon = statkey.find(':')
+                        pipe = statkey.find('|')
+
+                        if 0 <= colon < pipe:
+                            # statkey="diskspace:0|perDsUsed"  -> candidate="0"
+                            # statkey="diskspace:12|perDsUsed" -> candidate="12"
+                            # statkey="diskspace:|perDsUsed"   -> candidate="" (rejected by isdigit)
+                            candidate = statkey[colon + 1:pipe]
+                            if candidate.isdigit():
+                                disk_index = candidate
+
                         sample_labels = labels + [disk_index]
                     else:
                         sample_labels = labels
