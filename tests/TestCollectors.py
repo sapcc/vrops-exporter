@@ -166,6 +166,19 @@ class TestCollectors(unittest.TestCase):
                     multiple_metrics_generated.append(
                         {"resourceId": "5628-9ba1-55e847050815", "stat-list": {"stat": [
                             {"timestamps": [1582797716394], "statKey": {"key": metric['key']}, "data": [55.0]}]}})
+                if collector == "VMStatsDefaultCollector":
+                    # Exercise multi-disk path: same VM emits multiple per-disk
+                    # diskspace|perDsUsed samples that would collide on labels
+                    # without the disk_instance flag.
+                    multiple_metrics_generated.append(
+                        {"resourceId": "7422-91h7-52s842060815", "stat-list": {"stat": [
+                            {"timestamps": [1582797716394],
+                             "statKey": {"key": "diskspace:0|perDsUsed"}, "data": [10.0]},
+                            {"timestamps": [1582797716394],
+                             "statKey": {"key": "diskspace:1|perDsUsed"}, "data": [20.0]},
+                            {"timestamps": [1582797716394],
+                             "statKey": {"key": "diskspace:2|perDsUsed"}, "data": [30.0]},
+                        ]}})
                 Vrops.get_latest_stats_multiple = MagicMock(return_value=(multiple_metrics_generated, 200, 0.5))
 
             if "Properties" in collector:
