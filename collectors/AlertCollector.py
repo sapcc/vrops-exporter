@@ -1,7 +1,6 @@
 from BaseCollector import BaseCollector
 from prometheus_client.core import InfoMetricFamily
 import logging
-import time
 
 logger = logging.getLogger('vrops-exporter')
 

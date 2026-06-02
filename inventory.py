@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 from inventory.Builder import InventoryBuilder
 from optparse import OptionParser
-from tools.helper import yaml_read
 import sys
 import os
 import logging
-import random
 import signal
 
 
