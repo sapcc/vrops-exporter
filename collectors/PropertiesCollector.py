@@ -32,7 +32,8 @@ class PropertiesCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no resources')
             return
 
-        metrics = self.generate_metrics(label_names=self.label_names)
+        # stat_key_index is only needed by StatsCollector; properties do not normalise statKeys.
+        metrics, _ = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding, response_time = self.vrops.get_latest_properties_multiple(self.target,
                                                                                           token,
