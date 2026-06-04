@@ -222,6 +222,11 @@ class TestCollectors(unittest.TestCase):
             data = r.read().decode()
             data_array = data.split('\n')
             metrics = set()
+            # Track every "<name>{<labels>}" series we have seen in the scrape
+            # so we can detect duplicate samples that share an identical label
+            # set but carry different values.
+            # Avoids dropping samples in Prometheus.
+            series_lines = dict()
             for entry in data_array:
                 if entry.startswith('#'):
                     continue
@@ -234,7 +239,34 @@ class TestCollectors(unittest.TestCase):
                 split_entry = entry.split("}")
                 if len(split_entry) != 2:
                     continue
-                metrics.add(split_entry[0] + "}")
+                series = split_entry[0] + "}"
+                metrics.add(series)
+                # Bucket sample lines by their `<name>{<labels>}` series. If
+                # the collector emits the same series twice in one scrape we
+                # will catch it here regardless of whether the values match.
+                series_lines.setdefault(series, []).append(entry)
+
+            duplicate_series = {s: lines for s, lines in series_lines.items() if len(lines) > 1}
+            if duplicate_series:
+                max_shown = 10
+                items = list(duplicate_series.items())
+                blocks = []
+                for series, samples in items[:max_shown]:
+                    sample_lines = "\n".join(f"      {s}" for s in samples)
+                    blocks.append(f"  - {series}\n{sample_lines}")
+                trailer = ""
+                if len(items) > max_shown:
+                    trailer = f"\n  ... and {len(items) - max_shown} more"
+                shown = f" (showing first {max_shown})" if len(items) > max_shown else ""
+                msg = (f"{collector}: exporter emitted duplicate samples for "
+                       f"the same labelset in a single scrape. Prometheus v3 "
+                       f"drops these as 'different value but same timestamp'. "
+                       f"{len(items)} offending series{shown}:\n"
+                       + "\n".join(blocks) + trailer)
+                # Disable longMessage so assertFalse does not prefix the
+                # custom msg with a multi-kilobyte repr of the duplicate dict.
+                self.longMessage = False
+                self.assertFalse(duplicate_series, msg=msg)
 
             metrics_yaml_list = self.metrics_yaml[collector]
             self.assertTrue(metrics_yaml_list, msg=collector + " has no metrics defined, FIX IT!")
