@@ -343,7 +343,7 @@ class BaseCollector(ABC):
         gauge.add_metric(labels=[self.target, collector.lower()], value=number_of_resources)
         return gauge
 
-    def generate_metrics(self, label_names: list) -> dict:
+    def generate_metrics(self, label_names: list) -> tuple:
         collector_config = self.read_collector_config()
         metrics = {}
         for m in collector_config.get(self.name, {}):
@@ -359,7 +359,13 @@ class BaseCollector(ABC):
             }
         if not metrics:
             logger.error(f'Cannot find {self.name} in collector_config')
-        return metrics
+
+        # Build a second lookup that uses the same key shape StatsCollector sees from
+        # the API. Without it, config keys that contain ':', '/', or digits never
+        # match the API key, get treated as unknown, and end up exported a second time
+        # under the same gauge name - which is a duplicate in Prometheu
+        stat_key_index = {re.sub("[^a-zA-Z|_ -]+", "", raw_key): raw_key for raw_key in metrics}
+        return metrics, stat_key_index
 
     def generate_metrics_enriched_by_api(self, no_match_in_config: list, label_names: list) -> dict:
         gauges = dict()

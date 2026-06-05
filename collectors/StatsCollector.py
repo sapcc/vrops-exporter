@@ -28,7 +28,7 @@ class StatsCollector(BaseCollector):
             logger.warning(f'skipping {self.target} in {self.name}, no resources')
             return
 
-        metrics = self.generate_metrics(label_names=self.label_names)
+        metrics, stat_key_index = self.generate_metrics(label_names=self.label_names)
         project_ids = self.get_project_ids_by_target() if self.project_ids else []
         values, api_responding, response_time = self.vrops.get_latest_stats_multiple(self.target,
                                                                                      token,
@@ -61,8 +61,9 @@ class StatsCollector(BaseCollector):
 
                 metric_data = value_entry.get('data', [0])[0]
 
-                if norm_statkey in metrics:
-                    if metrics[norm_statkey].get('disk_instance'):
+                if norm_statkey in stat_key_index:
+                    raw_key = stat_key_index[norm_statkey]
+                    if metrics[raw_key].get('disk_instance'):
                         # Extract disk index from original statkey (e.g. diskspace:0|perDsUsed -> '0').
                         # Falls back to 'total' for non-instanced statkeys: vROps reports the VM-wide
                         # rollup as e.g. diskspace|perDsUsed without an instance suffix.
@@ -82,7 +83,7 @@ class StatsCollector(BaseCollector):
                         sample_labels = labels + [disk_index]
                     else:
                         sample_labels = labels
-                    metrics[norm_statkey]['gauge'].add_metric(labels=sample_labels, value=metric_data)
+                    metrics[raw_key]['gauge'].add_metric(labels=sample_labels, value=metric_data)
                 else:
                     no_match_in_config.append([statkey, metric_data, labels])
 
